@@ -25,3 +25,15 @@ proguard/
 
 # Log Files
 *.log
+
+# IntelliJ files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# .bat files
+*.bat
+
+# assets
+/*/proguard*
