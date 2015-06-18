@@ -1,12 +1,3 @@
-/**
- * Copyright (C) 2014 Sabre Polska, All rights reserved.
- * <p/>
- * This software is the confidential and proprietary product of Sabre Polska.
- * Any unauthorized use, reproduction, or transfer of this software is strictly
- * prohibited.
- * <p/>
- * Created by: SG0219926
- */
 package com.fteams.siftrain.util;
 
 public class SongUtils {
