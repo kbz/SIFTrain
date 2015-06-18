@@ -34,3 +34,4 @@ proguard/
 
 # assets
 /*/proguard*
+/*/assets/
