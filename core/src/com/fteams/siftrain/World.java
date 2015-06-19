@@ -35,6 +35,8 @@ public class World {
     public boolean processed;
     public CircleMark.Accuracy accuracy;
     public boolean started;
+    public int offsetX;
+    public int offsetY;
 
     private List<Float> accuracyMarks;
 
@@ -86,9 +88,11 @@ public class World {
         paused = false;
     }
 
-    public void setSize(int width, int height) {
+    public void setSize(int width, int height, int offsetX, int offsetY) {
         this.width = width;
         this.height = height;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
     }
 
     public Array<CircleMark> getMarks() {

@@ -183,8 +183,8 @@ public class WorldController implements Music.OnCompletionListener {
                 }
             }
         }
-        float centerX = width / 2;
-        float centerY = height * 0.25f;
+        float centerX = world.offsetX + width / 2;
+        float centerY = world.offsetY + height * 0.25f;
 
         float relativeX = (screenX - centerX) / ppuX;
         float relativeY = (-screenY + centerY) / ppuY;
@@ -301,8 +301,8 @@ public class WorldController implements Music.OnCompletionListener {
 
     public void released(int screenX, int screenY, int pointer, int button, float ppuX, float ppuY, int width, int height) {
 
-        float centerX = width / 2;
-        float centerY = height * 0.25f;
+        float centerX = world.offsetX + width / 2;
+        float centerY = world.offsetY + height * 0.25f;
 
         float relativeX = (screenX - centerX) / ppuX;
         float relativeY = (-screenY + centerY) / ppuY;
@@ -397,8 +397,7 @@ public class WorldController implements Music.OnCompletionListener {
     public void back() {
         if (world.started) {
             world.paused = true;
-            if (music != null)
-            {
+            if (music != null) {
                 music.pause();
             }
         }

@@ -1,6 +1,5 @@
 package com.fteams.siftrain.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -38,8 +37,25 @@ public class SongScreen implements Screen, InputProcessor {
 
     @Override
     public void resize(int width, int height) {
-        renderer.setSize(width, height);
-        world.setSize(width, height);
+        // use height as base and force a 3:2 ratio
+        int originalWidth = width;
+        int newWidth = height * 3 / 2;
+
+        int originalHeight = height;
+        int newHeight = width * 2 / 3;
+
+        // check which side should be shortened
+        if (newWidth > width)
+        {
+            height = newHeight;
+        }
+        else
+        {
+            width = newWidth;
+        }
+
+        renderer.setSize(width, height, (originalWidth - width) / 2, (originalHeight - height)/2);
+        world.setSize(width, height, (originalWidth - width) /2, (originalHeight - height)/2);
         this.width = width;
         this.height = height;
     }

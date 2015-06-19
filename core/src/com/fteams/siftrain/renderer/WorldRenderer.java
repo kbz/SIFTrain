@@ -75,14 +75,18 @@ public class WorldRenderer {
 
     private int width;
     private int height;
+    private int positionOffsetX;
+    private int positionOffsetY;
     // pixels per unit on X
     public float ppuX;
     // pixels per unit on Y
     public float ppuY;
 
-    public void setSize(int w, int h) {
+    public void setSize(int w, int h, int offsetX, int offsetY) {
         this.width = w;
         this.height = h;
+        this.positionOffsetX = offsetX;
+        this.positionOffsetY = offsetY;
         ppuX = (float) width / CAMERA_WIDTH;
         ppuY = (float) height / CAMERA_HEIGHT;
     }
@@ -161,8 +165,8 @@ public class WorldRenderer {
 
     private void drawAccuracyBar() {
         // draw the background (bad level)
-        float centerX = 200;
-        float y = height - height * 0.1f;
+        float centerX = this.positionOffsetX + 200;
+        float y = this.positionOffsetY + height - height * 0.1f;
         float zone = (float) (Assets.selectedSong.song_info[0].notes_speed / 2);
         float offset = GlobalConfiguration.offset / 1000f;
 
@@ -184,24 +188,24 @@ public class WorldRenderer {
 
     private void drawTapToBeginMessage() {
         String tapToBegin = "Tap to begin!";
-        float centerX = width / 2;
-        float centerY = height / 2 + height * 0.15f;
+        float centerX = this.positionOffsetX + width / 2;
+        float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
         layout.setText(font, tapToBegin);
         font.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
     }
 
     private void drawTapToContinue() {
         String tapToBegin = "Tap to continue!";
-        float centerX = width / 2;
-        float centerY = height / 2 + height * 0.15f;
+        float centerX = this.positionOffsetX + width / 2;
+        float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
         layout.setText(font, tapToBegin);
         font.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
     }
 
 
     private void drawProgressBar() {
-        float centerX = 0;
-        float centerY = height - height * 0.07f;
+        float centerX = this.positionOffsetX;
+        float centerY = this.positionOffsetY +height - height * 0.07f;
         float progress = (1.0f * world.score) / (world.sScore * 1.0f);
         if (progress >= 1f)
             progress = 1f;
@@ -213,28 +217,28 @@ public class WorldRenderer {
         } else {
             progress = (1.0f * (world.score > world.sScore ? world.sScore : world.score)) / (world.sScore * 1.0f);
         }
-        spriteBatch.draw(nicoKnob, progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
+        spriteBatch.draw(nicoKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
         // B -> A -- Umi
         if (world.score < world.bScore) {
             progress = (1.0f * world.bScore) / (world.sScore * 1.0f);
         } else {
             progress = (1.0f * (world.score > world.aScore ? world.aScore : world.score)) / (world.sScore * 1.0f);
         }
-        spriteBatch.draw(umiKnob, progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
+        spriteBatch.draw(umiKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
         // C - > B -- Rin
         if (world.score < world.cScore) {
             progress = (1.0f * world.cScore) / (world.sScore * 1.0f);
         } else {
             progress = (1.0f * (world.score > world.bScore ? world.bScore : world.score)) / (world.sScore * 1.0f);
         }
-        spriteBatch.draw(rinKnob, progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
+        spriteBatch.draw(rinKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
         // No -> C -- Nozomi
         if (world.score < world.cScore) {
             progress = (1.0f * world.score) / (world.sScore * 1.0f);
         } else {
             progress = (1.0f * world.cScore) / (world.sScore * 1.0f);
         }
-        spriteBatch.draw(nonTanKnob, progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
+        spriteBatch.draw(nonTanKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
     }
 
     private TextureRegion selectTextureForProgressBar() {
@@ -254,8 +258,8 @@ public class WorldRenderer {
     }
 
     private void drawAccuracy() {
-        float centerX = width / 2;
-        float centerY = height / 2 + height * 0.15f;
+        float centerX = this.positionOffsetX + width / 2;
+        float centerY = this.positionOffsetY +height / 2 + height * 0.15f;
         if (world.accuracy != CircleMark.Accuracy.NONE) {
             layout.setText(font, "" + world.accuracy);
             font.draw(spriteBatch, "" + world.accuracy, centerX - layout.width / 2, centerY - layout.height / 2);
@@ -263,7 +267,7 @@ public class WorldRenderer {
     }
 
     private void drawCombo() {
-        float centerX = width / 2;
+        float centerX = this.positionOffsetX + width / 2;
         float centerY = height / 2;
         if (world.combo != 0) {
             layout.setText(font, "" + world.combo);
@@ -272,7 +276,7 @@ public class WorldRenderer {
     }
 
     private void drawScore() {
-        float centerX = width / 2;
+        float centerX = this.positionOffsetX + width / 2;
         float centerY = height - height * 0.15f;
         String text = world.score + "";
         layout.setText(font, text);
@@ -285,8 +289,8 @@ public class WorldRenderer {
 
 
     private void drawTapZones() {
-        float centerX = width / 2;
-        float centerY = height - height * 0.25f;
+        float centerX = this.positionOffsetX + width / 2;
+        float centerY = this.positionOffsetY +height - height * 0.25f;
         float size = height * 0.2f;
         for (TapZone tapZone : world.getZones()) {
 
@@ -303,8 +307,8 @@ public class WorldRenderer {
     }
 
     private void drawCircles() {
-        float centerX = width / 2;
-        float centerY = height - height * 0.25f;
+        float centerX = this.positionOffsetX + width / 2;
+        float centerY = this.positionOffsetY + height - height * 0.25f;
         float size = height * 0.2f;
         for (CircleMark mark : world.getMarks()) {
             if (mark.isHold()) {
