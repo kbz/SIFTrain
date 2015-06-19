@@ -55,9 +55,11 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                     Assets.music.dispose();
                 }
                 Assets.music = SongLoader.loadSongFile(thisList.getSelected().getResourceName());
-                Assets.music.setLooping(true);
-                Assets.music.setVolume(GlobalConfiguration.songVolume / 100f);
-                Assets.music.play();
+                if (Assets.music != null) {
+                    Assets.music.setLooping(true);
+                    Assets.music.setVolume(GlobalConfiguration.songVolume / 100f);
+                    Assets.music.play();
+                }
             }
         });
         if (Assets.selectedSong != null) {

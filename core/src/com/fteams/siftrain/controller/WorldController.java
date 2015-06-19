@@ -70,7 +70,9 @@ public class WorldController implements Music.OnCompletionListener {
         Results.score = world.score;
         Results.accuracy = calculateAccuracy();
         Results.normalizedAccuracy = calculateNormalizedAccuracy();
-        music.dispose();
+        if (music != null) {
+            music.dispose();
+        }
         marks.clear();
         tapZones.clear();
         ((Game) Gdx.app.getApplicationListener()).setScreen(new ResultsScreen());
@@ -166,15 +168,19 @@ public class WorldController implements Music.OnCompletionListener {
 
         if (!world.started) {
             music = world.getMusic();
-            music.setLooping(false);
-            music.setOnCompletionListener(this);
-            music.setVolume(GlobalConfiguration.songVolume / 100f);
-            music.play();
+            if (music != null) {
+                music.setLooping(false);
+                music.setOnCompletionListener(this);
+                music.setVolume(GlobalConfiguration.songVolume / 100f);
+                music.play();
+            }
             world.started = true;
         } else {
             if (world.paused) {
                 world.paused = false;
-                music.play();
+                if (music != null) {
+                    music.play();
+                }
             }
         }
         float centerX = width / 2;
@@ -340,8 +346,12 @@ public class WorldController implements Music.OnCompletionListener {
         showTime -= delta;
         if (showTime <= 0) {
             int sum = 0;
+            boolean done = true;
             boolean acted = false;
             for (CircleMark mark : marks) {
+                if (!mark.isDone()) {
+                    done = false;
+                }
                 if (!mark.getState(CircleMark.State.PROCESSED) && mark.isDone()) {
                     mark.setState(CircleMark.State.PROCESSED, true);
                     if (!mark.isHold()) {
@@ -372,13 +382,18 @@ public class WorldController implements Music.OnCompletionListener {
                 }
             }
             world.processed = !acted;
+            if (done) {
+                this.done = true;
+            }
             if (acted) {
                 world.setLastBatch(sum);
                 world.score += sum;
                 world.combo = combo;
                 showTime = (float) (Assets.selectedSong.song_info[0].notes_speed * 0.1875f);
-                ;
             }
+        }
+        if (done && music == null) {
+            this.onCompletion(null);
         }
     }
 

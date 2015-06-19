@@ -25,7 +25,7 @@ public class SongLoader {
                     handle = Gdx.files.absolute(path + SONGFILE_MP3);
                     return Gdx.audio.newMusic(handle);
                 } catch (Exception e3) {
-                    throw e3;
+                    return null;
                 }
             }
         }
