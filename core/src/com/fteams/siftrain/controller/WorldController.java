@@ -382,8 +382,8 @@ public class WorldController implements Music.OnCompletionListener {
                 }
             }
             world.processed = !acted;
-            if (done) {
-                this.done = true;
+            if (done && music == null) {
+                this.onCompletion(null);
             }
             if (acted) {
                 world.setLastBatch(sum);
@@ -391,9 +391,6 @@ public class WorldController implements Music.OnCompletionListener {
                 world.combo = combo;
                 showTime = (float) (Assets.selectedSong.song_info[0].notes_speed * 0.1875f);
             }
-        }
-        if (done && music == null) {
-            this.onCompletion(null);
         }
     }
 
