@@ -397,7 +397,10 @@ public class WorldController implements Music.OnCompletionListener {
     public void back() {
         if (world.started) {
             world.paused = true;
-            music.pause();
+            if (music != null)
+            {
+                music.pause();
+            }
         }
     }
 

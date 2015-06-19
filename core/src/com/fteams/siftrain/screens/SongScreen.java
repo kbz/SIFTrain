@@ -74,7 +74,6 @@ public class SongScreen implements Screen, InputProcessor {
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.BACK) {
             // do nothing
-            System.out.println("Pressed back!");
             controller.back();
             return true;
         }
