@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -46,10 +45,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     private Label pathValueLabel = new Label(GlobalConfiguration.pathToBeatmaps, Assets.menuSkin, "song_style_result");
 
-    private Button returnButton = new TextButton("Return to Main Menu", Assets.menuSkin, "item1");
+    private TextButton returnButton = new TextButton("Return to Main Menu", Assets.menuSkin, "item1");
 
     @Override
     public void show() {
+        float fontScale = stage.getHeight() / GlobalConfiguration.BASE_HEIGHT;
         splashImage.setSize(stage.getWidth(), stage.getHeight());
         stage.addActor(splashImage);
 
@@ -84,35 +84,43 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         teamSrengthSlider.setY(stage.getHeight() / 2 - stage.getHeight() * 0.10f + teamSrengthSlider.getHeight() / 2);
         teamSrengthSlider.setValue(GlobalConfiguration.teamStrength);
         teamSrengthSlider.addListener(this);
-
-        titleLabel.setX(stage.getWidth() / 2 - titleLabel.getWidth() / 2);
-        titleLabel.setY(stage.getHeight() - stage.getHeight() * 0.2f);
-
         stage.addActor(titleLabel);
 
         songVolumeLabel.setX(songVolumeSlider.getX());
         songVolumeLabel.setY(songVolumeSlider.getY() + songVolumeSlider.getHeight());
+        songVolumeLabel.setFontScale(fontScale);
         songVolumeValueLabel = new Label(Integer.toString(GlobalConfiguration.songVolume), Assets.menuSkin, "song_style_result");
-        songVolumeValueLabel.setX(songVolumeSlider.getX() + songVolumeSlider.getWidth() - songVolumeValueLabel.getWidth());
+        songVolumeValueLabel.setX(songVolumeSlider.getX() + songVolumeSlider.getWidth() - songVolumeValueLabel.getWidth() * fontScale);
         songVolumeValueLabel.setY(songVolumeSlider.getY() + songVolumeSlider.getHeight());
+        songVolumeValueLabel.setFontScale(fontScale);
+
+        titleLabel.setX(stage.getWidth() / 2 - fontScale * titleLabel.getWidth() / 2);
+        titleLabel.setY(songVolumeLabel.getY() + songVolumeLabel.getHeight()*fontScale);
+        titleLabel.setFontScale(fontScale);
 
         feedbackVolumeLabel.setX(feedbackVolumeSlider.getX());
         feedbackVolumeLabel.setY(feedbackVolumeSlider.getY() + feedbackVolumeSlider.getHeight());
+        feedbackVolumeLabel.setFontScale(fontScale);
         feedbackVolumeValueLabel = new Label(Integer.toString(GlobalConfiguration.feedbackVolume), Assets.menuSkin, "song_style_result");
-        feedbackVolumeValueLabel.setX(feedbackVolumeSlider.getX() + feedbackVolumeSlider.getWidth() - feedbackVolumeValueLabel.getWidth());
+        feedbackVolumeValueLabel.setX(feedbackVolumeSlider.getX() + feedbackVolumeSlider.getWidth() - feedbackVolumeValueLabel.getWidth() * fontScale);
         feedbackVolumeValueLabel.setY(feedbackVolumeSlider.getY() + feedbackVolumeSlider.getHeight());
+        feedbackVolumeValueLabel.setFontScale(fontScale);
 
         offsetLabel.setX(offsetSlider.getX());
         offsetLabel.setY(offsetSlider.getY() + offsetSlider.getHeight());
+        offsetLabel.setFontScale(fontScale);
         offsetValueLabel = new Label((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.", Assets.menuSkin, "song_style_result");
-        offsetValueLabel.setX(offsetSlider.getX() + offsetSlider.getWidth() - offsetValueLabel.getWidth());
+        offsetValueLabel.setX(offsetSlider.getX() + offsetSlider.getWidth() - offsetValueLabel.getWidth() * fontScale);
         offsetValueLabel.setY(offsetSlider.getY() + offsetSlider.getHeight());
+        offsetValueLabel.setFontScale(fontScale);
 
         teamStrengthLabel.setX(teamSrengthSlider.getX());
         teamStrengthLabel.setY(teamSrengthSlider.getY() + teamSrengthSlider.getHeight());
+        teamStrengthLabel.setFontScale(fontScale);
         teamStrengthValueLabel = new Label(Integer.toString(GlobalConfiguration.teamStrength), Assets.menuSkin, "song_style_result");
-        teamStrengthValueLabel.setX(teamSrengthSlider.getX() + teamSrengthSlider.getWidth() - teamStrengthValueLabel.getWidth());
+        teamStrengthValueLabel.setX(teamSrengthSlider.getX() + teamSrengthSlider.getWidth() - teamStrengthValueLabel.getWidth() * fontScale);
         teamStrengthValueLabel.setY(teamSrengthSlider.getY() + teamSrengthSlider.getHeight());
+        teamStrengthValueLabel.setFontScale(fontScale);
 
         stage.addActor(songVolumeLabel);
         stage.addActor(feedbackVolumeLabel);
@@ -133,13 +141,16 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         returnButton.setHeight(stage.getHeight() * 0.2f);
         returnButton.setX(stage.getWidth() / 2 - returnButton.getWidth() / 2);
         returnButton.setY(stage.getHeight() * 0.1f);
+        returnButton.getLabel().setFontScale(fontScale);
 
         pathToBeatmaps.setX(offsetSlider.getX());
         pathToBeatmaps.setY(stage.getHeight() / 2 - stage.getHeight() * 0.20f + teamSrengthSlider.getHeight());
+        pathToBeatmaps.setFontScale(fontScale);
         stage.addActor(pathToBeatmaps);
 
-        pathValueLabel.setX(offsetSlider.getX() + offsetSlider.getWidth() - pathValueLabel.getWidth());
+        pathValueLabel.setX(offsetSlider.getX() + offsetSlider.getWidth() - pathValueLabel.getWidth() * fontScale);
         pathValueLabel.setY(stage.getHeight() / 2 - stage.getHeight() * 0.20f + teamSrengthSlider.getHeight());
+        pathValueLabel.setFontScale(fontScale);
 
         stage.addActor(pathValueLabel);
 

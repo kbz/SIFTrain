@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.fteams.siftrain.assets.Assets;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 
 public class MainMenuScreen implements Screen, InputProcessor {
     private Stage stage = new Stage();
@@ -69,11 +70,18 @@ public class MainMenuScreen implements Screen, InputProcessor {
 
         //The elements are displayed in the order you add them.
         //The first appear on top, the last at the bottom.
-        table.add(title).padBottom(40).row();
+        // title font scale = 1 for a 720 height
+        float fontScale = stage.getHeight()/ GlobalConfiguration.BASE_HEIGHT;
 
-        table.add(buttonPlay).size(300, 100).padBottom(20).row();
-        table.add(buttonSettings).size(300, 100).padBottom(20).row();
-        table.add(buttonExit).size(300, 100).padBottom(20).row();
+        title.setFontScale(fontScale);
+        table.add(title).padBottom(stage.getHeight()*0.08f).row();
+
+        buttonPlay.getLabel().setFontScale(fontScale);
+        buttonSettings.getLabel().setFontScale(fontScale);
+        buttonExit.getLabel().setFontScale(fontScale);
+        table.add(buttonPlay).size(stage.getWidth()*0.2f, stage.getHeight()*0.14f).padBottom(stage.getHeight()*0.04f).row();
+        table.add(buttonSettings).size(stage.getWidth()*0.2f, stage.getHeight()*0.14f).padBottom(stage.getHeight()*0.04f).row();
+        table.add(buttonExit).size(stage.getWidth()*0.2f, stage.getHeight()*0.14f).padBottom(stage.getHeight()*0.04f).row();
 
         table.setFillParent(true);
         stage.addActor(table);

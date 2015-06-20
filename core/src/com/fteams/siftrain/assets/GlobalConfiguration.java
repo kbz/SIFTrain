@@ -14,6 +14,8 @@ public class GlobalConfiguration {
     // path to beatmaps
     public static String pathToBeatmaps;
 
+    public final static int BASE_HEIGHT = 1080;
+
     public static void loadConfiguration()
     {
         Preferences prefs = Gdx.app.getPreferences("sif_train_config");

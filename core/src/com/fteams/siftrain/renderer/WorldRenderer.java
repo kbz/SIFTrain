@@ -165,24 +165,24 @@ public class WorldRenderer {
 
     private void drawAccuracyBar() {
         // draw the background (bad level)
-        float centerX = this.positionOffsetX + 200;
+        float centerX = this.positionOffsetX + width/6;
         float y = this.positionOffsetY + height - height * 0.1f;
         float zone = (float) (Assets.selectedSong.song_info[0].notes_speed / 2);
         float offset = GlobalConfiguration.offset / 1000f;
 
-        spriteBatch.draw(accBadBackground, centerX - 200, y, 400f, height * 0.02f);
+        spriteBatch.draw(accBadBackground, centerX - width/(6f), y, width/3f, height * 0.02f);
         // draw the background (good level)
-        spriteBatch.draw(accGoodBackground, centerX - 120, y, 240f, height * 0.02f);
+        spriteBatch.draw(accGoodBackground, centerX - width/10f, y, width/5f, height * 0.02f);
         // draw the background (great level)
-        spriteBatch.draw(accGreatBackground, centerX - 60, y, 120f, height * 0.02f);
+        spriteBatch.draw(accGreatBackground, centerX - width/20f, y, width/10f, height * 0.02f);
         // draw the background (perfect level)
-        spriteBatch.draw(accPerfectBackground, centerX - 28, y, 56f, height * 0.02f);
+        spriteBatch.draw(accPerfectBackground, centerX - 7f*width/300f, y, 7f*width/150f, height * 0.02f);
         // draw each of the 'markers'
         for (Float accMarker : world.getAccuracyMarks()) {
             if (Math.abs(accMarker + offset) > zone)
                 continue;
 
-            spriteBatch.draw(accHitMark, centerX - (accMarker + offset) * 200 / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
+            spriteBatch.draw(accHitMark, centerX - (accMarker + offset) * (width/6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
         }
     }
 

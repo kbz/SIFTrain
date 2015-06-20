@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.fteams.siftrain.assets.Assets;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
 
 public class ResultsScreen implements Screen, InputProcessor {
@@ -50,14 +51,15 @@ public class ResultsScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
+        // title font scale = 1 for a 720 height
+        float fontScale = stage.getHeight()/ GlobalConfiguration.BASE_HEIGHT;
 
         splashImage.setHeight(stage.getHeight());
         splashImage.setWidth(stage.getWidth());
         stage.addActor(splashImage);
         titleLabel.setX(stage.getWidth() / 2 - titleLabel.getWidth() / 2);
         titleLabel.setY(stage.getHeight() - stage.getHeight() * 0.3f);
-
-        stage.addActor(titleLabel);
+        titleLabel.setFontScale(fontScale);
 
         table.setFillParent(true);
         scoreResultLabel = new Label(Integer.toString(Results.score), Assets.menuSkin, "song_style_result_values");
@@ -73,10 +75,42 @@ public class ResultsScreen implements Screen, InputProcessor {
         perfectResultLabel = new Label(Integer.toString(Results.perfects), Assets.menuSkin, "song_style_result_values");
         comboResultLabel = new Label(Integer.toString(Results.combo) + (Results.combo == Assets.selectedSong.song_info[0].notes.length ? (Results.bads > 0 || Results.goods > 0 ? "(fake FC)" : " (FC)") : ""), Assets.menuSkin, "song_style_result_values");
 
-        table.add(new Label(Assets.selectedSong.toString(), Assets.menuSkin, "song_result_song_title")).colspan(3).padBottom(stage.getHeight() * 0.15f).row();
-        table.add(scoreLabel).padTop(stage.getHeight() * 0.18f).fillX();
-        table.add().width(stage.getWidth() * 0.2f).padTop(stage.getHeight() * 0.18f);
-        table.add(scoreResultLabel).padTop(stage.getHeight() * 0.18f).fillX().row();
+        scoreResultLabel.setFontScale(fontScale);
+        accuracyResultLabel.setFontScale(fontScale);
+        accuracyRangeResultLabel.setFontScale(fontScale);
+        normalizedAccuracyResultLabel.setFontScale(fontScale);
+        unstableRatingValueLabel.setFontScale(fontScale);
+        rankResultLabel.setFontScale(fontScale);
+        missResultLabel.setFontScale(fontScale);
+        badResultLabel.setFontScale(fontScale);
+        goodResultLabel.setFontScale(fontScale);
+        greatResultLabel.setFontScale(fontScale);
+        perfectResultLabel.setFontScale(fontScale);
+        comboResultLabel.setFontScale(fontScale);
+
+        scoreLabel.setFontScale(fontScale);
+        rankLabel.setFontScale(fontScale);
+        comboLabel.setFontScale(fontScale);
+        normalizedAccuracyLabel.setFontScale(fontScale);
+        accuracyLabel.setFontScale(fontScale);
+        accuracyRangeLabel.setFontScale(fontScale);
+        unstableRatingLabel.setFontScale(fontScale);
+
+        perfectLabel.setFontScale(fontScale);
+        greatLabel.setFontScale(fontScale);
+        goodLabel.setFontScale(fontScale);
+        badLabel.setFontScale(fontScale);
+        missLabel.setFontScale(fontScale);
+
+        Label songResultTitle = new Label(Assets.selectedSong.toString(), Assets.menuSkin, "song_result_song_title");
+        songResultTitle.setFontScale(fontScale);
+
+
+        table.add(songResultTitle).colspan(3).row();
+        table.add(titleLabel).colspan(3).padBottom(stage.getHeight() * 0.1f).row();
+        table.add(scoreLabel).fillX();
+        table.add().width(stage.getWidth() * 0.2f);
+        table.add(scoreResultLabel).fillX().row();
         table.add(rankLabel).fillX();
         table.add().width(stage.getWidth() * 0.2f);
         table.add(rankResultLabel).fillX().row();

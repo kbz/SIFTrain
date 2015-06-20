@@ -32,18 +32,24 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private List<SimpleSong> songList = new List<>(Assets.menuSkin);
     private ScrollPane songListPane = new ScrollPane(null, Assets.menuSkin);
     private Table table = new Table();
-    private Button nextButton = new TextButton("Next", Assets.menuSkin, "item1");
-    private Button backButton = new TextButton("Back", Assets.menuSkin, "item1");
+    private TextButton nextButton = new TextButton("Next", Assets.menuSkin, "item1");
+    private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
 
     @Override
     public void show() {
+        float scaleFactor = stage.getHeight()/GlobalConfiguration.BASE_HEIGHT;
         //The elements are displayed in the order you add them.
         //The first appear on top, the last at the bottom.
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
         stage.addActor(backgroundImage);
 
         songList.setItems((Array) Assets.songList);
+        songList.setSelectedIndex(0);
+
+        nextButton.getLabel().setFontScale(scaleFactor);
+        backButton.getLabel().setFontScale(scaleFactor);
+
         songList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -159,6 +165,12 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.BACK) {
+            if (Assets.music != null) {
+                if (Assets.music.isPlaying()) {
+                    Assets.music.stop();
+                }
+                Assets.music.dispose();
+            }
             Assets.setSelectedSong(songList.getSelected());
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             // do nothing

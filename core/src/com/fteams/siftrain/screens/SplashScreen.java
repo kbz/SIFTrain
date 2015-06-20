@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -52,18 +53,20 @@ public class SplashScreen implements Screen {
 
     @Override
     public void show() {
-
-        loadingProgress.setSize(stage.getWidth(), stage.getHeight() * 0.07f);
-        loadingProgress.setAnimateDuration(2);
-        stage.addActor(splashImage);
-        stage.addActor(loadingProgress);
-        splashImage.setX(stage.getWidth() / 2 - splashImage.getWidth() / 2);
-
         float sourceHeight = texture.getHeight();
         float targetHeight = stage.getHeight();
         float scale = targetHeight / sourceHeight;
 
         splashImage.setScale(scale);
+        splashImage.setX(stage.getWidth()/2 - (scale * splashImage.getWidth())/2);
+
+        loadingProgress.setSize(stage.getWidth(), stage.getHeight() * 0.07f);
+        loadingProgress.setAnimateDuration(2);
+
+        stage.addActor(splashImage);
+        stage.addActor(loadingProgress);
+
+        //splashImage.setX(stage.getWidth() / 2 - width / 2);
         splashImage.addAction(Actions.sequence(Actions.alpha(0)
                 , Actions.fadeIn(0.75f), Actions.delay(1.5f), Actions.run(new Runnable() {
             @Override
