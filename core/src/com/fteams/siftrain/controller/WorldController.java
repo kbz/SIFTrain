@@ -13,7 +13,9 @@ import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.screens.ResultsScreen;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WorldController implements Music.OnCompletionListener {
     private World world;
@@ -164,6 +166,7 @@ public class WorldController implements Music.OnCompletionListener {
         return (float) Math.sqrt(sum / (values.size() - skipped - 1));
     }
 
+    Map<Integer, Integer> pointerToZoneId = new HashMap<>();
     public void pressed(int screenX, int screenY, int pointer, int button, float ppuX, float ppuY, int width, int height) {
 
         if (!world.started) {
@@ -189,16 +192,24 @@ public class WorldController implements Music.OnCompletionListener {
         float relativeX = (screenX - centerX) / ppuX;
         float relativeY = (-screenY + centerY) / ppuY;
 
+        float circleRadius = 400 * 0.1f;
+        float relativeDistance = (float) Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+        float relativeAngle = (float)Math.acos(relativeX/relativeDistance);
+
         int matchedId = -1;
         for (TapZone zone : tapZones) {
             float x = zone.getPosition().x;
             float y = zone.getPosition().y;
-            float x2 = (relativeX - x) * (relativeX - x);
-            float y2 = (relativeY - y) * (relativeY - y);
-            float diff = (float) Math.sqrt(x2 + y2);
-            if (diff < 400 * 0.11f) {
-                matchedId = zone.getId();
-                zone.setState(TapZone.State.STATE_PRESSED, true);
+            float tapZoneDistance = (float) Math.sqrt(x * x + y * y);
+            if (tapZoneDistance - circleRadius * 2 < relativeDistance && relativeDistance < tapZoneDistance + circleRadius * 2)
+            {
+                float tapAngle = (float)Math.acos(x/tapZoneDistance);
+                if (tapAngle - Math.PI/16 < relativeAngle && relativeAngle < tapAngle + Math.PI/16 && relativeY < circleRadius)
+                {
+                    matchedId = zone.getId();
+                    zone.setState(TapZone.State.STATE_PRESSED, true);
+                    pointerToZoneId.put(pointer, matchedId);
+                }
             }
         }
         if (matchedId == -1) {
@@ -300,21 +311,12 @@ public class WorldController implements Music.OnCompletionListener {
     }
 
     public void released(int screenX, int screenY, int pointer, int button, float ppuX, float ppuY, int width, int height) {
-
-        float centerX = world.offsetX + width / 2;
-        float centerY = world.offsetY + height * 0.25f;
-
-        float relativeX = (screenX - centerX) / ppuX;
-        float relativeY = (-screenY + centerY) / ppuY;
         int matchedId = -1;
         for (TapZone zone : tapZones) {
-            float x = zone.getPosition().x;
-            float y = zone.getPosition().y;
-            float x2 = (relativeX - x) * (relativeX - x);
-            float y2 = (relativeY - y) * (relativeY - y);
-            float diff = (float) Math.sqrt(x2 + y2);
-            if (diff < 400 * 0.11f) {
+            if (zone.getId().equals(pointerToZoneId.get(pointer)))
+            {
                 matchedId = zone.getId();
+                pointerToZoneId.remove(pointer);
                 zone.setState(TapZone.State.STATE_PRESSED, false);
             }
         }
