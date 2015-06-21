@@ -58,10 +58,10 @@ public class SplashScreen implements Screen {
         float scale = targetHeight / sourceHeight;
 
         splashImage.setScale(scale);
-        splashImage.setX(stage.getWidth()/2 - (scale * splashImage.getWidth())/2);
+        splashImage.setX(stage.getWidth() / 2 - (scale * splashImage.getWidth()) / 2);
 
-        loadingProgress.setSize(stage.getWidth()*0.7f, stage.getHeight() * 0.07f);
-        loadingProgress.setX(stage.getWidth()*0.15f);
+        loadingProgress.setSize(scale * splashImage.getWidth() * 0.7f, stage.getHeight() * 0.07f);
+        loadingProgress.setX(splashImage.getX() + scale * splashImage.getWidth() * 0.15f);
         loadingProgress.setY(stage.getHeight()*0.2f);
         loadingProgress.setAnimateDuration(0.01f);
 

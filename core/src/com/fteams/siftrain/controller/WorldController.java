@@ -398,6 +398,12 @@ public class WorldController implements Music.OnCompletionListener {
 
     public void back() {
         if (world.started) {
+            // if the game was paused and we pressed back again, we skip to the results screen
+            if (world.paused)
+            {
+                this.onCompletion(this.music);
+                return;
+            }
             world.paused = true;
             if (music != null) {
                 music.pause();

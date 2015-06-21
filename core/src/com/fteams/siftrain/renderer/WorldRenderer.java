@@ -156,7 +156,10 @@ public class WorldRenderer {
         drawCircles();
         drawScore();
         drawCombo();
-        drawAccuracy();
+        if (!world.paused)
+        {
+            drawAccuracy();
+        }
         drawProgressBar();
         drawAccuracyBar();
         renderer.end();
@@ -168,7 +171,6 @@ public class WorldRenderer {
         float centerX = this.positionOffsetX + width / 6;
         float y = this.positionOffsetY + height - height * 0.1f;
         float zone = (float) (Assets.selectedSong.song_info[0].notes_speed / 2);
-        float offset = GlobalConfiguration.offset / 1000f;
 
         spriteBatch.draw(accBadBackground, centerX - width / (6f), y, width / 3f, height * 0.02f);
         // draw the background (good level)
@@ -179,10 +181,10 @@ public class WorldRenderer {
         spriteBatch.draw(accPerfectBackground, centerX - 7f * width / 300f, y, 7f * width / 150f, height * 0.02f);
         // draw each of the 'markers'
         for (Float accMarker : world.getAccuracyMarks()) {
-            if (Math.abs(accMarker + offset) > zone)
+            if (Math.abs(accMarker) > zone)
                 continue;
 
-            spriteBatch.draw(accHitMark, centerX - (accMarker + offset) * (width / 6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
+            spriteBatch.draw(accHitMark, centerX - (accMarker) * (width / 6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
         }
     }
 
@@ -200,6 +202,12 @@ public class WorldRenderer {
         float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
         layout.setText(font, tapToBegin);
         font.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
+
+        String backToExit = "Or press back again to skip to the Results screen.";
+        centerX = this.positionOffsetX + width / 2;
+        centerY = this.positionOffsetY + height / 2 + height * 0.1f;
+        layout.setText(font, backToExit);
+        font.draw(spriteBatch, backToExit, centerX - layout.width / 2, centerY - layout.height / 2);
     }
 
 

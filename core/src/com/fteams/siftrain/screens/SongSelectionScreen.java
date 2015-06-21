@@ -45,7 +45,6 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         stage.addActor(backgroundImage);
 
         songList.setItems((Array) Assets.songList);
-        songList.setSelectedIndex(0);
 
         nextButton.getLabel().setFontScale(scaleFactor);
         backButton.getLabel().setFontScale(scaleFactor);
@@ -70,6 +69,9 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         });
         if (Assets.selectedSong != null) {
             songList.setSelected(Assets.selectedSong);
+        } else
+        {
+            songList.setSelected(songList.getItems().size == 0 ? null : songList.getItems().first());
         }
         songListPane.setWidget(songList);
         songListPane.setWidth(stage.getWidth());
