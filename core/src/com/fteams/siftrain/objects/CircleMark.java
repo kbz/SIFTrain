@@ -1,6 +1,7 @@
 package com.fteams.siftrain.objects;
 
 import com.badlogic.gdx.math.Vector2;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.util.SongUtils;
@@ -71,6 +72,7 @@ public class CircleMark {
     private float size2;
 
     public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed) {
+        float timing = (float)(note.timing_sec*1f + GlobalConfiguration.offset/1000f);
         this.position.x = x;
         this.position.y = y;
         this.holdReleasePosition.x = x;
@@ -80,17 +82,17 @@ public class CircleMark {
         // position goes 9-8-...-2-1
         this.destination = note.position - 1;
         this.speed = noteSpeed;
-        this.spawnTime = (float) (note.timing_sec - speed);
-        this.startWaitTime = (float) (note.timing_sec - speed);
-        this.endWaitTime = (float) (note.timing_sec + 0.5f);
-        this.despawnTime = (float) (note.timing_sec * 1.0f);
+        this.spawnTime = (float) (timing - speed);
+        this.startWaitTime = (float) (timing - speed);
+        this.endWaitTime = timing + 0.5f;
+        this.despawnTime = timing * 1.0f;
         this.size = 0.1f;
         this.size2 = 0.1f;
         if (isHold()) {
-            this.holdEndSpawnTime = (float) (note.timing_sec + note.effect_value - speed);
-            this.holdEndStartWaitTime = (float) (note.timing_sec + note.effect_value - speed);
-            this.holdEndEndWaitTime = (float) (note.timing_sec + note.effect_value + 0.5f);
-            this.holdEndDespawnTime = (float) (note.timing_sec + note.effect_value);
+            this.holdEndSpawnTime = (float) (timing + note.effect_value - speed);
+            this.holdEndStartWaitTime = (float) (timing + note.effect_value - speed);
+            this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f);
+            this.holdEndDespawnTime = (float) (timing + note.effect_value);
             calculateHook();
 
         }

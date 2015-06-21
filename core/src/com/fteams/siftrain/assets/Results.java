@@ -17,18 +17,17 @@ public class Results {
     public static float unstableRating;
 
     public static Accuracy getAccuracyFor(float timing, double noteSpeed) {
-        float offset = GlobalConfiguration.offset / 1000f;
         // Perfect
-        if (Math.abs(timing + offset) < noteSpeed * 0.07f) {
+        if (Math.abs(timing) < noteSpeed * 0.07f) {
             return Accuracy.PERFECT;
         }
-        if (Math.abs(timing + offset) < noteSpeed * 0.15f) {
+        if (Math.abs(timing) < noteSpeed * 0.15f) {
             return Accuracy.GREAT;
         }
-        if (Math.abs(timing + offset) < noteSpeed * 0.3f) {
+        if (Math.abs(timing) < noteSpeed * 0.3f) {
             return Accuracy.GOOD;
         }
-        if (Math.abs(timing + offset) < noteSpeed * 0.5f) {
+        if (Math.abs(timing) < noteSpeed * 0.5f) {
             return Accuracy.BAD;
         }
         return Accuracy.MISS;
