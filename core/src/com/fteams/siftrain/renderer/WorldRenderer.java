@@ -55,11 +55,11 @@ public class WorldRenderer {
 
     TextureRegion accHitMark;
 
-    TextureRegion rinKnob;
-    TextureRegion umiKnob;
-    TextureRegion nicoKnob;
-    TextureRegion nonTanKnob;
-    TextureRegion makiKnob;
+    TextureRegion scoreMarker;
+    TextureRegion cRankKnob;
+    TextureRegion bRankKnob;
+    TextureRegion aRankKnob;
+    TextureRegion sRankKnob;
 
     BitmapFont font;
 
@@ -134,11 +134,11 @@ public class WorldRenderer {
         holdBG = new TextureRegion(Assets.holdBG);
         holdBGHolding = new TextureRegion(Assets.holdBGHolding);
 
-        rinKnob = atlas.findRegion("rin_star");
-        umiKnob = atlas.findRegion("umi_star");
-        nicoKnob = atlas.findRegion("nico_star");
-        nonTanKnob = atlas.findRegion("nozomi_star");
-        makiKnob = atlas.findRegion("maki_star");
+        scoreMarker = atlas.findRegion("score_marker");
+        cRankKnob = atlas.findRegion("c_marker");
+        bRankKnob = atlas.findRegion("b_marker");
+        aRankKnob = atlas.findRegion("a_marker");
+        sRankKnob = atlas.findRegion("s_marker");
         font = Assets.font;
     }
 
@@ -165,24 +165,24 @@ public class WorldRenderer {
 
     private void drawAccuracyBar() {
         // draw the background (bad level)
-        float centerX = this.positionOffsetX + width/6;
+        float centerX = this.positionOffsetX + width / 6;
         float y = this.positionOffsetY + height - height * 0.1f;
         float zone = (float) (Assets.selectedSong.song_info[0].notes_speed / 2);
         float offset = GlobalConfiguration.offset / 1000f;
 
-        spriteBatch.draw(accBadBackground, centerX - width/(6f), y, width/3f, height * 0.02f);
+        spriteBatch.draw(accBadBackground, centerX - width / (6f), y, width / 3f, height * 0.02f);
         // draw the background (good level)
-        spriteBatch.draw(accGoodBackground, centerX - width/10f, y, width/5f, height * 0.02f);
+        spriteBatch.draw(accGoodBackground, centerX - width / 10f, y, width / 5f, height * 0.02f);
         // draw the background (great level)
-        spriteBatch.draw(accGreatBackground, centerX - width/20f, y, width/10f, height * 0.02f);
+        spriteBatch.draw(accGreatBackground, centerX - width / 20f, y, width / 10f, height * 0.02f);
         // draw the background (perfect level)
-        spriteBatch.draw(accPerfectBackground, centerX - 7f*width/300f, y, 7f*width/150f, height * 0.02f);
+        spriteBatch.draw(accPerfectBackground, centerX - 7f * width / 300f, y, 7f * width / 150f, height * 0.02f);
         // draw each of the 'markers'
         for (Float accMarker : world.getAccuracyMarks()) {
             if (Math.abs(accMarker + offset) > zone)
                 continue;
 
-            spriteBatch.draw(accHitMark, centerX - (accMarker + offset) * (width/6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
+            spriteBatch.draw(accHitMark, centerX - (accMarker + offset) * (width / 6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
         }
     }
 
@@ -205,40 +205,26 @@ public class WorldRenderer {
 
     private void drawProgressBar() {
         float centerX = this.positionOffsetX;
-        float centerY = this.positionOffsetY +height - height * 0.07f;
+        float centerY = this.positionOffsetY + height - height * 0.07f;
         float progress = (1.0f * world.score) / (world.sScore * 1.0f);
         if (progress >= 1f)
             progress = 1f;
 
-        spriteBatch.draw(selectTextureForProgressBar(), centerX, centerY + height * 0.035f / 2, progress * width, height * 0.035f);
-        // A -> S -- Nico
-        if (world.score < world.aScore) {
-            progress = (1.0f * world.aScore) / (world.sScore * 1.0f);
-        } else {
-            progress = (1.0f * (world.score > world.sScore ? world.sScore : world.score)) / (world.sScore * 1.0f);
-        }
-        spriteBatch.draw(nicoKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
-        // B -> A -- Umi
-        if (world.score < world.bScore) {
-            progress = (1.0f * world.bScore) / (world.sScore * 1.0f);
-        } else {
-            progress = (1.0f * (world.score > world.aScore ? world.aScore : world.score)) / (world.sScore * 1.0f);
-        }
-        spriteBatch.draw(umiKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
-        // C - > B -- Rin
-        if (world.score < world.cScore) {
-            progress = (1.0f * world.cScore) / (world.sScore * 1.0f);
-        } else {
-            progress = (1.0f * (world.score > world.bScore ? world.bScore : world.score)) / (world.sScore * 1.0f);
-        }
-        spriteBatch.draw(rinKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
-        // No -> C -- Nozomi
-        if (world.score < world.cScore) {
+        spriteBatch.draw(selectTextureForProgressBar(), centerX, centerY + height * 0.035f, progress * width, height * 0.025f);
+        // S rank marker
+        spriteBatch.draw(sRankKnob, this.positionOffsetX + width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
+        // A rank marker
+        spriteBatch.draw(aRankKnob, this.positionOffsetX + (1.0f * world.aScore) / (world.sScore * 1.0f) * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
+        // B rank marker
+        spriteBatch.draw(bRankKnob, this.positionOffsetX + (1.0f * world.bScore) / (world.sScore * 1.0f) * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
+        // C rank marker
+        spriteBatch.draw(cRankKnob, this.positionOffsetX + (1.0f * world.cScore) / (world.sScore * 1.0f) * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
+        // No rank marker -> C -- Nozomi
+        if (world.score < world.sScore) {
             progress = (1.0f * world.score) / (world.sScore * 1.0f);
-        } else {
-            progress = (1.0f * world.cScore) / (world.sScore * 1.0f);
+            spriteBatch.draw(scoreMarker, this.positionOffsetX + progress * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
         }
-        spriteBatch.draw(nonTanKnob, this.positionOffsetX + progress * width - height * 0.07f / 2, centerY, height * 0.07f, height * 0.07f);
+
     }
 
     private TextureRegion selectTextureForProgressBar() {
@@ -259,7 +245,7 @@ public class WorldRenderer {
 
     private void drawAccuracy() {
         float centerX = this.positionOffsetX + width / 2;
-        float centerY = this.positionOffsetY +height / 2 + height * 0.15f;
+        float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
         if (world.accuracy != CircleMark.Accuracy.NONE) {
             layout.setText(font, "" + world.accuracy);
             font.draw(spriteBatch, "" + world.accuracy, centerX - layout.width / 2, centerY - layout.height / 2);
@@ -290,7 +276,7 @@ public class WorldRenderer {
 
     private void drawTapZones() {
         float centerX = this.positionOffsetX + width / 2;
-        float centerY = this.positionOffsetY +height - height * 0.25f;
+        float centerY = this.positionOffsetY + height - height * 0.25f;
         float size = height * 0.2f;
         for (TapZone tapZone : world.getZones()) {
 

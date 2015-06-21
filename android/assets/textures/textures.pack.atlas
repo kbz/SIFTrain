@@ -1,296 +1,303 @@
 
 textures.pack.png
-size: 1024,1024
+size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 acc_mark
   rotate: false
-  xy: 1006, 954
+  xy: 506, 454
   size: 1, 50
   orig: 1, 50
   offset: 0, 0
   index: -1
 circle
   rotate: false
-  xy: 2, 504
-  size: 500, 500
-  orig: 500, 500
+  xy: 2, 254
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_hold_press_no_black
   rotate: false
   xy: 2, 2
-  size: 500, 500
-  orig: 500, 500
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_hold_press_no_black_sim
   rotate: false
-  xy: 504, 504
-  size: 500, 500
-  orig: 500, 500
+  xy: 254, 254
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_hold_release_no_black
   rotate: false
-  xy: 504, 2
-  size: 500, 500
-  orig: 500, 500
+  xy: 254, 2
+  size: 250, 250
+  orig: 250, 250
+  offset: 0, 0
+  index: -1
+selection_menu_background
+  rotate: false
+  xy: 509, 454
+  size: 1, 50
+  orig: 1, 50
+  offset: 0, 0
+  index: -1
+selection_menu_selected
+  rotate: false
+  xy: 506, 402
+  size: 1, 50
+  orig: 1, 50
   offset: 0, 0
   index: -1
 
 textures.pack2.png
-size: 1024,1024
+size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 circle_hold_release_no_black_sim
   rotate: false
-  xy: 2, 504
-  size: 500, 500
-  orig: 500, 500
+  xy: 2, 254
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_sim
   rotate: false
   xy: 2, 2
-  size: 500, 500
-  orig: 500, 500
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_special
   rotate: false
-  xy: 504, 504
-  size: 500, 500
-  orig: 500, 500
+  xy: 254, 254
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_special_sim
   rotate: false
-  xy: 504, 2
-  size: 500, 500
-  orig: 500, 500
+  xy: 254, 2
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 
 textures.pack3.png
-size: 1024,1024
+size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 circle_token
   rotate: false
-  xy: 2, 504
-  size: 500, 500
-  orig: 500, 500
+  xy: 2, 254
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 circle_token_sim
   rotate: false
   xy: 2, 2
-  size: 500, 500
-  orig: 500, 500
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 tap
   rotate: false
-  xy: 504, 504
-  size: 500, 500
-  orig: 500, 500
+  xy: 254, 254
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 tap_pressed
   rotate: false
-  xy: 504, 2
-  size: 500, 500
-  orig: 500, 500
+  xy: 254, 2
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 
 textures.pack4.png
-size: 1024,1024
+size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+a_marker
+  rotate: false
+  xy: 254, 383
+  size: 100, 125
+  orig: 100, 125
+  offset: 0, 0
+  index: -1
 acc_bad
   rotate: false
-  xy: 2, 106
+  xy: 2, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 acc_good
   rotate: false
-  xy: 881, 970
+  xy: 254, 331
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 acc_great
   rotate: false
-  xy: 379, 468
+  xy: 458, 458
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 acc_perfect
   rotate: false
-  xy: 2, 54
+  xy: 54, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
+b_marker
+  rotate: false
+  xy: 356, 383
+  size: 100, 125
+  orig: 100, 125
+  offset: 0, 0
+  index: -1
+c_marker
+  rotate: false
+  xy: 324, 256
+  size: 100, 125
+  orig: 100, 125
+  offset: 0, 0
+  index: -1
 hold_background
   rotate: false
-  xy: 54, 106
+  xy: 458, 406
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 hold_background_holding
   rotate: false
-  xy: 881, 918
+  xy: 254, 279
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 knob
   rotate: false
-  xy: 985, 1000
+  xy: 458, 384
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 knob_after
   rotate: false
-  xy: 379, 394
+  xy: 426, 257
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 knob_before
   rotate: false
-  xy: 431, 446
+  xy: 480, 384
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
-maki_star
-  rotate: false
-  xy: 2, 158
-  size: 375, 360
-  orig: 375, 360
-  offset: 0, 0
-  index: -1
 menu_item_down
   rotate: false
-  xy: 379, 96
-  size: 640, 200
-  orig: 640, 200
+  xy: 2, 156
+  size: 320, 100
+  orig: 320, 100
   offset: 0, 0
   index: -1
-nico_star
+menu_item_idle
   rotate: false
-  xy: 504, 660
-  size: 375, 360
-  orig: 375, 360
+  xy: 2, 54
+  size: 320, 100
+  orig: 320, 100
   offset: 0, 0
   index: -1
-nozomi_star
+no_rank_marker
   rotate: false
-  xy: 504, 298
-  size: 375, 360
-  orig: 375, 360
+  xy: 324, 129
+  size: 100, 125
+  orig: 100, 125
   offset: 0, 0
   index: -1
 progress_bar_a_score
   rotate: false
-  xy: 933, 970
+  xy: 106, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 progress_bar_b_score
   rotate: false
-  xy: 379, 416
+  xy: 158, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 progress_bar_c_score
   rotate: false
-  xy: 431, 468
+  xy: 210, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 progress_bar_no_score
   rotate: false
-  xy: 2, 2
+  xy: 262, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 progress_bar_s_score
   rotate: false
-  xy: 54, 54
+  xy: 426, 331
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
-selection_menu_background
+s_marker
   rotate: false
-  xy: 106, 106
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
-selection_menu_selected
-  rotate: false
-  xy: 881, 866
-  size: 50, 50
-  orig: 50, 50
+  xy: 324, 2
+  size: 100, 125
+  orig: 100, 125
   offset: 0, 0
   index: -1
 song_selection_menu_background
   rotate: false
-  xy: 933, 918
+  xy: 426, 279
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 tap_warn
   rotate: false
-  xy: 2, 520
-  size: 500, 500
-  orig: 500, 500
+  xy: 2, 258
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1
 
 textures.pack5.png
-size: 1024,1024
+size: 128,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-menu_item_idle
-  rotate: false
-  xy: 2, 726
-  size: 640, 200
-  orig: 640, 200
-  offset: 0, 0
-  index: -1
-rin_star
-  rotate: false
-  xy: 2, 364
-  size: 375, 360
-  orig: 375, 360
-  offset: 0, 0
-  index: -1
-umi_star
+score_marker
   rotate: false
   xy: 2, 2
-  size: 375, 360
-  orig: 375, 360
+  size: 100, 125
+  orig: 100, 125
   offset: 0, 0
   index: -1
