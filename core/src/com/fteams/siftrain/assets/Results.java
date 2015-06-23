@@ -18,13 +18,13 @@ public class Results {
 
     public static Accuracy getAccuracyFor(float timing, double noteSpeed) {
         // Perfect
-        if (Math.abs(timing) < noteSpeed * 0.07f) {
+        if (Math.abs(timing) < noteSpeed * 0.05f) {
             return Accuracy.PERFECT;
         }
         if (Math.abs(timing) < noteSpeed * 0.15f) {
             return Accuracy.GREAT;
         }
-        if (Math.abs(timing) < noteSpeed * 0.3f) {
+        if (Math.abs(timing) < noteSpeed * 0.20f) {
             return Accuracy.GOOD;
         }
         if (Math.abs(timing) < noteSpeed * 0.5f) {

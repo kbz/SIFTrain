@@ -14,7 +14,7 @@ public class GlobalConfiguration {
     // path to beatmaps
     public static String pathToBeatmaps;
 
-    public final static int BASE_HEIGHT = 1080;
+    public final static int BASE_HEIGHT = 720;
 
     public static void loadConfiguration()
     {

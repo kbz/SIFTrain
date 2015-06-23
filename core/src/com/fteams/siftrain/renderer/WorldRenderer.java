@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.fteams.siftrain.World;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
+import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.util.SongUtils;
@@ -167,24 +168,22 @@ public class WorldRenderer {
     }
 
     private void drawAccuracyBar() {
-        // draw the background (bad level)
         float centerX = this.positionOffsetX + width / 6;
         float y = this.positionOffsetY + height - height * 0.1f;
         float zone = (float) (Assets.selectedSong.song_info[0].notes_speed / 2);
 
-        spriteBatch.draw(accBadBackground, centerX - width / (6f), y, width / 3f, height * 0.02f);
+        // draw the background (bad level)
+        spriteBatch.draw(accBadBackground, centerX - width / 6f, y, width / 3f, height * 0.02f);
         // draw the background (good level)
-        spriteBatch.draw(accGoodBackground, centerX - width / 10f, y, width / 5f, height * 0.02f);
+        spriteBatch.draw(accGoodBackground, centerX - 0.4f*width / 6f, y, 0.4f*width / 3f, height * 0.02f);
         // draw the background (great level)
-        spriteBatch.draw(accGreatBackground, centerX - width / 20f, y, width / 10f, height * 0.02f);
+        spriteBatch.draw(accGreatBackground, centerX - 0.3f*width / 6f, y, 0.3f*width / 3f, height * 0.02f);
         // draw the background (perfect level)
-        spriteBatch.draw(accPerfectBackground, centerX - 7f * width / 300f, y, 7f * width / 150f, height * 0.02f);
+        spriteBatch.draw(accPerfectBackground, centerX - 0.1f*width / 6f, y, 0.1f * width / 3f, height * 0.02f);
         // draw each of the 'markers'
-        for (Float accMarker : world.getAccuracyMarks()) {
-            if (Math.abs(accMarker) > zone)
-                continue;
-
-            spriteBatch.draw(accHitMark, centerX - (accMarker) * (width / 6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
+        for (AccuracyMarker accMarker : world.getAccuracyMarkers()) {
+            if (accMarker.display)
+                spriteBatch.draw(accHitMark, centerX - (accMarker.getTime()) * (width / 6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
         }
     }
 

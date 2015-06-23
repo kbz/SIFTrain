@@ -84,14 +84,14 @@ public class CircleMark {
         this.speed = noteSpeed;
         this.spawnTime = (float) (timing - speed);
         this.startWaitTime = (float) (timing - speed);
-        this.endWaitTime = timing + 0.5f;
+        this.endWaitTime = timing + (float)(0.5f*speed);
         this.despawnTime = timing * 1.0f;
         this.size = 0.1f;
         this.size2 = 0.1f;
         if (isHold()) {
             this.holdEndSpawnTime = (float) (timing + note.effect_value - speed);
             this.holdEndStartWaitTime = (float) (timing + note.effect_value - speed);
-            this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f);
+            this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f*speed);
             this.holdEndDespawnTime = (float) (timing + note.effect_value);
             calculateHook();
 
@@ -148,28 +148,10 @@ public class CircleMark {
             }
             return;
         }
-        spawnTime -= delta;
-        despawnTime -= delta;
-        startWaitTime -= delta;
-        endWaitTime -= delta;
-
-        if (spawnTime <= 0 && despawnTime > 0 && !getState(State.VISIBLE)) {
-            setState(State.VISIBLE, true);
-        }
-        if (spawnTime >= 0 || despawnTime <= 0) {
-            if (getState(State.VISIBLE)) {
-                setState(State.VISIBLE, false);
-            }
-        }
-
-        if (getState(State.VISIBLE)) {
-            updateSize(despawnTime);
-            position.add(velocity.cpy().scl(delta));
-            hookPoint.add(velocity.cpy().scl(delta));
-        }
-        if (startWaitTime <= 0 && endWaitTime > 0 && !getState(State.WAITING)) {
-            setState(State.WAITING, true);
-            setState(State.WAITING_START, true);
+        updateFirst(delta);
+        if (isHold())
+        {
+            updateSecond(delta);
         }
         // miss if we miss the first note
         if (isHold() && !firstHit && !getState(State.HOLDING) && endWaitTime <= 0 && getState(State.WAITING_START) && !getState(State.MISS)) {
@@ -189,29 +171,6 @@ public class CircleMark {
             //System.out.println("MISS-002: didn't hit the note");
         }
         if (isHold() && !getState(State.MISS)) {
-            holdEndSpawnTime -= delta;
-            holdEndDespawnTime -= delta;
-            holdEndStartWaitTime -= delta;
-            holdEndEndWaitTime -= delta;
-
-            if (holdEndSpawnTime <= 0 && holdEndDespawnTime > 0 && !getState(State.END_VISIBLE)) {
-                setState(State.END_VISIBLE, true);
-                setState(State.WAITING_END, true);
-            }
-            if (holdEndSpawnTime >= 0 || holdEndDespawnTime <= 0) {
-                if (getState(State.END_VISIBLE)) {
-                    setState(State.END_VISIBLE, false);
-                }
-            }
-            if (getState(State.END_VISIBLE)) {
-                updateSize2(holdEndDespawnTime);
-                holdReleasePosition.add(velocity.cpy().scl(delta));
-                hookPoint2.add(velocity.cpy().scl(delta));
-            }
-
-            if (holdEndStartWaitTime <= 0 && holdEndEndWaitTime > 0 && !getState(State.WAITING_END) && getState(State.WAITING)) {
-                setState(State.WAITING_END, true);
-            }
             // miss if we hold for too long
             if (holdEndEndWaitTime <= 0 && getState(State.WAITING_END) && !getState(State.MISS)) {
                 //System.out.println("MISS-003: held for too long");
@@ -236,18 +195,78 @@ public class CircleMark {
         }
     }
 
+
+    private void updateFirst(float delta) {
+        spawnTime -= delta;
+        despawnTime -= delta;
+        startWaitTime -= delta;
+        endWaitTime -= delta;
+
+        if (spawnTime <= 0 && despawnTime > 0 && !getState(State.VISIBLE)) {
+            setState(State.VISIBLE, true);
+        }
+        if (spawnTime >= 0 || despawnTime <= 0) {
+            if (getState(State.VISIBLE)) {
+                setState(State.VISIBLE, false);
+            }
+        }
+
+        if (getState(State.VISIBLE)) {
+            updateSize(despawnTime);
+            position.add(velocity.cpy().scl(delta));
+            hookPoint.add(velocity.cpy().scl(delta));
+        }
+        if (startWaitTime <= 0 && endWaitTime > 0 && !getState(State.WAITING)) {
+            setState(State.WAITING, true);
+            setState(State.WAITING_START, true);
+        }
+    }
+
+    private void updateSecond(float delta) {
+
+        holdEndSpawnTime -= delta;
+        holdEndDespawnTime -= delta;
+        holdEndStartWaitTime -= delta;
+        holdEndEndWaitTime -= delta;
+
+        if (holdEndSpawnTime <= 0 && holdEndDespawnTime > 0 && !getState(State.END_VISIBLE)) {
+            setState(State.END_VISIBLE, true);
+            setState(State.WAITING_END, true);
+        }
+        if (holdEndSpawnTime >= 0 || holdEndDespawnTime <= 0) {
+            if (getState(State.END_VISIBLE)) {
+                setState(State.END_VISIBLE, false);
+            }
+        }
+        if (getState(State.END_VISIBLE)) {
+            updateSize2(holdEndDespawnTime);
+            holdReleasePosition.add(velocity.cpy().scl(delta));
+            hookPoint2.add(velocity.cpy().scl(delta));
+        }
+
+        if (holdEndStartWaitTime <= 0 && holdEndEndWaitTime > 0 && !getState(State.WAITING_END) && getState(State.WAITING)) {
+            setState(State.WAITING_END, true);
+        }
+    }
+
     public float getSize2() {
         return this.size2;
     }
 
     public Accuracy hit() {
+        Accuracy accuracy = Results.getAccuracyFor(despawnTime, speed);
+        // If the note was tapped too early, we ignore the tap
+        if (despawnTime > 0 && accuracy == Accuracy.MISS)
+        {
+            return Accuracy.NONE;
+        }
         accuracyHitStartTime = despawnTime;
         if (isHold()) {
             setState(State.HOLDING, true);
-            accuracyStart = Results.getAccuracyFor(despawnTime, speed);
+            accuracyStart = accuracy;
             firstHit = true;
         } else {
-            accuracyStart = Results.getAccuracyFor(despawnTime, speed);
+            accuracyStart = accuracy;
             accuracyEnd = Accuracy.NONE;
             firstHit = true;
             secondHit = true;

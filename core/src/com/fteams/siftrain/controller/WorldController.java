@@ -8,6 +8,7 @@ import com.fteams.siftrain.World;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
+import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.screens.ResultsScreen;
@@ -22,6 +23,7 @@ public class WorldController implements Music.OnCompletionListener {
 
     private final Array<CircleMark> marks;
     private final Array<TapZone> tapZones;
+    private final Array<AccuracyMarker> accuracyMarkers;
 
     public boolean done;
 
@@ -44,6 +46,7 @@ public class WorldController implements Music.OnCompletionListener {
         this.world = world;
         this.marks = world.getMarks();
         this.tapZones = world.getZones();
+        this.accuracyMarkers = world.getAccuracyMarkers();
         this.combo = 0;
         this.badCount = 0;
         this.goodCount = 0;
@@ -75,9 +78,20 @@ public class WorldController implements Music.OnCompletionListener {
         if (music != null) {
             music.dispose();
         }
+        accuracyMarkers.clear();
         marks.clear();
         tapZones.clear();
         ((Game) Gdx.app.getApplicationListener()).setScreen(new ResultsScreen());
+    }
+
+    private int countType(Array<CircleMark> marks, Integer effect) {
+        int sum = 0;
+        for (CircleMark mark : marks) {
+            if ((mark.effect & effect) != 0) {
+                sum++;
+            }
+        }
+        return sum;
     }
 
     private float calculateNormalizedAccuracy() {
@@ -100,35 +114,32 @@ public class WorldController implements Music.OnCompletionListener {
         for (TapZone tapZone : tapZones) {
             tapZone.update(delta);
         }
+        for (AccuracyMarker marker : world.getAccuracyMarkers()) {
+            marker.update(delta);
+        }
     }
 
     private float calculateAccuracy() {
         float sum = 0f;
-        int skipped = 0;
         List<Float> high = new ArrayList<>();
         List<Float> low = new ArrayList<>();
-        float offset = GlobalConfiguration.offset / 1000f;
-        for (Float hit : world.getAccuracyMarks()) {
-            if (Math.abs(hit + offset) > 0.5 * Assets.selectedSong.song_info[0].notes_speed) {
-                skipped++;
-                continue;
-            }
-            sum += (hit + offset);
+        for (AccuracyMarker hit : world.getAccuracyMarkers()) {
+            sum += (hit.getTime());
         }
-        float average = sum / (world.getAccuracyMarks().size() - skipped);
-        for (Float value : world.getAccuracyMarks()) {
-            if (value + offset >= average) {
-                high.add(value + offset);
+        float average = sum / world.getAccuracyMarkers().size;
+        for (AccuracyMarker value : world.getAccuracyMarkers()) {
+            if (value.getTime() >= average) {
+                high.add(value.getTime());
             } else {
-                low.add(value + offset);
+                low.add(value.getTime());
             }
         }
 
         Results.minAccuracy = calcAverage(low);
         Results.maxAccuracy = calcAverage(high);
-        Results.unstableRating = 10 * calcDeviation(world.getAccuracyMarks(), offset);
+        Results.unstableRating = 10 * calcDeviation(world.getAccuracyMarkers());
 
-        return sum / (world.getAccuracyMarks().size() - skipped);
+        return sum / world.getAccuracyMarkers().size;
     }
 
     private float calcAverage(List<Float> values) {
@@ -139,34 +150,25 @@ public class WorldController implements Music.OnCompletionListener {
         return sum / values.size();
     }
 
-    private float calcDeviation(List<Float> values, float offset) {
-        if (values.isEmpty())
+    private float calcDeviation(Array<AccuracyMarker> values) {
+        if (values.size == 0)
             return 0f;
 
         float sum = 0f;
-        int skipped = 0;
-        for (Float value : values) {
-            if (Math.abs(value + offset) > 0.5 * Assets.selectedSong.song_info[0].notes_speed) {
-                skipped++;
-                continue;
-            }
-            sum += (value + offset);
+        for (AccuracyMarker value : values) {
+            sum += value.getTime();
         }
 
-        float mean = sum / (values.size() - skipped);
+        float mean = sum / values.size;
         sum = 0f;
-        skipped = 0;
-        for (Float value : values) {
-            if (Math.abs(value + offset) > 0.5 * Assets.selectedSong.song_info[0].notes_speed) {
-                skipped++;
-                continue;
-            }
-            sum += (value + offset - mean) * (value + offset - mean);
+        for (AccuracyMarker value : values) {
+            sum += (value.getTime() - mean) * (value.getTime() - mean);
         }
-        return (float) Math.sqrt(sum / (values.size() - skipped - 1));
+        return (float) Math.sqrt(sum / (values.size - 1));
     }
 
     Map<Integer, Integer> pointerToZoneId = new HashMap<>();
+
     public void pressed(int screenX, int screenY, int pointer, int button, float ppuX, float ppuY, int width, int height) {
 
         if (!world.started) {
@@ -194,18 +196,16 @@ public class WorldController implements Music.OnCompletionListener {
 
         float circleRadius = 400 * 0.1f;
         float relativeDistance = (float) Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-        float relativeAngle = (float)Math.acos(relativeX/relativeDistance);
+        float relativeAngle = (float) Math.acos(relativeX / relativeDistance);
 
         int matchedId = -1;
         for (TapZone zone : tapZones) {
             float x = zone.getPosition().x;
             float y = zone.getPosition().y;
             float tapZoneDistance = (float) Math.sqrt(x * x + y * y);
-            if (tapZoneDistance - circleRadius * 2 < relativeDistance && relativeDistance < tapZoneDistance + circleRadius * 2)
-            {
-                float tapAngle = (float)Math.acos(x/tapZoneDistance);
-                if (tapAngle - Math.PI/16 < relativeAngle && relativeAngle < tapAngle + Math.PI/16 && relativeY < circleRadius)
-                {
+            if (tapZoneDistance - circleRadius * 2 < relativeDistance && relativeDistance < tapZoneDistance + circleRadius * 2) {
+                float tapAngle = (float) Math.acos(x / tapZoneDistance);
+                if (tapAngle - Math.PI / 16 < relativeAngle && relativeAngle < tapAngle + Math.PI / 16 && relativeY < circleRadius) {
                     matchedId = zone.getId();
                     zone.setState(TapZone.State.STATE_PRESSED, true);
                     pointerToZoneId.put(pointer, matchedId);
@@ -222,11 +222,14 @@ public class WorldController implements Music.OnCompletionListener {
             }
             if (mark.getNote().position == (matchedId)) {
                 CircleMark.Accuracy accuracy = mark.hit();
+                // if we tap too early, ignore this tap
+                if (accuracy == CircleMark.Accuracy.NONE)
+                    continue;
+
                 playSoundForAccuracy(accuracy);
                 world.accuracy = accuracy;
-                if (mark.isHold()) {
-                    world.getAccuracyMarks().add(mark.accuracyHitStartTime);
-                }
+                accuracyMarkers.add(new AccuracyMarker(mark.accuracyHitStartTime));
+                accuracyList.add(accuracy);
                 // 1 mark per tap
                 break;
             }
@@ -313,8 +316,7 @@ public class WorldController implements Music.OnCompletionListener {
     public void released(int screenX, int screenY, int pointer, int button, float ppuX, float ppuY, int width, int height) {
         int matchedId = -1;
         for (TapZone zone : tapZones) {
-            if (zone.getId().equals(pointerToZoneId.get(pointer)))
-            {
+            if (zone.getId().equals(pointerToZoneId.get(pointer))) {
                 matchedId = zone.getId();
                 pointerToZoneId.remove(pointer);
                 zone.setState(TapZone.State.STATE_PRESSED, false);
@@ -335,8 +337,17 @@ public class WorldController implements Music.OnCompletionListener {
             if (matchedId == mark.getNote().position) {
                 if (mark.isHold()) {
                     CircleMark.Accuracy accuracy = mark.release();
-                    playSoundForAccuracy(accuracy);
+                    // releasing in the same zone as an upcoming hold can cause 'None' resultsnar
+                    if (accuracy == CircleMark.Accuracy.NONE)
+                        continue;
+                    if (accuracy != CircleMark.Accuracy.MISS) {
+                        playSoundForAccuracy(accuracy);
+                        accuracyMarkers.add(new AccuracyMarker(mark.accuracyHitEndTime));
+                    }
+                    accuracyList.add(accuracy);
                     world.accuracy = accuracy;
+                    // 1 mark per release
+                    break;
                 }
             }
         }
@@ -359,25 +370,20 @@ public class WorldController implements Music.OnCompletionListener {
                     if (!mark.isHold()) {
                         sum += calculateScore(mark.accuracyStart, null, false);
                         processAccuracy(mark.accuracyStart, null, false);
-                        accuracyList.add(mark.accuracyStart);
                         if (mark.accuracyStart == CircleMark.Accuracy.MISS) {
+                            accuracyList.add(mark.accuracyStart);
                             world.accuracy = CircleMark.Accuracy.MISS;
-                        } else {
-                            world.getAccuracyMarks().add(mark.accuracyHitStartTime);
                         }
                     } else {
                         processAccuracy(mark.accuracyStart, mark.accuracyEnd, true);
                         sum += calculateScore(mark.accuracyStart, mark.accuracyEnd, true);
                         if (mark.accuracyStart == CircleMark.Accuracy.MISS) {
                             world.accuracy = CircleMark.Accuracy.MISS;
-                        } else if (mark.accuracyEnd == CircleMark.Accuracy.MISS) {
                             accuracyList.add(mark.accuracyStart);
+
+                        } else if (mark.accuracyEnd == CircleMark.Accuracy.MISS) {
                             world.accuracy = CircleMark.Accuracy.MISS;
 
-                        } else {
-                            accuracyList.add(mark.accuracyStart);
-                            accuracyList.add(mark.accuracyEnd);
-                            world.getAccuracyMarks().add(mark.accuracyHitEndTime);
                         }
                     }
                     acted = true;
@@ -399,8 +405,7 @@ public class WorldController implements Music.OnCompletionListener {
     public void back() {
         if (world.started) {
             // if the game was paused and we pressed back again, we skip to the results screen
-            if (world.paused)
-            {
+            if (world.paused) {
                 this.onCompletion(this.music);
                 return;
             }

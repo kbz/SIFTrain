@@ -69,7 +69,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         feedbackVolumeSlider.setValue(GlobalConfiguration.feedbackVolume);
         feedbackVolumeSlider.addListener(this);
 
-        offsetSlider = new Slider(-150f, 150f, 5f, false, Assets.menuSkin);
+        offsetSlider = new Slider(-150f, 150f, 1f, false, Assets.menuSkin);
         offsetSlider.setWidth(stage.getWidth() * 0.7f);
         offsetSlider.setHeight(stage.getHeight() * 0.03f);
         offsetSlider.setX(stage.getWidth() / 2 - offsetSlider.getWidth() / 2);

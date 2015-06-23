@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
+import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.TapZone;
 
@@ -38,7 +39,7 @@ public class World {
     public int offsetX;
     public int offsetY;
 
-    private List<Float> accuracyMarks;
+    private Array<AccuracyMarker> accuracyMarkers;
 
     public boolean paused;
 
@@ -84,7 +85,7 @@ public class World {
         }
         accuracy = CircleMark.Accuracy.NONE;
         processed = true;
-        this.accuracyMarks = new ArrayList<>();
+        this.accuracyMarkers = new Array<>();
         paused = false;
     }
 
@@ -111,7 +112,7 @@ public class World {
         this.lastBatch = lastBatch;
     }
 
-    public List<Float> getAccuracyMarks() {
-        return accuracyMarks;
+    public Array<AccuracyMarker> getAccuracyMarkers() {
+        return accuracyMarkers;
     }
 }
