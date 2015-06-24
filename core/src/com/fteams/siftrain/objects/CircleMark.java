@@ -9,7 +9,7 @@ import com.fteams.siftrain.util.SongUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CircleMark {
+public class CircleMark implements Comparable<CircleMark>{
 
     public boolean getState(State state) {
         return stateMap.get(state);
@@ -36,6 +36,16 @@ public class CircleMark {
         return holdReleasePosition;
     }
 
+    @Override
+    public int compareTo(CircleMark o) {
+        if (this.spawnTime != o.spawnTime)
+        {
+            return Float.compare(spawnTime, o.spawnTime);
+        }
+        return Integer.compare(destination, o.destination);
+
+    }
+
     public enum Accuracy {
         NONE, MISS, BAD, GOOD, GREAT, PERFECT
 
@@ -48,11 +58,9 @@ public class CircleMark {
     Vector2 position = new Vector2();
     Vector2 holdReleasePosition = new Vector2();
     Vector2 velocity = new Vector2();
-    public Vector2 hookPoint = new Vector2();
-    public Vector2 hookPoint2 = new Vector2();
 
     public Integer destination = 0;
-    Double speed;
+    public Double speed;
     SimpleNotesInfo note;
 
     private Map<State, Boolean> stateMap = new HashMap<>();
@@ -93,18 +101,13 @@ public class CircleMark {
             this.holdEndStartWaitTime = (float) (timing + note.effect_value - speed);
             this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f*speed);
             this.holdEndDespawnTime = (float) (timing + note.effect_value);
-            calculateHook();
 
         }
+        accuracyHitStartTime = -9f;
+        accuracyHitEndTime = -9f;
+
         initializeVelocity();
         initializeStates();
-    }
-
-    private void calculateHook() {
-        hookPoint.x = 0;
-        hookPoint.y = 0;
-        hookPoint2.x = 0;
-        hookPoint2.y = 0;
     }
 
     private boolean firstHit;
@@ -153,6 +156,62 @@ public class CircleMark {
         {
             updateSecond(delta);
         }
+        processMiss();
+    }
+
+
+    private void updateFirst(float delta) {
+        spawnTime -= delta;
+        despawnTime -= delta;
+        startWaitTime -= delta;
+        endWaitTime -= delta;
+
+        if (spawnTime <= 0 && despawnTime > 0 && !getState(State.VISIBLE)) {
+            setState(State.VISIBLE, true);
+        }
+        if (spawnTime >= 0 || despawnTime <= 0) {
+            if (getState(State.VISIBLE)) {
+                setState(State.VISIBLE, false);
+            }
+        }
+
+        if (getState(State.VISIBLE)) {
+            updateSize(despawnTime);
+            position.add(velocity.cpy().scl(delta));
+        }
+        if (startWaitTime <= 0 && endWaitTime > 0 && !getState(State.WAITING)) {
+            setState(State.WAITING, true);
+            setState(State.WAITING_START, true);
+        }
+    }
+
+    private void updateSecond(float delta) {
+
+        holdEndSpawnTime -= delta;
+        holdEndDespawnTime -= delta;
+        holdEndStartWaitTime -= delta;
+        holdEndEndWaitTime -= delta;
+
+        if (holdEndSpawnTime <= 0 && holdEndDespawnTime > 0 && !getState(State.END_VISIBLE)) {
+            setState(State.END_VISIBLE, true);
+            setState(State.WAITING_END, true);
+        }
+        if (holdEndSpawnTime >= 0 || holdEndDespawnTime <= 0) {
+            if (getState(State.END_VISIBLE)) {
+                setState(State.END_VISIBLE, false);
+            }
+        }
+        if (getState(State.END_VISIBLE)) {
+            updateSize2(holdEndDespawnTime);
+            holdReleasePosition.add(velocity.cpy().scl(delta));
+        }
+
+        if (holdEndStartWaitTime <= 0 && holdEndEndWaitTime > 0 && !getState(State.WAITING_END) && getState(State.WAITING)) {
+            setState(State.WAITING_END, true);
+        }
+    }
+
+    private void processMiss() {
         // miss if we miss the first note
         if (isHold() && !firstHit && !getState(State.HOLDING) && endWaitTime <= 0 && getState(State.WAITING_START) && !getState(State.MISS)) {
             setState(State.WAITING, false);
@@ -195,60 +254,6 @@ public class CircleMark {
         }
     }
 
-
-    private void updateFirst(float delta) {
-        spawnTime -= delta;
-        despawnTime -= delta;
-        startWaitTime -= delta;
-        endWaitTime -= delta;
-
-        if (spawnTime <= 0 && despawnTime > 0 && !getState(State.VISIBLE)) {
-            setState(State.VISIBLE, true);
-        }
-        if (spawnTime >= 0 || despawnTime <= 0) {
-            if (getState(State.VISIBLE)) {
-                setState(State.VISIBLE, false);
-            }
-        }
-
-        if (getState(State.VISIBLE)) {
-            updateSize(despawnTime);
-            position.add(velocity.cpy().scl(delta));
-            hookPoint.add(velocity.cpy().scl(delta));
-        }
-        if (startWaitTime <= 0 && endWaitTime > 0 && !getState(State.WAITING)) {
-            setState(State.WAITING, true);
-            setState(State.WAITING_START, true);
-        }
-    }
-
-    private void updateSecond(float delta) {
-
-        holdEndSpawnTime -= delta;
-        holdEndDespawnTime -= delta;
-        holdEndStartWaitTime -= delta;
-        holdEndEndWaitTime -= delta;
-
-        if (holdEndSpawnTime <= 0 && holdEndDespawnTime > 0 && !getState(State.END_VISIBLE)) {
-            setState(State.END_VISIBLE, true);
-            setState(State.WAITING_END, true);
-        }
-        if (holdEndSpawnTime >= 0 || holdEndDespawnTime <= 0) {
-            if (getState(State.END_VISIBLE)) {
-                setState(State.END_VISIBLE, false);
-            }
-        }
-        if (getState(State.END_VISIBLE)) {
-            updateSize2(holdEndDespawnTime);
-            holdReleasePosition.add(velocity.cpy().scl(delta));
-            hookPoint2.add(velocity.cpy().scl(delta));
-        }
-
-        if (holdEndStartWaitTime <= 0 && holdEndEndWaitTime > 0 && !getState(State.WAITING_END) && getState(State.WAITING)) {
-            setState(State.WAITING_END, true);
-        }
-    }
-
     public float getSize2() {
         return this.size2;
     }
@@ -270,7 +275,7 @@ public class CircleMark {
             accuracyEnd = Accuracy.NONE;
             firstHit = true;
             secondHit = true;
-            setState(State.PROCESSED, false);
+            setState(State.PROCESSED, true);
             setState(State.WAITING, false);
         }
         setState(State.WAITING_START, false);
@@ -293,6 +298,7 @@ public class CircleMark {
         setState(State.WAITING, false);
         accuracyEnd = Results.getAccuracyFor(holdEndDespawnTime, speed);
         if (accuracyEnd == Accuracy.MISS) {
+            setState(CircleMark.State.PROCESSED, true);
             //System.out.println("MISS-005: Released hold too early");
         }
         return accuracyEnd;

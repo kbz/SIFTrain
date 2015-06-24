@@ -7,6 +7,7 @@ import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
+import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
 
 import java.util.ArrayList;
@@ -30,22 +31,16 @@ public class World {
      */
     Array<CircleMark> marks = new Array<>();
 
-    Music music;
     public int combo;
-    private int lastBatch;
-    public boolean processed;
     public CircleMark.Accuracy accuracy;
     public boolean started;
     public int offsetX;
     public int offsetY;
 
     private Array<AccuracyMarker> accuracyMarkers;
+    private Array<ScoreDiffMarker> scoreMarkers;
 
     public boolean paused;
-
-    public Music getMusic() {
-        return music;
-    }
 
     // Getters -----------
     public Array<TapZone> getZones() {
@@ -59,7 +54,7 @@ public class World {
     }
 
     private void createWorld() {
-        music = SongLoader.loadSongFile(Assets.selectedSong.getResourceName());
+        Assets.music = SongLoader.loadSongFile(Assets.selectedSong.getResourceName());
         float x = 0f;
         float y = 0f;
         score = 0;
@@ -72,6 +67,7 @@ public class World {
             CircleMark mark = new CircleMark(x, y, notesInfo, noteSpeed);
             marks.add(mark);
         }
+        marks.sort();
 
         float step = (float) (Math.PI / 8);
         float distance = 600f / 2 - 400f * 0.1275f;
@@ -84,8 +80,8 @@ public class World {
             zones.add(zone);
         }
         accuracy = CircleMark.Accuracy.NONE;
-        processed = true;
         this.accuracyMarkers = new Array<>();
+        this.scoreMarkers = new Array<>();
         paused = false;
     }
 
@@ -100,19 +96,11 @@ public class World {
         return marks;
     }
 
-    public int getCombo() {
-        return combo;
-    }
-
-    public int getLastBatch() {
-        return lastBatch;
-    }
-
-    public void setLastBatch(int lastBatch) {
-        this.lastBatch = lastBatch;
-    }
-
     public Array<AccuracyMarker> getAccuracyMarkers() {
         return accuracyMarkers;
+    }
+
+    public Array<ScoreDiffMarker> getScoreMarkers() {
+        return scoreMarkers;
     }
 }

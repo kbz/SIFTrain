@@ -13,6 +13,7 @@ import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
+import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.util.SongUtils;
 
@@ -273,10 +274,19 @@ public class WorldRenderer {
         float centerY = height - height * 0.15f;
         String text = world.score + "";
         layout.setText(font, text);
-        if (world.getLastBatch() != 0 && !world.processed) {
-            text += " (+" + world.getLastBatch() + ")";
+        float width = layout.width;
+        float height = layout.height;
+        font.draw(spriteBatch, text, centerX - width / 2, centerY - height / 2);
+        for (ScoreDiffMarker marker : world.getScoreMarkers())
+        {
+            if (!marker.display)
+                continue;
+
+            String markerValue = "(+" +marker.value+")";
+            layout.setText(font, markerValue);
+
+            font.draw(spriteBatch, markerValue, centerX + (marker.left ? -width/2-layout.width-layout.width/2 : width/2+layout.width/2), centerY - height/2);
         }
-        font.draw(spriteBatch, text, centerX - layout.width / 2, centerY - layout.height / 2);
 
     }
 
@@ -306,16 +316,15 @@ public class WorldRenderer {
         for (CircleMark mark : world.getMarks()) {
             if (mark.isHold()) {
                 if (mark.getState(CircleMark.State.WAITING)) {
-                    // todo: draw the beam in holds
                     float[] points = {
-                            (float) (mark.hookPoint2.x * ppuX - mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/ (float) (mark.hookPoint2.y * ppuY - mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
-                            (float) (mark.hookPoint.x * ppuX - mark.getSize() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/ (float) (mark.hookPoint.y * ppuY - mark.getSize() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
-                            (float) (mark.hookPoint.x * ppuX + mark.getSize() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/ (float) (mark.hookPoint.y * ppuY + mark.getSize() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
-                            (float) (mark.hookPoint2.x * ppuX + mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/  (float) (mark.hookPoint2.y * ppuY + mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8))
+                            (float) (mark.getHoldReleasePosition().x * ppuX - mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
+                            /*centerY +*/ (float) (mark.getHoldReleasePosition().y * ppuY - mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
+                            (float) (mark.getPosition().x * ppuX - mark.getSize() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
+                            /*centerY +*/ (float) (mark.getPosition().y * ppuY - mark.getSize() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
+                            (float) (mark.getPosition().x * ppuX + mark.getSize() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
+                            /*centerY +*/ (float) (mark.getPosition().y * ppuY + mark.getSize() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
+                            (float) (mark.getHoldReleasePosition().x * ppuX + mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
+                            /*centerY +*/  (float) (mark.getHoldReleasePosition().y * ppuY + mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8))
                     };
                     spriteBatch.draw(new PolygonRegion(mark.getState(CircleMark.State.HOLDING) ? holdBGHolding : holdBG, points, triangles), centerX, centerY);
                 }

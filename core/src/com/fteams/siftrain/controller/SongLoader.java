@@ -5,7 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 
 public class SongLoader {
-    private static final String SONGFILE_PREFIX = "beatmaps/soundfiles//";
+    private static final String SONGFILE_PREFIX = "beatmaps/soundfiles/";
     private static final String SONGFILE_MP3 = ".mp3";
     private static final String SONGFILE_OGG = ".ogg";
     private static final String SONGFILE_WAV = ".wav";

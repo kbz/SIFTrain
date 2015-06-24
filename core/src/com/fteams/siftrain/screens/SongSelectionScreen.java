@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -35,7 +36,8 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private TextButton nextButton = new TextButton("Next", Assets.menuSkin, "item1");
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
-
+    private Music music;
+    
     @Override
     public void show() {
         float scaleFactor = stage.getHeight()/GlobalConfiguration.BASE_HEIGHT;
@@ -53,17 +55,17 @@ public class SongSelectionScreen implements Screen, InputProcessor {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 List<SimpleSong> thisList = (List<SimpleSong>) actor;
-                if (Assets.music != null) {
-                    if (Assets.music.isPlaying()) {
-                        Assets.music.stop();
+                if (music != null) {
+                    if (music.isPlaying()) {
+                        music.stop();
                     }
-                    Assets.music.dispose();
+                    music.dispose();
                 }
-                Assets.music = SongLoader.loadSongFile(thisList.getSelected().getResourceName());
-                if (Assets.music != null) {
-                    Assets.music.setLooping(true);
-                    Assets.music.setVolume(GlobalConfiguration.songVolume / 100f);
-                    Assets.music.play();
+                music = SongLoader.loadSongFile(thisList.getSelected().getResourceName());
+                if (music != null) {
+                    music.setLooping(true);
+                    music.setVolume(GlobalConfiguration.songVolume / 100f);
+                    music.play();
                 }
             }
         });
@@ -83,11 +85,11 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         backButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (Assets.music != null) {
-                    if (Assets.music.isPlaying()) {
-                        Assets.music.stop();
+                if (music != null) {
+                    if (music.isPlaying()) {
+                        music.stop();
                     }
-                    Assets.music.dispose();
+                    music.dispose();
                 }
                 Assets.setSelectedSong(songList.getSelected());
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
@@ -96,11 +98,11 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         nextButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (Assets.music != null) {
-                    if (Assets.music.isPlaying()) {
-                        Assets.music.stop();
+                if (music != null) {
+                    if (music.isPlaying()) {
+                        music.stop();
                     }
-                    Assets.music.dispose();
+                    music.dispose();
                 }
                 if (songList.getSelected() == null)
                 {
@@ -167,11 +169,11 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.BACK) {
-            if (Assets.music != null) {
-                if (Assets.music.isPlaying()) {
-                    Assets.music.stop();
+            if (music != null) {
+                if (music.isPlaying()) {
+                    music.stop();
                 }
-                Assets.music.dispose();
+                music.dispose();
             }
             Assets.setSelectedSong(songList.getSelected());
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
