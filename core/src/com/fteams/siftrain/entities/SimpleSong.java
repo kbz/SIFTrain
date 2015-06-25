@@ -9,20 +9,10 @@ public class SimpleSong implements Comparable<SimpleSong> {
     public Integer difficulty;
     public SimpleRankInfo[] rank_info;
     public SimpleSongInfo[] song_info;
-    private File file;
     private String resourceName;
 
     public String toString() {
         return song_name + " [" + SongUtils.getDifficulty(difficulty) + "]";
-    }
-
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 
     public String getResourceName() {

@@ -225,6 +225,13 @@ public class WorldController implements Music.OnCompletionListener {
             if (accuracy2.compareTo(CircleMark.Accuracy.GOOD) > 0) {
                 combo++;
                 world.combo = combo;
+            } else {
+                if (combo > largestCombo) {
+                    largestCombo = combo;
+                }
+                combo = 0;
+                world.combo = 0;
+
             }
 
         }
