@@ -148,22 +148,22 @@ public class WorldRenderer {
         spriteBatch.begin();
         renderer.setProjectionMatrix(cam.combined);
         renderer.begin(ShapeRenderer.ShapeType.Line);
-        if (!world.started) {
-            drawTapToBeginMessage();
-        }
-        if (world.paused) {
-            drawTapToContinue();
-        }
         drawTapZones();
         drawCircles();
         drawScore();
         drawCombo();
+        drawProgressBar();
+        drawAccuracyBar();
+        if (!world.started) {
+            drawTapToBeginMessage();
+        }
         if (!world.paused)
         {
             drawAccuracy();
         }
-        drawProgressBar();
-        drawAccuracyBar();
+        if (world.paused) {
+            drawTapToContinue();
+        }
         renderer.end();
         spriteBatch.end();
     }

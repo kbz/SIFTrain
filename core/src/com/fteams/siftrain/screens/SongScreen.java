@@ -88,7 +88,7 @@ public class SongScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.BACK) {
+        if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
             // do nothing
             controller.back();
             return true;
