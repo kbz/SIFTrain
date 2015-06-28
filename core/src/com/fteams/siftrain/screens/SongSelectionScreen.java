@@ -36,8 +36,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private TextButton nextButton = new TextButton("Next", Assets.menuSkin, "item1");
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
-    private Music music;
-    
+
     @Override
     public void show() {
         float scaleFactor = stage.getHeight()/GlobalConfiguration.BASE_HEIGHT;
@@ -51,24 +50,6 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         nextButton.getLabel().setFontScale(scaleFactor);
         backButton.getLabel().setFontScale(scaleFactor);
 
-        songList.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                List<SimpleSong> thisList = (List<SimpleSong>) actor;
-                if (music != null) {
-                    if (music.isPlaying()) {
-                        music.stop();
-                    }
-                    music.dispose();
-                }
-                music = SongLoader.loadSongFile(thisList.getSelected().getResourceName());
-                if (music != null) {
-                    music.setLooping(true);
-                    music.setVolume(GlobalConfiguration.songVolume / 100f);
-                    music.play();
-                }
-            }
-        });
         if (Assets.selectedSong != null) {
             songList.setSelected(Assets.selectedSong);
         } else
@@ -85,12 +66,6 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         backButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (music != null) {
-                    if (music.isPlaying()) {
-                        music.stop();
-                    }
-                    music.dispose();
-                }
                 Assets.setSelectedSong(songList.getSelected());
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -98,12 +73,6 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         nextButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (music != null) {
-                    if (music.isPlaying()) {
-                        music.stop();
-                    }
-                    music.dispose();
-                }
                 if (songList.getSelected() == null)
                 {
                     return;
@@ -169,12 +138,6 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.BACK) {
-            if (music != null) {
-                if (music.isPlaying()) {
-                    music.stop();
-                }
-                music.dispose();
-            }
             Assets.setSelectedSong(songList.getSelected());
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             // do nothing

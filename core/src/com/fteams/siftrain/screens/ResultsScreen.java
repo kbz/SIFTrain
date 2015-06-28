@@ -46,7 +46,7 @@ public class ResultsScreen implements Screen, InputProcessor {
     private Label comboResultLabel;
     private Label titleLabel = new Label("Results/結果発表", Assets.menuSkin, "default");
 
-    private float timeBeforeClose = 5f;
+    private float timeBeforeClose = 2f;
     private boolean canClose = false;
 
     @Override

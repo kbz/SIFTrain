@@ -314,8 +314,8 @@ public class WorldRenderer {
         float centerY = this.positionOffsetY + height - height * 0.25f;
         float size = height * 0.2f;
         for (CircleMark mark : world.getMarks()) {
-            if (mark.isHold()) {
-                if (mark.getState(CircleMark.State.WAITING)) {
+            if (mark.hold) {
+                if (mark.waiting) {
                     float[] points = {
                             (float) (mark.getHoldReleasePosition().x * ppuX - mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
                             /*centerY +*/ (float) (mark.getHoldReleasePosition().y * ppuY - mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
@@ -326,15 +326,15 @@ public class WorldRenderer {
                             (float) (mark.getHoldReleasePosition().x * ppuX + mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
                             /*centerY +*/  (float) (mark.getHoldReleasePosition().y * ppuY + mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8))
                     };
-                    spriteBatch.draw(new PolygonRegion(mark.getState(CircleMark.State.HOLDING) ? holdBGHolding : holdBG, points, triangles), centerX, centerY);
+                    spriteBatch.draw(new PolygonRegion(mark.holding ? holdBGHolding : holdBG, points, triangles), centerX, centerY);
                 }
-                if (mark.getState(CircleMark.State.END_VISIBLE)) {
+                if (mark.endVisible) {
                     TextureRegion region = circleHoldEnd;
                     spriteBatch.draw(region, centerX - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().x * ppuX, centerY - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().y * ppuY, size * mark.getSize2(), size * mark.getSize2());
                 }
                 // coordinates for the beam start and end
             }
-            if (mark.getState(CircleMark.State.VISIBLE)) {
+            if (mark.visible) {
                 int effectMask = mark.getEffectMask();
                 spriteBatch.draw(selectTextureForCircle(effectMask), centerX - size * mark.getSize() / 2 + mark.getPosition().x * ppuX, centerY - size * mark.getSize() / 2 + mark.getPosition().y * ppuY, size * mark.getSize(), size * mark.getSize());
             }

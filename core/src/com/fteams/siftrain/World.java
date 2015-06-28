@@ -1,17 +1,12 @@
 package com.fteams.siftrain;
 
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.assets.Assets;
-import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class World {
 
@@ -53,8 +48,9 @@ public class World {
         createWorld();
     }
 
+    public float delay;
+
     private void createWorld() {
-        Assets.music = SongLoader.loadSongFile(Assets.selectedSong.getResourceName());
         float x = 0f;
         float y = 0f;
         score = 0;
@@ -63,8 +59,13 @@ public class World {
         bScore = Assets.selectedSong.rank_info[1].rank_max;
         aScore = Assets.selectedSong.rank_info[2].rank_max;
         sScore = Assets.selectedSong.rank_info[3].rank_max;
+        Double firstNote = Assets.selectedSong.song_info[0].notes[0].timing_sec;
+        delay = 0f;
+        if (firstNote < noteSpeed) {
+            delay = (float) (noteSpeed - firstNote) + 0.5f;
+        }
         for (SimpleNotesInfo notesInfo : Assets.selectedSong.song_info[0].notes) {
-            CircleMark mark = new CircleMark(x, y, notesInfo, noteSpeed);
+            CircleMark mark = new CircleMark(x, y, notesInfo, noteSpeed, delay);
             marks.add(mark);
         }
         marks.sort();

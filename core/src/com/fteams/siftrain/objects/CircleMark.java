@@ -1,24 +1,13 @@
 package com.fteams.siftrain.objects;
 
 import com.badlogic.gdx.math.Vector2;
+import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.util.SongUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class CircleMark implements Comparable<CircleMark>{
-
-    public boolean getState(State state) {
-        return stateMap.get(state);
-    }
-
-    public void setState(State state, boolean value) {
-        stateMap.put(state, value);
-    }
-
+public class CircleMark implements Comparable<CircleMark> {
 
     public float getSize() {
         return size;
@@ -38,8 +27,7 @@ public class CircleMark implements Comparable<CircleMark>{
 
     @Override
     public int compareTo(CircleMark o) {
-        if (this.spawnTime != o.spawnTime)
-        {
+        if (this.spawnTime != o.spawnTime) {
             return Float.compare(spawnTime, o.spawnTime);
         }
         return Integer.compare(destination, o.destination);
@@ -51,9 +39,15 @@ public class CircleMark implements Comparable<CircleMark>{
 
     }
 
-    public enum State {
-        VISIBLE, WAITING, HOLDING, MISS, END_VISIBLE, WAITING_START, WAITING_END, PROCESSED
-    }
+    public boolean visible;
+    public boolean waiting;
+    public boolean holding;
+    public boolean miss;
+    public boolean endVisible;
+    public boolean waitingStart;
+    public boolean waitingEnd;
+    public boolean processed;
+    public boolean hold;
 
     Vector2 position = new Vector2();
     Vector2 holdReleasePosition = new Vector2();
@@ -62,8 +56,6 @@ public class CircleMark implements Comparable<CircleMark>{
     public Integer destination = 0;
     public Double speed;
     SimpleNotesInfo note;
-
-    private Map<State, Boolean> stateMap = new HashMap<>();
 
     private float spawnTime;
     private float despawnTime;
@@ -79,32 +71,35 @@ public class CircleMark implements Comparable<CircleMark>{
     private float size;
     private float size2;
 
-    public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed) {
-        float timing = (float)(note.timing_sec*1f + GlobalConfiguration.offset/1000f);
+
+    public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed, float delay) {
+        float timing = (float) (delay + note.timing_sec * 1f - GlobalConfiguration.offset*1f / 1000f);
         this.position.x = x;
         this.position.y = y;
         this.holdReleasePosition.x = x;
         this.holdReleasePosition.y = y;
         this.note = note;
         this.effect = note.effect;
+        this.hold = (note.effect & SongUtils.NOTE_TYPE_HOLD) != 0;
         // position goes 9-8-...-2-1
         this.destination = note.position - 1;
         this.speed = noteSpeed;
         this.spawnTime = (float) (timing - speed);
         this.startWaitTime = (float) (timing - speed);
-        this.endWaitTime = timing + (float)(0.5f*speed);
+        this.endWaitTime = timing + (float) (0.5f * speed);
         this.despawnTime = timing * 1.0f;
         this.size = 0.1f;
         this.size2 = 0.1f;
-        if (isHold()) {
+        if (hold) {
             this.holdEndSpawnTime = (float) (timing + note.effect_value - speed);
             this.holdEndStartWaitTime = (float) (timing + note.effect_value - speed);
-            this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f*speed);
+            this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f * speed);
             this.holdEndDespawnTime = (float) (timing + note.effect_value);
 
         }
         accuracyHitStartTime = -9f;
         accuracyHitEndTime = -9f;
+        previousTime = 0f;
 
         initializeVelocity();
         initializeStates();
@@ -120,14 +115,14 @@ public class CircleMark implements Comparable<CircleMark>{
     public float accuracyHitEndTime;
 
     private void initializeStates() {
-        setState(State.VISIBLE, false);
-        setState(State.WAITING, false);
-        setState(State.MISS, false);
-        setState(State.HOLDING, false);
-        setState(State.END_VISIBLE, false);
-        setState(State.WAITING_START, false);
-        setState(State.WAITING_END, false);
-        setState(State.PROCESSED, false);
+        visible = false;
+        waiting = false;
+        miss = false;
+        holding = false;
+        endVisible = false;
+        waitingStart = false;
+        waitingEnd = false;
+        processed = false;
     }
 
     private void initializeVelocity() {
@@ -138,117 +133,118 @@ public class CircleMark implements Comparable<CircleMark>{
     }
 
     public boolean isDone() {
-        return getState(State.MISS) || (firstHit && secondHit);
+        return miss || (firstHit && secondHit);
     }
 
-    public void update(float delta) {
-        if (getState(State.MISS) || (firstHit && secondHit)) {
-            if (getState(State.VISIBLE)) {
-                setState(State.VISIBLE, false);
+    float previousTime;
+
+    public void update(float time) {
+        if (miss || (firstHit && secondHit)) {
+            if (visible) {
+                visible = false;
             }
-            if (getState(State.END_VISIBLE)) {
-                setState(State.END_VISIBLE, false);
+            if (endVisible) {
+                endVisible = false;
             }
             return;
         }
-        updateFirst(delta);
-        if (isHold())
-        {
-            updateSecond(delta);
+        updateFirst(time);
+        if (hold) {
+            updateSecond(time);
         }
-        processMiss();
+        processMiss(time);
+        previousTime = time;
     }
 
 
-    private void updateFirst(float delta) {
-        spawnTime -= delta;
-        despawnTime -= delta;
-        startWaitTime -= delta;
-        endWaitTime -= delta;
+    private void updateFirst(float time) {
 
-        if (spawnTime <= 0 && despawnTime > 0 && !getState(State.VISIBLE)) {
-            setState(State.VISIBLE, true);
+        if (spawnTime <= time && despawnTime > time && !visible) {
+            visible = true;
         }
-        if (spawnTime >= 0 || despawnTime <= 0) {
-            if (getState(State.VISIBLE)) {
-                setState(State.VISIBLE, false);
+        if (spawnTime >= time || despawnTime <= time) {
+            if (visible) {
+                if (GlobalConfiguration.playHintSounds)
+                {
+                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume/200f);
+                }
+                visible = false;
             }
         }
 
-        if (getState(State.VISIBLE)) {
-            updateSize(despawnTime);
-            position.add(velocity.cpy().scl(delta));
+        if (visible) {
+            updateSize(despawnTime - time);
+            position.add(velocity.cpy().scl(time - previousTime));
         }
-        if (startWaitTime <= 0 && endWaitTime > 0 && !getState(State.WAITING)) {
-            setState(State.WAITING, true);
-            setState(State.WAITING_START, true);
+        if (startWaitTime <= time && endWaitTime > time && !waiting) {
+            waiting = true;
+            waitingStart = true;
         }
     }
 
-    private void updateSecond(float delta) {
+    private void updateSecond(float time) {
 
-        holdEndSpawnTime -= delta;
-        holdEndDespawnTime -= delta;
-        holdEndStartWaitTime -= delta;
-        holdEndEndWaitTime -= delta;
-
-        if (holdEndSpawnTime <= 0 && holdEndDespawnTime > 0 && !getState(State.END_VISIBLE)) {
-            setState(State.END_VISIBLE, true);
-            setState(State.WAITING_END, true);
+        if (holdEndSpawnTime <= time && holdEndDespawnTime > time && !endVisible) {
+            endVisible = true;
+            waitingEnd = true;
         }
-        if (holdEndSpawnTime >= 0 || holdEndDespawnTime <= 0) {
-            if (getState(State.END_VISIBLE)) {
-                setState(State.END_VISIBLE, false);
+        if (holdEndSpawnTime >= time || holdEndDespawnTime <= time) {
+            if (endVisible) {
+                if (GlobalConfiguration.playHintSounds)
+                {
+                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume/200f);
+                }
+                endVisible = false;
             }
         }
-        if (getState(State.END_VISIBLE)) {
-            updateSize2(holdEndDespawnTime);
-            holdReleasePosition.add(velocity.cpy().scl(delta));
+        if (endVisible) {
+            updateSize2(holdEndDespawnTime - time);
+            holdReleasePosition.add(velocity.cpy().scl(time - previousTime));
         }
 
-        if (holdEndStartWaitTime <= 0 && holdEndEndWaitTime > 0 && !getState(State.WAITING_END) && getState(State.WAITING)) {
-            setState(State.WAITING_END, true);
+        if (holdEndStartWaitTime <= time && holdEndEndWaitTime > time && !waitingEnd && waiting) {
+            waitingEnd = true;
         }
     }
 
-    private void processMiss() {
+    private void processMiss(float time) {
         // miss if we miss the first note
-        if (isHold() && !firstHit && !getState(State.HOLDING) && endWaitTime <= 0 && getState(State.WAITING_START) && !getState(State.MISS)) {
-            setState(State.WAITING, false);
-            setState(State.END_VISIBLE, false);
-            setState(State.VISIBLE, false);
-            setState(State.MISS, true);
+        if (hold && !firstHit && !holding && endWaitTime <= time && waitingStart && !miss) {
+            waiting = false;
+            endVisible = false;
+            visible = false;
+            miss = true;
             accuracyStart = Accuracy.MISS;
             accuracyEnd = Accuracy.MISS;
             // System.out.println("MISS-001: didn't hit the note");
-        } else if (!isHold() && endWaitTime <= 0 && getState(State.WAITING_START) && !getState(State.MISS)) {
-            setState(State.WAITING, false);
-            setState(State.END_VISIBLE, false);
-            setState(State.VISIBLE, false);
-            setState(State.MISS, true);
+        } else if (!hold && endWaitTime <= time && waitingStart && !miss) {
+            waiting = false;
+            endVisible = false;
+            visible = false;
+            miss = true;
             accuracyStart = Accuracy.MISS;
             //System.out.println("MISS-002: didn't hit the note");
         }
-        if (isHold() && !getState(State.MISS)) {
+        if (hold && !miss) {
             // miss if we hold for too long
-            if (holdEndEndWaitTime <= 0 && getState(State.WAITING_END) && !getState(State.MISS)) {
+            if (holdEndEndWaitTime <= time && waitingEnd && !miss) {
                 //System.out.println("MISS-003: held for too long");
                 //System.out.println(stateMap);
-                setState(State.MISS, true);
-                setState(State.WAITING_END, false);
-                setState(State.HOLDING, false);
-                setState(State.VISIBLE, false);
-                setState(State.END_VISIBLE, false);
-                setState(State.WAITING, false);
+                miss = true;
+                waitingEnd = false;
+                holding = false;
+                visible = false;
+                endVisible = false;
+                waiting = false;
                 accuracyEnd = Accuracy.MISS;
             }
             // miss if we release before we start waiting
-            if (firstHit && holdEndSpawnTime > 0 && !getState(State.HOLDING) && !getState(State.MISS)) {
+            if (firstHit && holdEndSpawnTime > time && !holding && !miss) {
                 accuracyEnd = Accuracy.MISS;
-                setState(State.WAITING, false);
-                setState(State.END_VISIBLE, false);
-                setState(State.VISIBLE, false);
-                setState(State.MISS, true);
+                waiting = false;
+                endVisible = false;
+                visible = false;
+                miss = true;
                 //System.out.println("MISS-004: released hold too early");
             }
         }
@@ -259,15 +255,14 @@ public class CircleMark implements Comparable<CircleMark>{
     }
 
     public Accuracy hit() {
-        Accuracy accuracy = Results.getAccuracyFor(despawnTime, speed);
+        Accuracy accuracy = Results.getAccuracyFor(previousTime - despawnTime, speed);
         // If the note was tapped too early, we ignore the tap
-        if (despawnTime > 0 && accuracy == Accuracy.MISS)
-        {
+        if (despawnTime > previousTime && accuracy == Accuracy.MISS) {
             return Accuracy.NONE;
         }
-        accuracyHitStartTime = despawnTime;
-        if (isHold()) {
-            setState(State.HOLDING, true);
+        accuracyHitStartTime = despawnTime - previousTime;
+        if (hold) {
+            holding = true;
             accuracyStart = accuracy;
             firstHit = true;
         } else {
@@ -275,12 +270,11 @@ public class CircleMark implements Comparable<CircleMark>{
             accuracyEnd = Accuracy.NONE;
             firstHit = true;
             secondHit = true;
-            setState(State.PROCESSED, true);
-            setState(State.WAITING, false);
+            processed = true;
+            waiting = false;
         }
-        setState(State.WAITING_START, false);
-        setState(State.VISIBLE, false);
-
+        waitingStart = false;
+        visible = false;
         // calculate hit accuracy
         return accuracyStart;
     }
@@ -291,14 +285,14 @@ public class CircleMark implements Comparable<CircleMark>{
             return Accuracy.NONE;
         }
         secondHit = true;
-        accuracyHitEndTime = holdEndDespawnTime;
-        setState(State.WAITING_END, false);
-        setState(State.HOLDING, false);
-        setState(State.END_VISIBLE, false);
-        setState(State.WAITING, false);
-        accuracyEnd = Results.getAccuracyFor(holdEndDespawnTime, speed);
+        accuracyHitEndTime = holdEndDespawnTime - previousTime;
+        waitingEnd = false;
+        holding = false;
+        endVisible = false;
+        waiting = false;
+        accuracyEnd = Results.getAccuracyFor(previousTime - holdEndDespawnTime, speed);
         if (accuracyEnd == Accuracy.MISS) {
-            setState(CircleMark.State.PROCESSED, true);
+            processed = true;
             //System.out.println("MISS-005: Released hold too early");
         }
         return accuracyEnd;
@@ -316,9 +310,5 @@ public class CircleMark implements Comparable<CircleMark>{
 
     public Vector2 getPosition() {
         return position;
-    }
-
-    public Boolean isHold() {
-        return (note.effect & SongUtils.NOTE_TYPE_HOLD) != 0;
     }
 }

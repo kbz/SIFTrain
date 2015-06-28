@@ -37,8 +37,6 @@ public class Assets {
     public static Texture holdBG;
     public static Texture holdBGHolding;
 
-    public static Music music;
-
     public static Array<SimpleSong> songList;
 
     // In here we'll put everything that needs to be loaded in this format:

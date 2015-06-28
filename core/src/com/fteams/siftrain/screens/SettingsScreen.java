@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -20,6 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 
+import jdk.nashorn.internal.objects.Global;
+
+@SuppressWarnings("unchecked")
 public class SettingsScreen extends ChangeListener implements Screen, InputProcessor {
     private Texture texture = Assets.mainMenuBackgroundTexture;
     private Image splashImage = new Image(texture);
@@ -42,6 +46,8 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Slider feedbackVolumeSlider;
     private Slider offsetSlider;
     private Slider teamSrengthSlider;
+
+    private CheckBox playHintSoundCheckbox;
 
     private Label pathValueLabel = new Label(GlobalConfiguration.pathToBeatmaps, Assets.menuSkin, "song_style_result");
 
@@ -69,7 +75,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         feedbackVolumeSlider.setValue(GlobalConfiguration.feedbackVolume);
         feedbackVolumeSlider.addListener(this);
 
-        offsetSlider = new Slider(-150f, 150f, 1f, false, Assets.menuSkin);
+        offsetSlider = new Slider(-250f, 250f, 1f, false, Assets.menuSkin);
         offsetSlider.setWidth(stage.getWidth() * 0.7f);
         offsetSlider.setHeight(stage.getHeight() * 0.03f);
         offsetSlider.setX(stage.getWidth() / 2 - offsetSlider.getWidth() / 2);
@@ -95,7 +101,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         songVolumeValueLabel.setFontScale(fontScale);
 
         titleLabel.setX(stage.getWidth() / 2 - fontScale * titleLabel.getWidth() / 2);
-        titleLabel.setY(songVolumeLabel.getY() + songVolumeLabel.getHeight()*fontScale);
+        titleLabel.setY(songVolumeLabel.getY() + songVolumeLabel.getHeight() * fontScale);
         titleLabel.setFontScale(fontScale);
 
         feedbackVolumeLabel.setX(feedbackVolumeSlider.getX());
@@ -138,10 +144,19 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         stage.addActor(teamStrengthValueLabel);
 
         returnButton.setWidth(stage.getWidth() * 0.3f);
-        returnButton.setHeight(stage.getHeight() * 0.2f);
+        returnButton.setHeight(stage.getHeight() * 0.12f);
         returnButton.setX(stage.getWidth() / 2 - returnButton.getWidth() / 2);
         returnButton.setY(stage.getHeight() * 0.1f);
         returnButton.getLabel().setFontScale(fontScale);
+
+        playHintSoundCheckbox = new CheckBox("Hint Sounds (" + (GlobalConfiguration.playHintSounds ? "X" : " ") + ")", Assets.menuSkin);
+        playHintSoundCheckbox.getLabel().setFontScale(fontScale);
+        playHintSoundCheckbox.setChecked(GlobalConfiguration.playHintSounds);
+        playHintSoundCheckbox.setX(stage.getWidth() / 2 - offsetSlider.getWidth() / 2);
+        playHintSoundCheckbox.getLabel().setY(pathToBeatmaps.getY() + pathToBeatmaps.getHeight() * fontScale);
+        playHintSoundCheckbox.setY(stage.getHeight() / 2 - stage.getHeight() * 0.25f-playHintSoundCheckbox.getHeight()*fontScale/2);
+        playHintSoundCheckbox.addListener(this);
+        stage.addActor(playHintSoundCheckbox);
 
         pathToBeatmaps.setX(offsetSlider.getX());
         pathToBeatmaps.setY(stage.getHeight() / 2 - stage.getHeight() * 0.20f + teamSrengthSlider.getHeight());
@@ -225,6 +240,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
             GlobalConfiguration.teamStrength = (int) ((Slider) actor).getValue();
             teamStrengthValueLabel.setText(Integer.toString(GlobalConfiguration.teamStrength));
             teamStrengthValueLabel.setX(actor.getX() + actor.getWidth() - teamStrengthValueLabel.getWidth());
+        }
+        if (actor == playHintSoundCheckbox)
+        {
+            GlobalConfiguration.playHintSounds = ((CheckBox)(actor)).isChecked();
+            playHintSoundCheckbox.setText("Hint Sounds (" + (playHintSoundCheckbox.isChecked() ? "X" : " ") + ")");
         }
     }
 

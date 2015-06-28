@@ -13,6 +13,7 @@ public class GlobalConfiguration {
     public static int offset;
     // path to beatmaps
     public static String pathToBeatmaps;
+    public static boolean playHintSounds;
 
     public final static int BASE_HEIGHT = 720;
 
@@ -24,6 +25,7 @@ public class GlobalConfiguration {
         songVolume = prefs.getInteger("song_vol", 100);
         feedbackVolume = prefs.getInteger("feedback_vol", 100);
         pathToBeatmaps = prefs.getString("path_to_beatmaps", Gdx.files.getExternalStoragePath() + "beatmaps");
+        playHintSounds = prefs.getBoolean("play_hint_sounds", false);
 
     }
 
@@ -34,6 +36,7 @@ public class GlobalConfiguration {
         prefs.putInteger("song_vol", songVolume);
         prefs.putInteger("feedback_vol", feedbackVolume);
         prefs.putString("path_to_beatmaps", pathToBeatmaps);
+        prefs.putBoolean("play_hint_sounds", playHintSounds);
         prefs.flush();
     }
 }

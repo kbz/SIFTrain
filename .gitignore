@@ -35,3 +35,7 @@ proguard/
 # assets
 /*/proguard*
 /*/assets/
+
+# trace files
+captures/
+*.trace
