@@ -76,6 +76,7 @@ public class WorldController implements Music.OnCompletionListener {
         this.oldTime = 0f;
         theSong = SongLoader.loadSongFile(Assets.selectedSong.getResourceName());
         this.hasMusic = theSong != null;
+        this.timeSyncAcc = 0f;
     }
 
     @Override
@@ -125,6 +126,7 @@ public class WorldController implements Music.OnCompletionListener {
     public float time;
     public float lastmtime;
     public float oldTime;
+    public float timeSyncAcc;
 
 
     public void update(float delta) {
@@ -151,43 +153,11 @@ public class WorldController implements Music.OnCompletionListener {
             }
         }
         // sync music and beatmap if there's music
-        if (hasMusic) {
-            mtime = theSong.getPosition();
-            double nextTime = time + delta;
-            double nextMTime = mtime + world.delay;
-            double deSync = nextTime - nextMTime;
-            float threshold = 2f / Gdx.graphics.getFramesPerSecond();
-            if (mtime < lastmtime) {
-                System.out.println("Doc, we have a problem [" + mtime + "] < [" + lastmtime + "]");
-            }
-            if (mtime <= 0f && !songStarted) {
-                time += delta;
-            } else {
-                if (mtime == lastmtime) {
-                    time += delta;
-                } else if (Math.abs(deSync) < threshold) {
-                    time += delta;
-                    lastmtime = mtime;
-                } else {
-                    lastmtime = mtime;
-                    time = mtime + world.delay;
-                }
-                if (time < oldTime) {
-                    time = (float) (oldTime + delta - deSync / 2f);
-                }
-            }
-        } else
-//         otherwise just play the beatmap
-        {
-            time += delta;
-        }
-        oldTime = time;
+        sync(delta);
+
         for (CircleMark mark : marks) {
             mark.update(time);
         }
-//        for (TapZone tapZone : tapZones) {
-//            tapZone.update(delta);
-//        }
         for (AccuracyMarker marker : world.getAccuracyMarkers()) {
             marker.update(delta);
         }
@@ -195,6 +165,51 @@ public class WorldController implements Music.OnCompletionListener {
             marker.update(delta);
         }
         processInput();
+    }
+
+    private void sync(float delta) {
+        float theTime = time;
+        if (hasMusic) {
+            mtime = theSong.getPosition();
+            if (mtime <= 0f && !songStarted) {
+                time += delta;
+                // use the first 300 ms of the song to sync
+            } else if (songStarted && mtime < 0.3f) {
+                time = mtime + world.delay;
+                lastmtime = mtime;
+                // if we haven't synced in a while
+            } else if (timeSyncAcc > 0.5f) {
+                lastmtime = mtime;
+                time = mtime + world.delay;
+                timeSyncAcc = 0f;
+                // if the time didn't update we interpolate the delta
+            } else if (lastmtime == mtime) {
+                time += delta;
+                timeSyncAcc += delta;
+                // if the new reading is behind the previous one, we interpolate the delta
+            } else if (mtime < lastmtime) {
+                time = lastmtime + world.delay + delta;
+                lastmtime = lastmtime + delta;
+                timeSyncAcc += delta;
+                // if the new reading is way ahead, we interpolate the delta
+            } else if (mtime > oldTime + 2 * delta) {
+                time = lastmtime + world.delay + delta;
+                lastmtime = lastmtime + delta;
+                timeSyncAcc += delta;
+            } else {
+                lastmtime = mtime;
+                time = mtime + world.delay;
+                timeSyncAcc = 0f;
+            }
+            // smoothen transitions if the new time is ahead or behind of the time + delta
+            float theDiff = time - (theTime + delta);
+            time = theTime + delta + theDiff * 1 / Gdx.graphics.getFramesPerSecond();
+        } else
+        // otherwise just play the beatmap
+        {
+            time += delta;
+        }
+        oldTime = time;
     }
 
     private float calculateAccuracy() {
@@ -377,7 +392,7 @@ public class WorldController implements Music.OnCompletionListener {
     private void playMusicOnDemand() {
         if (!world.started) {
             world.started = true;
-            if (hasMusic){
+            if (hasMusic) {
                 theSong.setLooping(false);
                 theSong.setOnCompletionListener(this);
                 theSong.setVolume(GlobalConfiguration.songVolume / 100f);
