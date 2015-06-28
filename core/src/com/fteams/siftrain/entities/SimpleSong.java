@@ -10,6 +10,7 @@ public class SimpleSong implements Comparable<SimpleSong> {
     public SimpleRankInfo[] rank_info;
     public SimpleSongInfo[] song_info;
     private String resourceName;
+    private Boolean valid;
 
     public String toString() {
         return song_name + " [" + SongUtils.getDifficulty(difficulty) + "]";
@@ -32,5 +33,13 @@ public class SimpleSong implements Comparable<SimpleSong> {
             return difficulty.compareTo(o.difficulty);
         }
         return 0;
+    }
+
+    public Boolean getValid() {
+        return valid;
+    }
+
+    public void setValid(Boolean valid) {
+        this.valid = valid;
     }
 }

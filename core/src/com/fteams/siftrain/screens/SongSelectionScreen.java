@@ -77,6 +77,10 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                 {
                     return;
                 }
+                if (!songList.getSelected().getValid())
+                {
+                    return;
+                }
                 Assets.setSelectedSong(songList.getSelected());
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
             }
