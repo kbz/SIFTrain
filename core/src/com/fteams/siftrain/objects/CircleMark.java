@@ -49,10 +49,12 @@ public class CircleMark implements Comparable<CircleMark> {
     public boolean processed;
     public boolean hold;
 
+    public boolean left;
     Vector2 position = new Vector2();
     Vector2 holdReleasePosition = new Vector2();
     Vector2 velocity = new Vector2();
 
+    public Integer notePosition;
     public Integer destination = 0;
     public Double speed;
     SimpleNotesInfo note;
@@ -74,6 +76,7 @@ public class CircleMark implements Comparable<CircleMark> {
 
     public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed, float delay) {
         float timing = (float) (delay + note.timing_sec * 1f - GlobalConfiguration.offset*1f / 1000f);
+        notePosition = note.position;
         this.position.x = x;
         this.position.y = y;
         this.holdReleasePosition.x = x;
@@ -113,6 +116,15 @@ public class CircleMark implements Comparable<CircleMark> {
 
     public float accuracyHitStartTime;
     public float accuracyHitEndTime;
+
+    public void updateDestination(int newDestination)
+    {
+        this.destination = newDestination;
+        this.notePosition = newDestination + 1;
+        // reset the velocity vectors;
+        initializeVelocity();
+    }
+
 
     private void initializeStates() {
         visible = false;

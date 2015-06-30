@@ -9,6 +9,7 @@ public class GlobalConfiguration {
     // team strength in SIF units
     public static int teamStrength;
     // offset in milliseconds
+    public static boolean random;
 
     public static int offset;
     // path to beatmaps

@@ -12,7 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -26,6 +28,8 @@ import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleSong;
 
+import jdk.nashorn.internal.objects.Global;
+
 @SuppressWarnings("unchecked")
 public class SongSelectionScreen implements Screen, InputProcessor {
 
@@ -36,10 +40,11 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private TextButton nextButton = new TextButton("Next", Assets.menuSkin, "item1");
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
+    private CheckBox randomCheckbox = new CheckBox("Randomize Notes (" + (GlobalConfiguration.random ? "X" : " ") + ")", Assets.menuSkin);
 
     @Override
     public void show() {
-        float scaleFactor = stage.getHeight()/GlobalConfiguration.BASE_HEIGHT;
+        float scaleFactor = stage.getHeight() / GlobalConfiguration.BASE_HEIGHT;
         //The elements are displayed in the order you add them.
         //The first appear on top, the last at the bottom.
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
@@ -49,17 +54,18 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
         nextButton.getLabel().setFontScale(scaleFactor);
         backButton.getLabel().setFontScale(scaleFactor);
+        randomCheckbox.getLabel().setFontScale(scaleFactor);
+        randomCheckbox.setChecked(GlobalConfiguration.random);
 
         if (Assets.selectedSong != null) {
             songList.setSelected(Assets.selectedSong);
-        } else
-        {
+        } else {
             songList.setSelected(songList.getItems().size == 0 ? null : songList.getItems().first());
         }
         songListPane.setWidget(songList);
         songListPane.setWidth(stage.getWidth());
 
-        table.add(songListPane).colspan(2).size(stage.getWidth() * 0.87f, stage.getHeight() * 0.65f).row();
+        table.add(songListPane).colspan(3).size(stage.getWidth() * 0.87f, stage.getHeight() * 0.65f).row();
         table.setWidth(stage.getWidth());
         table.setHeight(stage.getHeight());
 
@@ -67,27 +73,35 @@ public class SongSelectionScreen implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Assets.setSelectedSong(songList.getSelected());
+                GlobalConfiguration.random = !GlobalConfiguration.random;
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
         }));
         nextButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (songList.getSelected() == null)
-                {
+                if (songList.getSelected() == null) {
                     return;
                 }
-                if (!songList.getSelected().getValid())
-                {
+                if (!songList.getSelected().getValid()) {
                     return;
                 }
                 Assets.setSelectedSong(songList.getSelected());
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
             }
         }));
-        table.add(backButton).size(stage.getWidth() * 0.87f / 2, stage.getHeight() * 0.2f);
-        table.add(nextButton).size(stage.getWidth() * 0.87f / 2, stage.getHeight() * 0.2f).row();
+        randomCheckbox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                GlobalConfiguration.random = !GlobalConfiguration.random;
+                randomCheckbox.setText("Randomize Notes (" + (GlobalConfiguration.random ? "X" : " ") + ")");
+            }
 
+
+        });
+        table.add(backButton).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.2f);
+        table.add(nextButton).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.2f);
+        table.add(randomCheckbox).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.2f).row();
         stage.addActor(table);
 
         InputMultiplexer impx = new InputMultiplexer();
@@ -179,4 +193,5 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     public boolean scrolled(int amount) {
         return false;
     }
+
 }

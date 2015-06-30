@@ -442,7 +442,7 @@ public class WorldController implements Music.OnCompletionListener {
             if (!mark.waiting) {
                 continue;
             }
-            if (mark.getNote().position == (matchedId)) {
+            if (mark.notePosition == (matchedId)) {
                 CircleMark.Accuracy accuracy = mark.hit();
                 // if we tap too early, ignore this tap
                 if (accuracy == CircleMark.Accuracy.NONE)
@@ -482,7 +482,7 @@ public class WorldController implements Music.OnCompletionListener {
                 continue;
             }
 
-            if (matchedId == mark.getNote().position) {
+            if (matchedId == mark.notePosition) {
                 CircleMark.Accuracy accuracy = mark.release();
                 // releasing in the same zone as an upcoming hold can cause 'None' results
                 if (accuracy == CircleMark.Accuracy.NONE)

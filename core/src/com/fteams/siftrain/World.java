@@ -2,11 +2,13 @@ package com.fteams.siftrain;
 
 import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.assets.Assets;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
+import com.fteams.siftrain.util.Randomizer;
 
 public class World {
 
@@ -69,6 +71,12 @@ public class World {
             marks.add(mark);
         }
         marks.sort();
+
+        if (GlobalConfiguration.random)
+        {
+            Randomizer randomizer = new Randomizer();
+            randomizer.randomize(marks);
+        }
 
         float step = (float) (Math.PI / 8);
         float distance = 600f / 2 - 400f * 0.1275f;
