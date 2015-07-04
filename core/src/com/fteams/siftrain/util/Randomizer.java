@@ -51,14 +51,14 @@ public class Randomizer {
             if (mark.getNote().timing_sec + mark.getNote().effect_value > holdEndTime) {
                 holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value;
                 left = !left;
-                Integer pos = getPositionForHold(left);
+                Integer pos = getPositionWithoutMiddle(left);
                 mark.updateDestination(pos);
                 mark.left = left;
                 // new hold is shorter than the previous one
                 // just add it.
             } else {
                 isLeft = !left;
-                Integer pos = getPositionForHold(isLeft);
+                Integer pos = getPositionWithoutMiddle(isLeft);
                 mark.updateDestination(pos);
                 mark.left = isLeft;
             }
@@ -73,14 +73,14 @@ public class Randomizer {
                 // notes close together must go to different sides
                 if (mark.getNote().timing_sec - previous.getNote().timing_sec < averageDistance) {
                     isLeft = !previous.left;
-                    Integer pos = getPositionForHold(isLeft);
+                    Integer pos = getPositionWithoutMiddle(isLeft);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                     left = isLeft;
-                    // they're far away and we may choose a side randomly
+                    // if the new note is released really close to the last hold, make sure to release on the other side
                 } else {
                     isLeft = !left;
-                    Integer pos = getPositionForHold(isLeft);
+                    Integer pos = getPositionWithoutMiddle(isLeft);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                     left = isLeft;
@@ -89,7 +89,7 @@ public class Randomizer {
                 // if the note is the first one, we just pick a random side and spawn it there.
             } else {
                 left = isLeft;
-                Integer pos = getPositionForHold(left);
+                Integer pos = getPositionWithoutMiddle(left);
                 mark.updateDestination(pos);
                 mark.left = isLeft;
                 left = isLeft;
@@ -104,7 +104,8 @@ public class Randomizer {
         if (holding) {
             // pick the other side
             isLeft = !left;
-            Integer pos = getPosition(isLeft);
+            // if one side is holding, notes will never spawn in the middle lane
+            Integer pos = getPositionWithoutMiddle(isLeft);
             mark.updateDestination(pos);
             mark.left = isLeft;
             // we're not holding
@@ -115,15 +116,25 @@ public class Randomizer {
                 // if the notes are close together, use different sides
                 if (mark.getNote().timing_sec - previous.getNote().timing_sec < averageDistance) {
                     isLeft = !previous.left;
-                    Integer pos = getPosition(isLeft);
-                    while (Math.abs(pos - previous.destination) <= 1) {
-                        pos = getPosition(isLeft);
-                    }
+                    // if notes are too close together, we don't pick up the center
+                    // this also applies to simultaneous notes (distance will obviously be < average)
+                    Integer pos = getPositionWithoutMiddle(isLeft);
+                    mark.updateDestination(pos);
+                    mark.left = isLeft;
+                } else if (mark.getNote().timing_sec - holdEndTime < averageDistance) {
+                    // they're far away and we may choose a side randomly
+                    isLeft = !left;
+                    Integer pos = getPositionWithoutMiddle(isLeft);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                     // if they're not really close, just pick a random side
-                } else {
+                }else {
                     Integer pos = getPosition(isLeft);
+                    // if the note is multi - don't pick the center
+                    if ((mark.effect & (SongUtils.NOTE_TYPE_SIMULT_END | SongUtils.NOTE_TYPE_SIMULT_START)) != 0)
+                    {
+                        pos = getPositionWithoutMiddle(isLeft);
+                    }
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                 }
@@ -162,7 +173,7 @@ public class Randomizer {
     }
 
     // holds don't spawn in the middle
-    private Integer getPositionForHold(boolean isLeft) {
+    private Integer getPositionWithoutMiddle(boolean isLeft) {
         // left = 5-8
         if (isLeft) {
             return 5 + (int) (Math.random() * 100) % 4;

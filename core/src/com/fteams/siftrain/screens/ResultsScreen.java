@@ -73,7 +73,7 @@ public class ResultsScreen implements Screen, InputProcessor {
         goodResultLabel = new Label(Integer.toString(Results.goods), Assets.menuSkin, "song_style_result_values");
         greatResultLabel = new Label(Integer.toString(Results.greats), Assets.menuSkin, "song_style_result_values");
         perfectResultLabel = new Label(Integer.toString(Results.perfects), Assets.menuSkin, "song_style_result_values");
-        comboResultLabel = new Label(Integer.toString(Results.combo) + (Results.combo == Assets.selectedSong.song_info[0].notes.length ? (Results.bads > 0 || Results.goods > 0 ? "(fake FC)" : " (FC)") : ""), Assets.menuSkin, "song_style_result_values");
+        comboResultLabel = new Label(Integer.toString(Results.combo) + (Results.combo == Assets.selectedSong.song_info.get(0).notes.size() ? (Results.bads > 0 || Results.goods > 0 ? "(Fake FC)" : " (FC)") : ""), Assets.menuSkin, "song_style_result_values");
 
         scoreResultLabel.setFontScale(fontScale);
         accuracyResultLabel.setFontScale(fontScale);

@@ -1,38 +1,47 @@
 package com.fteams.siftrain.assets;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetDescriptor;
-import com.badlogic.gdx.assets.AssetLoaderParameters;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
+import com.fteams.siftrain.entities.BeatmapDescription;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.entities.SimpleSong;
+import com.fteams.siftrain.util.SongUtils;
 import com.google.gson.Gson;
 
-public class SimpleSongLoader extends AsynchronousAssetLoader<SimpleSong, SimpleSongLoader.SimpleSongParameter> {
-    private SimpleSong song;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    public SimpleSongLoader(FileHandleResolver resolver) {
-        super(resolver);
+public class SimpleSongLoader {
+    private List<String> errors = new ArrayList<>();
+    private List<String> warnings = new ArrayList<>();
+
+    public List<String> getErrors() {
+        return errors;
     }
 
-    @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, SimpleSongLoader.SimpleSongParameter parameter) {
-        FileHandle handle = resolve(fileName);
+    public List<String> getWarnings() {
+        return warnings;
+    }
+
+    public SimpleSong loadSong(BeatmapDescription beatmap) {
+        FileHandle handle = Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "/" + beatmap.getFileName());
+        SimpleSong song = null;
         String jsonDefinition = handle.readString("UTF-8");
         try {
             song = new Gson().fromJson(jsonDefinition, SimpleSong.class);
-            String validationResult = validateFields(song);
+            validateSong(song);
             song.setValid(true);
-            if (validationResult != null)
-            {
-                Gdx.app.log("MAPLOADER",handle.file().getName() + " " + validationResult);
+            if (warnings.size() > 0) {
                 song = new SimpleSong();
-                song.song_name = "Error: Beatmap format invalid. (" + handle.file().getName() +")";
+                beatmap.song_name = "Error: Beatmap format invalid. (" + handle.file().getName() + ")";
+                song.difficulty = 1;
+                song.setValid(true);
+            }
+            if (errors.size() > 0) {
+                song = new SimpleSong();
+                beatmap.song_name = "Error: Beatmap format invalid. (" + handle.file().getName() + ")";
                 song.difficulty = 1;
                 song.setValid(false);
             }
@@ -42,56 +51,80 @@ public class SimpleSongLoader extends AsynchronousAssetLoader<SimpleSong, Simple
             song.difficulty = 1;
             song.setValid(false);
         } finally {
-            song.setResourceName(handle.file().getName().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)|(\\.rs)", ""));
-        }
-    }
-
-    private String validateFields(SimpleSong song) {
-        if (song.rank_info.length != 5)
-            return "rank_info must have 5 elements";
-        for (SimpleRankInfo rankInfo : song.rank_info)
-        {
-            if (rankInfo.rank == null || rankInfo.rank_max == null)
-                return "verify rank format. ";
-        }
-        int previousRank = 0;
-        for (int i = 0; i < song.rank_info.length-1; i++)
-        {
-            SimpleRankInfo sri = song.rank_info[i];
-            if (previousRank >= sri.rank_max)
-            {
-                return "ranks are not ordered.";
+            if (song != null) {
+                song.setResourceName(handle.file().getName().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)|(\\.rs)", ""));
             }
-            previousRank = sri.rank_max;
         }
-        if (song.song_info.length < 1)
-            return "song_info is empty";
-        if (song.song_info[0].notes_speed == null)
-            return "notes_speed is empty";
-        if (song.song_info[0].notes.length == 0)
-            return "notes is empty";
-        for (SimpleNotesInfo notesInfo : song.song_info[0].notes)
-        {
-            if (notesInfo.timing_sec == null || notesInfo.effect == null || notesInfo.position == null || notesInfo.effect_value == null)
-                return "note format invalid. ";
-        }
-        if (song.difficulty == null)
-            return "difficulty is not set";
-        return null;
-    }
-
-    @Override
-    public SimpleSong loadSync(AssetManager manager, String fileName, FileHandle file, SimpleSongLoader.SimpleSongParameter parameter) {
-        SimpleSong song = this.song;
-        this.song = null;
         return song;
     }
 
-    @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, SimpleSongLoader.SimpleSongParameter parameter) {
-        return null;
+    public void validateSong(SimpleSong song) {
+        if (song.difficulty == null) {
+            errors.add("song_info: difficulty not specified.");
+            return;
+        }
+        validateRanks(song);
+        validateSongInfo(song);
     }
 
-    static public class SimpleSongParameter extends AssetLoaderParameters<SimpleSong> {
+    public boolean validateRanks(SimpleSong song) {
+        List<String> errors = new ArrayList<>();
+        if (song.rank_info == null) {
+            warnings.add("rank_info is not defined");
+        } else if (song.rank_info.size() < 4) {
+            warnings.add("rank_info should have at least 4 elements, calculating default values instead.");
+        } else {
+            int empty = 0;
+            for (SimpleRankInfo rankInfo : song.rank_info) {
+                if (rankInfo.rank_max == null) {
+                    empty++;
+                }
+            }
+
+            if (empty > 0) {
+                errors.add("rank_info: rank_max is not specified for " + empty + " entries.");
+            }
+            Collections.sort(song.rank_info);
+            Integer max = -1;
+            for (int i = 0; i < song.rank_info.size() - 1; i++) {
+                if (max.equals(song.rank_info.get(i).rank_max)) {
+                    errors.add("rank_info: there's more than one entry for <" + max + ">");
+                }
+                max = song.rank_info.get(i).rank_max;
+            }
+        }
+        this.errors.addAll(errors);
+        return errors.size() > 0;
+    }
+
+    public boolean validateSongInfo(SimpleSong song) {
+        List<String> errors = new ArrayList<>();
+
+        if (song.song_info == null) {
+            errors.add("song_info: song_info element is not defined.");
+        } else if (song.song_info.size() == 0) {
+            errors.add("song_info: the song_info element is empty.");
+        } else {
+            if (song.song_info.get(0).notes == null) {
+                errors.add("song_info: notes element not defined.");
+            } else if (song.song_info.get(0).notes.size() == 0) {
+                errors.add("song_info: the beatmap doesn't contain notes. ");
+            }
+            if (song.song_info.get(0).notes_speed == null) {
+                warnings.add("song_info: notes_speed element not defined, using default values for this difficulty");
+                song.song_info.get(0).notes_speed = SongUtils.getDefaultNoteSpeedForDifficulty(song.difficulty);
+            }
+            Collections.sort(song.song_info.get(0).notes);
+            int wrongDef = 0;
+            for (SimpleNotesInfo notesInfo : song.song_info.get(0).notes) {
+                if (notesInfo.timing_sec == null || notesInfo.effect == null || notesInfo.position == null || notesInfo.effect_value == null)
+                    wrongDef++;
+            }
+            if (wrongDef > 0) {
+                errors.add("song_info: <" + wrongDef + "> notes are defined incorrectly.");
+            }
+        }
+        this.errors.addAll(errors);
+        return errors.size() > 0;
     }
 }

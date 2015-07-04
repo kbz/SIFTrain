@@ -2,31 +2,26 @@ package com.fteams.siftrain.entities;
 
 import com.fteams.siftrain.util.SongUtils;
 
-import java.io.File;
-import java.util.List;
-
-public class SimpleSong implements Comparable<SimpleSong> {
+public class BeatmapDescription implements Comparable<BeatmapDescription> {
     public String song_name;
     public Integer difficulty;
-    public List<SimpleRankInfo> rank_info;
-    public List<SimpleSongInfo> song_info;
+    private String fileName;
     private String resourceName;
-    private Boolean valid;
 
     public String toString() {
         return song_name + " [" + SongUtils.getDifficulty(difficulty) + "]";
     }
 
-    public String getResourceName() {
-        return resourceName;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     @Override
-    public int compareTo(SimpleSong o) {
+    public int compareTo(BeatmapDescription o) {
         if (!o.getResourceName().equals(resourceName)) {
             return resourceName.compareTo(o.resourceName);
         }
@@ -36,11 +31,11 @@ public class SimpleSong implements Comparable<SimpleSong> {
         return 0;
     }
 
-    public Boolean getValid() {
-        return valid;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
-    public void setValid(Boolean valid) {
-        this.valid = valid;
+    public String getResourceName() {
+        return resourceName;
     }
 }

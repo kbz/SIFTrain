@@ -4,13 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.fteams.siftrain.entities.BeatmapDescription;
 import com.fteams.siftrain.entities.SimpleSong;
 
 public class Assets {
@@ -19,9 +19,10 @@ public class Assets {
     public static AssetManager externalManager = new AssetManager(new ExternalFileHandleResolver());
 
     static {
-        externalManager.setLoader(SimpleSong.class, new SimpleSongLoader(new ExternalFileHandleResolver()));
+        externalManager.setLoader(BeatmapDescription.class, new SimplifiedBeatmapLoader(new ExternalFileHandleResolver()));
     }
 
+    public static BeatmapDescription selectedBeatmap;
     public static SimpleSong selectedSong;
     public static TextureAtlas atlas;
 
@@ -37,7 +38,7 @@ public class Assets {
     public static Texture holdBG;
     public static Texture holdBGHolding;
 
-    public static Array<SimpleSong> songList;
+    public static Array<BeatmapDescription> beatmapList;
 
     // In here we'll put everything that needs to be loaded in this format:
     // manager.load("file location in assets", fileType.class);
@@ -56,7 +57,7 @@ public class Assets {
         internalManager.load("fonts/song-font.fnt", BitmapFont.class);
         if (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles").exists()) {
             for (String fileName : Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles").file().list()) {
-                externalManager.load("beatmaps/datafiles/" + fileName, SimpleSong.class);
+                externalManager.load("beatmaps/datafiles/" + fileName, BeatmapDescription.class);
             }
         } else {
             (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps")).mkdirs();
@@ -103,14 +104,14 @@ public class Assets {
     }
 
     public static void setSongs() {
-        if (songList == null) {
-            songList = new Array<>();
+        if (beatmapList == null) {
+            beatmapList = new Array<>();
             Array<String> assets = externalManager.getAssetNames();
             for (String string : assets) {
-                songList.add(externalManager.get(string, SimpleSong.class));
+                beatmapList.add(externalManager.get(string, BeatmapDescription.class));
             }
 
-            songList.sort();
+            beatmapList.sort();
         }
     }
 
@@ -120,6 +121,10 @@ public class Assets {
 
     public static float getProgress() {
         return (internalManager.getProgress() + externalManager.getProgress()) / 2;
+    }
+
+    public static void setSelectedBeatmap(BeatmapDescription beatmap) {
+        selectedBeatmap = beatmap;
     }
 
     public static void setSelectedSong(SimpleSong song) {

@@ -86,16 +86,17 @@ public class Results {
 
     public static String getRankString() {
         // no rank
-        if (score < Assets.selectedSong.rank_info[0].rank_max) {
+        int shift = Assets.selectedSong.rank_info.get(0).rank_max == 0 ? 1 : 0;
+        if (score < Assets.selectedSong.rank_info.get(shift).rank_max) {
             return "No Rank";
         }
-        if (score < Assets.selectedSong.rank_info[1].rank_max) {
+        if (score < Assets.selectedSong.rank_info.get(shift + 1).rank_max) {
             return "C Rank";
         }
-        if (score < Assets.selectedSong.rank_info[2].rank_max) {
+        if (score < Assets.selectedSong.rank_info.get(shift + 2).rank_max) {
             return "B Rank";
         }
-        if (score < Assets.selectedSong.rank_info[3].rank_max) {
+        if (score < Assets.selectedSong.rank_info.get(shift + 3).rank_max) {
             return "A Rank";
         }
         return "S rank";

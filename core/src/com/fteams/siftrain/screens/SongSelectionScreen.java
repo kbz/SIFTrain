@@ -22,13 +22,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
+import com.fteams.siftrain.assets.SimpleSongLoader;
+import com.fteams.siftrain.entities.BeatmapDescription;
 import com.fteams.siftrain.entities.SimpleSong;
 
 @SuppressWarnings("unchecked")
 public class SongSelectionScreen implements Screen, InputProcessor {
 
     private Stage stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-    private List<SimpleSong> songList = new List<>(Assets.menuSkin);
+    private List<BeatmapDescription> songList = new List<>(Assets.menuSkin);
     private ScrollPane songListPane = new ScrollPane(null, Assets.menuSkin);
     private Table table = new Table();
     private TextButton nextButton = new TextButton("Next", Assets.menuSkin, "item1");
@@ -44,7 +46,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
         stage.addActor(backgroundImage);
 
-        songList.setItems((Array) Assets.songList);
+        songList.setItems((Array) Assets.beatmapList);
 
         nextButton.getLabel().setFontScale(scaleFactor);
         backButton.getLabel().setFontScale(scaleFactor);
@@ -52,8 +54,8 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         randomCheckbox.getImageCell().width(0f);
         randomCheckbox.setChecked(GlobalConfiguration.random);
 
-        if (Assets.selectedSong != null) {
-            songList.setSelected(Assets.selectedSong);
+        if (Assets.selectedBeatmap != null) {
+            songList.setSelected(Assets.selectedBeatmap);
         } else {
             songList.setSelected(songList.getItems().size == 0 ? null : songList.getItems().first());
         }
@@ -67,7 +69,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         backButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Assets.setSelectedSong(songList.getSelected());
+                Assets.setSelectedBeatmap(songList.getSelected());
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
         }));
@@ -77,11 +79,17 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                 if (songList.getSelected() == null) {
                     return;
                 }
-                if (!songList.getSelected().getValid()) {
-                    return;
+                Assets.setSelectedBeatmap(songList.getSelected());
+                SimpleSongLoader loader = new SimpleSongLoader();
+                Assets.selectedSong = loader.loadSong(Assets.selectedBeatmap);
+                if (loader.getErrors().size() > 0 || loader.getWarnings().size() > 0)
+                {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new BeatmapLoadingScreen());
                 }
-                Assets.setSelectedSong(songList.getSelected());
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
+                else
+                {
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
+                }
             }
         }));
         randomCheckbox.addListener(new ChangeListener() {
@@ -150,7 +158,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.BACK) {
-            Assets.setSelectedSong(songList.getSelected());
+            Assets.setSelectedBeatmap(songList.getSelected());
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             // do nothing
             return true;

@@ -1,6 +1,8 @@
 package com.fteams.siftrain.entities;
 
+import java.util.List;
+
 public class SimpleSongInfo {
     public Double notes_speed;
-    public SimpleNotesInfo[] notes;
+    public List<SimpleNotesInfo> notes;
 }

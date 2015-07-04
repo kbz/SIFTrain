@@ -14,4 +14,46 @@ public class SongUtils {
         return DIFF[difficulty - 1];
     }
 
+    public static Double getDefaultNoteSpeedForDifficulty(Integer difficulty) {
+        switch(difficulty)
+        {
+            case 1:
+                return 1.6;
+            case 2:
+                return 1.3;
+            case 3:
+                return 1.0;
+            case 4:
+                return 0.8;
+            default:
+                return 1.0;
+        }
+    }
+
+    static float rankMultiplier [][] = {{1, 1.5f, 2, 2.5f},{1, 2, 2.5f, 3},{1, 2.5f, 3, 3.5f},{1, 2.75f, 3, 3.25f}};
+    static float difficultyMultiplier [] = {88, 129, 170, 211};
+
+    public static int getCScoreForSong(int size, Integer difficulty) {
+        float rMult = rankMultiplier[difficulty-1][0];
+        float dMult = difficultyMultiplier[difficulty-1];
+        return (int)Math.ceil(rMult * dMult * size );
+    }
+
+    public static int getBScoreForSong(int size, Integer difficulty) {
+        float rMult = rankMultiplier[difficulty-1][1];
+        float dMult = difficultyMultiplier[difficulty-1];
+        return (int)Math.ceil(rMult * dMult * size );
+    }
+
+    public static int getAScoreForSong(int size, Integer difficulty) {
+        float rMult = rankMultiplier[difficulty-1][2];
+        float dMult = difficultyMultiplier[difficulty-1];
+        return (int)Math.ceil(rMult * dMult * size );
+    }
+
+    public static int getSScoreForSong(int size, Integer difficulty) {
+        float rMult = rankMultiplier[difficulty-1][3];
+        float dMult = difficultyMultiplier[difficulty-1];
+        return (int)Math.ceil(rMult * dMult * size );
+    }
 }
