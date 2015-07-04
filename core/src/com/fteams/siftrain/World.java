@@ -12,6 +12,8 @@ import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.util.Randomizer;
 import com.fteams.siftrain.util.SongUtils;
 
+import java.util.ArrayList;
+
 public class World {
 
     int width;
@@ -73,6 +75,10 @@ public class World {
             bScore = SongUtils.getBScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
             aScore = SongUtils.getAScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
             sScore = SongUtils.getSScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
+            if (Assets.selectedSong.rank_info == null)
+            {
+                Assets.selectedSong.rank_info = new ArrayList<>();
+            }
             Assets.selectedSong.rank_info.clear();
             Assets.selectedSong.rank_info.add(new SimpleRankInfo(cScore));
             Assets.selectedSong.rank_info.add(new SimpleRankInfo(bScore));
