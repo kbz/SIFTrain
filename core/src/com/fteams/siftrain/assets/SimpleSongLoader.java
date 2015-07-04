@@ -33,13 +33,8 @@ public class SimpleSongLoader {
             song = new Gson().fromJson(jsonDefinition, SimpleSong.class);
             validateSong(song);
             song.setValid(true);
-            if (warnings.size() > 0) {
-                // nothing special about warnings
-            }
             if (errors.size() > 0) {
-                song = new SimpleSong();
                 beatmap.song_name = "Error: Beatmap format invalid. (" + handle.file().getName() + ")";
-                song.difficulty = 1;
                 song.setValid(false);
             }
         } catch (Exception e) {
@@ -109,7 +104,6 @@ public class SimpleSongLoader {
             }
             if (song.song_info.get(0).notes_speed == null) {
                 warnings.add("song_info: notes_speed element not defined, using default values for this difficulty");
-                song.song_info.get(0).notes_speed = SongUtils.getDefaultNoteSpeedForDifficulty(song.difficulty);
             }
             Collections.sort(song.song_info.get(0).notes);
             int wrongDef = 0;

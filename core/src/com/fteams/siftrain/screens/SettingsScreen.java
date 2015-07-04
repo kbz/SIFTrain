@@ -65,7 +65,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     private Label pathValueLabel = new Label(GlobalConfiguration.pathToBeatmaps, Assets.menuSkin, "song_style_result");
 
-    private TextButton returnButton = new TextButton("Return to Main Menu", Assets.menuSkin, "item1");
+    private TextButton returnButton = new TextButton("Save and Return", Assets.menuSkin, "item1");
 
     @Override
     public void show() {

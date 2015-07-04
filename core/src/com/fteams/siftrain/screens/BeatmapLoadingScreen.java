@@ -41,7 +41,7 @@ public class BeatmapLoadingScreen implements Screen {
 
         SimpleSong song = Assets.selectedSong;
         SimpleSongLoader loader = new SimpleSongLoader();
-        loader.validateSongInfo(song);
+        loader.validateSong(song);
 
         Table table = new Table();
         table.setX(stage.getWidth() * 0.15f);
@@ -63,7 +63,8 @@ public class BeatmapLoadingScreen implements Screen {
                 for (String warning : loader.getWarnings()) {
                     Label warningLabel = new Label(warning, Assets.menuSkin, "song_style_result");
                     warningLabel.setFontScale(scaleFactor);
-                    warningTable.add(warningLabel).left().fillX().row();
+                    errorLabel.setWrap(true);
+                    warningTable.add(warningLabel).width(stage.getWidth() * 0.7f).left().fillX().row();
                 }
                 ScrollPane warningPane = new ScrollPane(warningTable);
                 table.add(warningPane).row();
@@ -80,7 +81,8 @@ public class BeatmapLoadingScreen implements Screen {
             for (String error : loader.getErrors()) {
                 Label errorLabel = new Label(error, Assets.menuSkin, "song_style_result");
                 errorLabel.setFontScale(scaleFactor);
-                errorTable.add(errorLabel).left().fillX().row();
+                errorLabel.setWrap(true);
+                errorTable.add(errorLabel).width(stage.getWidth()*0.7f).left().fillX().row();
             }
             ScrollPane errorPane = new ScrollPane(errorTable);
             table.add(errorPane).width(stage.getWidth() * 0.7f).height(stage.getHeight() * 0.25f).row();
@@ -93,7 +95,8 @@ public class BeatmapLoadingScreen implements Screen {
                 for (String warning : loader.getWarnings()) {
                     Label warningLabel = new Label(warning, Assets.menuSkin, "song_style_result");
                     warningLabel.setFontScale(scaleFactor);
-                    warningTable.add(warningLabel).left().fillX().row();
+                    warningLabel.setWrap(true);
+                    warningTable.add(warningLabel).width(stage.getWidth()*0.7f).left().fillX().row();
                 }
                 ScrollPane warningPane = new ScrollPane(warningTable);
                 table.add(warningPane).width(stage.getWidth() * 0.7f).height(stage.getHeight() * 0.25f).row();
