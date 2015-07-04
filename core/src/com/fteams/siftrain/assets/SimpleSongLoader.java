@@ -33,6 +33,7 @@ public class SimpleSongLoader {
             song = new Gson().fromJson(jsonDefinition, SimpleSong.class);
             validateSong(song);
             song.setValid(true);
+            beatmap.song_name = song.song_name;
             if (errors.size() > 0) {
                 beatmap.song_name = "Error: Beatmap format invalid. (" + handle.file().getName() + ")";
                 song.setValid(false);
