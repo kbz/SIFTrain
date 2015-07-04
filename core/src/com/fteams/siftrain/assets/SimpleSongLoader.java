@@ -34,10 +34,7 @@ public class SimpleSongLoader {
             validateSong(song);
             song.setValid(true);
             if (warnings.size() > 0) {
-                song = new SimpleSong();
-                beatmap.song_name = "Error: Beatmap format invalid. (" + handle.file().getName() + ")";
-                song.difficulty = 1;
-                song.setValid(true);
+                // nothing special about warnings
             }
             if (errors.size() > 0) {
                 song = new SimpleSong();
