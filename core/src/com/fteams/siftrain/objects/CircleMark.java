@@ -75,7 +75,7 @@ public class CircleMark implements Comparable<CircleMark> {
 
 
     public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed, float delay) {
-        float timing = (float) (delay + note.timing_sec * 1f - GlobalConfiguration.offset*1f / 1000f);
+        float timing = (float) (delay + note.timing_sec * 1f - GlobalConfiguration.offset * 1f / 1000f);
         notePosition = note.position;
         this.position.x = x;
         this.position.y = y;
@@ -117,8 +117,7 @@ public class CircleMark implements Comparable<CircleMark> {
     public float accuracyHitStartTime;
     public float accuracyHitEndTime;
 
-    public void updateDestination(int newDestination)
-    {
+    public void updateDestination(int newDestination) {
         this.destination = newDestination;
         this.notePosition = newDestination + 1;
         // reset the velocity vectors;
@@ -176,9 +175,8 @@ public class CircleMark implements Comparable<CircleMark> {
         }
         if (spawnTime >= time || despawnTime <= time) {
             if (visible) {
-                if (GlobalConfiguration.playHintSounds)
-                {
-                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume/200f);
+                if (GlobalConfiguration.playHintSounds) {
+                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
                 }
                 visible = false;
             }
@@ -202,9 +200,8 @@ public class CircleMark implements Comparable<CircleMark> {
         }
         if (holdEndSpawnTime >= time || holdEndDespawnTime <= time) {
             if (endVisible) {
-                if (GlobalConfiguration.playHintSounds)
-                {
-                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume/200f);
+                if (GlobalConfiguration.playHintSounds) {
+                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
                 }
                 endVisible = false;
             }
@@ -267,12 +264,12 @@ public class CircleMark implements Comparable<CircleMark> {
     }
 
     public Accuracy hit() {
-        Accuracy accuracy = Results.getAccuracyFor(previousTime - despawnTime, speed);
+        Accuracy accuracy = Results.getAccuracyFor(previousTime - despawnTime - GlobalConfiguration.inputOffset / 1000f, speed);
         // If the note was tapped too early, we ignore the tap
         if (despawnTime > previousTime && accuracy == Accuracy.MISS) {
             return Accuracy.NONE;
         }
-        accuracyHitStartTime = despawnTime - previousTime;
+        accuracyHitStartTime = previousTime - despawnTime - GlobalConfiguration.inputOffset / 1000f;
         if (hold) {
             holding = true;
             accuracyStart = accuracy;
@@ -297,12 +294,12 @@ public class CircleMark implements Comparable<CircleMark> {
             return Accuracy.NONE;
         }
         secondHit = true;
-        accuracyHitEndTime = holdEndDespawnTime - previousTime;
+        accuracyHitEndTime = previousTime - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f;
         waitingEnd = false;
         holding = false;
         endVisible = false;
         waiting = false;
-        accuracyEnd = Results.getAccuracyFor(previousTime - holdEndDespawnTime, speed);
+        accuracyEnd = Results.getAccuracyFor(previousTime - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f, speed);
         if (accuracyEnd == Accuracy.MISS) {
             processed = true;
             //System.out.println("MISS-005: Released hold too early");

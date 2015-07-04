@@ -6,15 +6,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -25,10 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
-import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleSong;
-
-import jdk.nashorn.internal.objects.Global;
 
 @SuppressWarnings("unchecked")
 public class SongSelectionScreen implements Screen, InputProcessor {
@@ -55,6 +49,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         nextButton.getLabel().setFontScale(scaleFactor);
         backButton.getLabel().setFontScale(scaleFactor);
         randomCheckbox.getLabel().setFontScale(scaleFactor);
+        randomCheckbox.getImageCell().width(0f);
         randomCheckbox.setChecked(GlobalConfiguration.random);
 
         if (Assets.selectedSong != null) {
@@ -73,7 +68,6 @@ public class SongSelectionScreen implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Assets.setSelectedSong(songList.getSelected());
-                GlobalConfiguration.random = !GlobalConfiguration.random;
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
         }));
@@ -93,7 +87,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         randomCheckbox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                GlobalConfiguration.random = !GlobalConfiguration.random;
+                GlobalConfiguration.random = ((CheckBox) actor).isChecked();
                 randomCheckbox.setText("Randomize Notes (" + (GlobalConfiguration.random ? "X" : " ") + ")");
             }
 

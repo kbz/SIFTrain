@@ -40,6 +40,6 @@
     "default-horizontal": {background: "knob_after", knobBefore:"knob_before"}
   },
   "com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle":{
-    "default":{checkboxOn: "selection_menu_background", checkboxOff: "selection_menu_selected", font: jp-font-small}
+    "default":{checkboxOn: "selection_menu_background", checkboxOff: "selection_menu_background", font: jp-font-small}
   }
 }

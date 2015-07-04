@@ -11,17 +11,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
-
-import jdk.nashorn.internal.objects.Global;
 
 @SuppressWarnings("unchecked")
 public class SettingsScreen extends ChangeListener implements Screen, InputProcessor {
@@ -34,20 +35,33 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Label songVolumeLabel = new Label("Song Volume", Assets.menuSkin, "song_style_result");
     private Label feedbackVolumeLabel = new Label("Touch Feedback Volume", Assets.menuSkin, "song_style_result");
     private Label offsetLabel = new Label("Global offset", Assets.menuSkin, "song_style_result");
+    private Label inputOffsetLabel = new Label("Input offset", Assets.menuSkin, "song_style_result");
     private Label teamStrengthLabel = new Label("Team Strength", Assets.menuSkin, "song_style_result");
     private Label pathToBeatmaps = new Label("Path to Beatmaps", Assets.menuSkin, "song_style_result");
+
+    private TextButton volumeSettingsTabButton = new TextButton("Volume Settings", Assets.menuSkin, "item1");
+    private TextButton offsetSettingsTabButton = new TextButton("Timing Settings", Assets.menuSkin, "item1");
+    private TextButton scoreSettingsTabButton = new TextButton("Scoring Settings", Assets.menuSkin, "item1");
+    private TextButton otherSettingsTabButton = new TextButton("Other", Assets.menuSkin, "item1");
+
+    private Table tabbedPane = new Table();
+    private Stack content = new Stack();
 
     private Label songVolumeValueLabel;
     private Label feedbackVolumeValueLabel;
     private Label offsetValueLabel;
+    private Label inputOffsetValueLabel;
     private Label teamStrengthValueLabel;
 
     private Slider songVolumeSlider;
     private Slider feedbackVolumeSlider;
     private Slider offsetSlider;
+    private Slider inputOffsetSlider;
     private Slider teamSrengthSlider;
 
     private CheckBox playHintSoundCheckbox;
+
+    private final static boolean DEBUG= false;
 
     private Label pathValueLabel = new Label(GlobalConfiguration.pathToBeatmaps, Assets.menuSkin, "song_style_result");
 
@@ -59,117 +73,200 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         splashImage.setSize(stage.getWidth(), stage.getHeight());
         stage.addActor(splashImage);
 
+        volumeSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
+        offsetSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
+        scoreSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
+        otherSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
+        returnButton.getLabel().setFontScale(fontScale * 0.7f);
+
+
+        ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
+        buttonGroup.add(volumeSettingsTabButton);
+        buttonGroup.add(offsetSettingsTabButton);
+        buttonGroup.add(scoreSettingsTabButton);
+        buttonGroup.add(otherSettingsTabButton);
+        buttonGroup.setMaxCheckCount(1);
+        buttonGroup.setMinCheckCount(1);
+        buttonGroup.setUncheckLast(true);
+        volumeSettingsTabButton.setChecked(true);
+
+        // settings title
+        titleLabel.setFontScale(fontScale * 0.6f);
+        tabbedPane.add(titleLabel).padBottom(stage.getHeight() * 0.05f).colspan(2).fillX().row();
+
+        /*
+        buttons info:
+        width: 0.3
+        spawn between 0.1 and 0.4
+         */
+        // settings buttons
+        tabbedPane.setDebug(DEBUG);
+        tabbedPane.add(volumeSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
+        tabbedPane.add().width(stage.getWidth() * 0.1f).row();
+        tabbedPane.add(offsetSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
+        tabbedPane.add().width(stage.getWidth() * 0.1f).row();
+        tabbedPane.add(scoreSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
+        tabbedPane.add().width(stage.getWidth() * 0.1f).row();
+        tabbedPane.add(otherSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
+        tabbedPane.add().width(stage.getWidth() * 0.1f).row();
+        tabbedPane.setX(stage.getWidth() * 0.225f);
+        tabbedPane.setY(stage.getHeight() / 2);
+
+        tabbedPane.add(returnButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
+        tabbedPane.add().width(stage.getWidth() * 0.1f).row();
+
+        // volume block
+        songVolumeLabel.setFontScale(fontScale);
+        songVolumeValueLabel = new Label(Integer.toString(GlobalConfiguration.songVolume), Assets.menuSkin, "song_style_result");
+        songVolumeValueLabel.setFontScale(fontScale);
+
         songVolumeSlider = new Slider(0, 100f, 1f, false, Assets.menuSkin);
-        songVolumeSlider.setWidth(stage.getWidth() * 0.7f);
-        songVolumeSlider.setHeight(stage.getHeight() * 0.03f);
-        songVolumeSlider.setX(stage.getWidth() / 2 - songVolumeSlider.getWidth() / 2);
-        songVolumeSlider.setY(stage.getHeight() / 2 + stage.getHeight() * 0.2f + songVolumeSlider.getHeight() / 2);
         songVolumeSlider.setValue(GlobalConfiguration.songVolume);
         songVolumeSlider.addListener(this);
 
+        feedbackVolumeLabel.setFontScale(fontScale);
+        feedbackVolumeValueLabel = new Label(Integer.toString(GlobalConfiguration.feedbackVolume), Assets.menuSkin, "song_style_result");
+        feedbackVolumeValueLabel.setFontScale(fontScale);
+
         feedbackVolumeSlider = new Slider(0, 100f, 1f, false, Assets.menuSkin);
-        feedbackVolumeSlider.setWidth(stage.getWidth() * 0.7f);
-        feedbackVolumeSlider.setHeight(stage.getHeight() * 0.03f);
-        feedbackVolumeSlider.setX(stage.getWidth() / 2 - feedbackVolumeSlider.getWidth() / 2);
-        feedbackVolumeSlider.setY(stage.getHeight() / 2 + stage.getHeight() * 0.1f + feedbackVolumeSlider.getHeight() / 2);
         feedbackVolumeSlider.setValue(GlobalConfiguration.feedbackVolume);
         feedbackVolumeSlider.addListener(this);
 
+        playHintSoundCheckbox = new CheckBox("Hint Sounds (" + (GlobalConfiguration.playHintSounds ? "X" : " ") + ")", Assets.menuSkin);
+        playHintSoundCheckbox.getLabel().setFontScale(fontScale);
+        playHintSoundCheckbox.getImageCell().width(0);
+        playHintSoundCheckbox.setChecked(GlobalConfiguration.playHintSounds);
+        playHintSoundCheckbox.addListener(this);
+
+        final Table volumeTable = new Table();
+        volumeTable.setHeight(stage.getHeight() * 0.7f);
+        volumeTable.setWidth(stage.getWidth() * 0.6f);
+        // song volume
+        volumeTable.add(songVolumeLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left();
+        volumeTable.add().width(stage.getWidth() * 0.25f);
+        volumeTable.add(songVolumeValueLabel).width(stage.getWidth() * 0.05f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        volumeTable.add(songVolumeSlider).width(stage.getWidth() * 0.6f).height(songVolumeLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        volumeTable.add().height(songVolumeLabel.getHeight()).row();
+
+        // feedback volume
+        volumeTable.add(feedbackVolumeLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left();
+        volumeTable.add().width(stage.getWidth() * 0.25f);
+        volumeTable.add(feedbackVolumeValueLabel).width(stage.getWidth() * 0.05f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        volumeTable.add(feedbackVolumeSlider).width(stage.getWidth() * 0.6f).height(songVolumeLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        volumeTable.add().height(songVolumeLabel.getHeight()).row();
+
+        volumeTable.add(playHintSoundCheckbox).height(songVolumeLabel.getHeight() * fontScale).colspan(3).left().row();
+        volumeTable.add().expand().fill().row();
+
+        volumeTable.setDebug(DEBUG);
+
+        content.add(volumeTable);
+
+        // timing block
+        offsetLabel.setFontScale(fontScale);
+        offsetValueLabel = new Label((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.", Assets.menuSkin, "song_style_result");
+        offsetValueLabel.setFontScale(fontScale);
+
         offsetSlider = new Slider(-250f, 250f, 1f, false, Assets.menuSkin);
-        offsetSlider.setWidth(stage.getWidth() * 0.7f);
-        offsetSlider.setHeight(stage.getHeight() * 0.03f);
-        offsetSlider.setX(stage.getWidth() / 2 - offsetSlider.getWidth() / 2);
-        offsetSlider.setY(stage.getHeight() / 2 - stage.getHeight() * 0.00f + offsetSlider.getHeight() / 2);
         offsetSlider.setValue(GlobalConfiguration.offset);
         offsetSlider.addListener(this);
 
-        teamSrengthSlider = new Slider(0, 70000, 1f, false, Assets.menuSkin);
-        teamSrengthSlider.setWidth(stage.getWidth() * 0.7f);
-        teamSrengthSlider.setHeight(stage.getHeight() * 0.03f);
-        teamSrengthSlider.setX(stage.getWidth() / 2 - teamSrengthSlider.getWidth() / 2);
-        teamSrengthSlider.setY(stage.getHeight() / 2 - stage.getHeight() * 0.10f + teamSrengthSlider.getHeight() / 2);
-        teamSrengthSlider.setValue(GlobalConfiguration.teamStrength);
-        teamSrengthSlider.addListener(this);
-        stage.addActor(titleLabel);
+        inputOffsetLabel.setFontScale(fontScale);
+        inputOffsetValueLabel = new Label((GlobalConfiguration.inputOffset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.inputOffset) + " ms.", Assets.menuSkin, "song_style_result");
+        inputOffsetValueLabel.setFontScale(fontScale);
 
-        songVolumeLabel.setX(songVolumeSlider.getX());
-        songVolumeLabel.setY(songVolumeSlider.getY() + songVolumeSlider.getHeight());
-        songVolumeLabel.setFontScale(fontScale);
-        songVolumeValueLabel = new Label(Integer.toString(GlobalConfiguration.songVolume), Assets.menuSkin, "song_style_result");
-        songVolumeValueLabel.setX(songVolumeSlider.getX() + songVolumeSlider.getWidth() - songVolumeValueLabel.getWidth() * fontScale);
-        songVolumeValueLabel.setY(songVolumeSlider.getY() + songVolumeSlider.getHeight());
-        songVolumeValueLabel.setFontScale(fontScale);
+        inputOffsetSlider = new Slider(-250f, 250f, 1f, false, Assets.menuSkin);
+        inputOffsetSlider.setValue(GlobalConfiguration.inputOffset);
+        inputOffsetSlider.addListener(this);
 
-        titleLabel.setX(stage.getWidth() / 2 - fontScale * titleLabel.getWidth() / 2);
-        titleLabel.setY(songVolumeLabel.getY() + songVolumeLabel.getHeight() * fontScale);
-        titleLabel.setFontScale(fontScale);
 
-        feedbackVolumeLabel.setX(feedbackVolumeSlider.getX());
-        feedbackVolumeLabel.setY(feedbackVolumeSlider.getY() + feedbackVolumeSlider.getHeight());
-        feedbackVolumeLabel.setFontScale(fontScale);
-        feedbackVolumeValueLabel = new Label(Integer.toString(GlobalConfiguration.feedbackVolume), Assets.menuSkin, "song_style_result");
-        feedbackVolumeValueLabel.setX(feedbackVolumeSlider.getX() + feedbackVolumeSlider.getWidth() - feedbackVolumeValueLabel.getWidth() * fontScale);
-        feedbackVolumeValueLabel.setY(feedbackVolumeSlider.getY() + feedbackVolumeSlider.getHeight());
-        feedbackVolumeValueLabel.setFontScale(fontScale);
+        final Table offsetTable = new Table();
+        // global offset
+        offsetTable.setHeight(stage.getHeight() * 0.7f);
+        offsetTable.setWidth(stage.getWidth() * 0.6f);
+        offsetTable.add(offsetLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f);
+        offsetTable.add().width(stage.getWidth() * 0.20f);
+        offsetTable.add(offsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(offsetSlider).width(stage.getWidth() * 0.6f).height(offsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        offsetTable.add().height(offsetValueLabel.getHeight()).row();
 
-        offsetLabel.setX(offsetSlider.getX());
-        offsetLabel.setY(offsetSlider.getY() + offsetSlider.getHeight());
-        offsetLabel.setFontScale(fontScale);
-        offsetValueLabel = new Label((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.", Assets.menuSkin, "song_style_result");
-        offsetValueLabel.setX(offsetSlider.getX() + offsetSlider.getWidth() - offsetValueLabel.getWidth() * fontScale);
-        offsetValueLabel.setY(offsetSlider.getY() + offsetSlider.getHeight());
-        offsetValueLabel.setFontScale(fontScale);
+        // input offset
+        offsetTable.add(inputOffsetLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
+        offsetTable.add().width(stage.getWidth() * 0.20f);
+        offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(inputOffsetSlider).width(stage.getWidth() * 0.6f).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
 
-        teamStrengthLabel.setX(teamSrengthSlider.getX());
-        teamStrengthLabel.setY(teamSrengthSlider.getY() + teamSrengthSlider.getHeight());
+        offsetTable.add().expand().fill().row();
+        offsetTable.setVisible(false);
+        offsetTable.setDebug(DEBUG);
+
+        content.add(offsetTable);
+
+        // strength block
         teamStrengthLabel.setFontScale(fontScale);
         teamStrengthValueLabel = new Label(Integer.toString(GlobalConfiguration.teamStrength), Assets.menuSkin, "song_style_result");
-        teamStrengthValueLabel.setX(teamSrengthSlider.getX() + teamSrengthSlider.getWidth() - teamStrengthValueLabel.getWidth() * fontScale);
-        teamStrengthValueLabel.setY(teamSrengthSlider.getY() + teamSrengthSlider.getHeight());
         teamStrengthValueLabel.setFontScale(fontScale);
 
-        stage.addActor(songVolumeLabel);
-        stage.addActor(feedbackVolumeLabel);
-        stage.addActor(offsetLabel);
-        stage.addActor(teamStrengthLabel);
+        teamSrengthSlider = new Slider(0, 70000, 1f, false, Assets.menuSkin);
+        teamSrengthSlider.setValue(GlobalConfiguration.teamStrength);
+        teamSrengthSlider.addListener(this);
 
-        stage.addActor(songVolumeSlider);
-        stage.addActor(feedbackVolumeSlider);
-        stage.addActor(offsetSlider);
-        stage.addActor(teamSrengthSlider);
+        final Table scoringTable = new Table();
 
-        stage.addActor(songVolumeValueLabel);
-        stage.addActor(feedbackVolumeValueLabel);
-        stage.addActor(offsetValueLabel);
-        stage.addActor(teamStrengthValueLabel);
+        scoringTable.setHeight(stage.getHeight() * 0.7f);
+        scoringTable.setWidth(stage.getWidth() * 0.6f);
 
-        returnButton.setWidth(stage.getWidth() * 0.3f);
-        returnButton.setHeight(stage.getHeight() * 0.12f);
-        returnButton.setX(stage.getWidth() / 2 - returnButton.getWidth() / 2);
-        returnButton.setY(stage.getHeight() * 0.1f);
-        returnButton.getLabel().setFontScale(fontScale);
+        scoringTable.add(teamStrengthLabel).height(teamStrengthLabel.getHeight() * fontScale).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
+        scoringTable.add().width(stage.getWidth() * 0.20f);
+        scoringTable.add(teamStrengthValueLabel).width(stage.getWidth() * 0.10f).right().row();
+        scoringTable.add(teamSrengthSlider).height(teamStrengthLabel.getHeight() * fontScale).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        scoringTable.add().expand().fill().row();
+        scoringTable.setDebug(DEBUG);
 
-        playHintSoundCheckbox = new CheckBox("Hint Sounds (" + (GlobalConfiguration.playHintSounds ? "X" : " ") + ")", Assets.menuSkin);
-        playHintSoundCheckbox.getLabel().setFontScale(fontScale);
-        playHintSoundCheckbox.setChecked(GlobalConfiguration.playHintSounds);
-        playHintSoundCheckbox.setX(stage.getWidth() / 2 - offsetSlider.getWidth() / 2);
-        playHintSoundCheckbox.getLabel().setY(pathToBeatmaps.getY() + pathToBeatmaps.getHeight() * fontScale);
-        playHintSoundCheckbox.setY(stage.getHeight() / 2 - stage.getHeight() * 0.25f-playHintSoundCheckbox.getHeight()*fontScale/2);
-        playHintSoundCheckbox.addListener(this);
-        stage.addActor(playHintSoundCheckbox);
+        scoringTable.setVisible(false);
 
-        pathToBeatmaps.setX(offsetSlider.getX());
-        pathToBeatmaps.setY(stage.getHeight() / 2 - stage.getHeight() * 0.20f + teamSrengthSlider.getHeight());
+        content.add(scoringTable);
+
+        // extras - path to beatmaps
         pathToBeatmaps.setFontScale(fontScale);
-        stage.addActor(pathToBeatmaps);
-
-        pathValueLabel.setX(offsetSlider.getX() + offsetSlider.getWidth() - pathValueLabel.getWidth() * fontScale);
-        pathValueLabel.setY(stage.getHeight() / 2 - stage.getHeight() * 0.20f + teamSrengthSlider.getHeight());
         pathValueLabel.setFontScale(fontScale);
 
-        stage.addActor(pathValueLabel);
+        final Table otherTable = new Table();
 
-        stage.addActor(returnButton);
+        otherTable.setHeight(stage.getHeight() * 0.7f);
+        otherTable.setWidth(stage.getWidth() * 0.6f);
+
+        otherTable.add(pathToBeatmaps).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().row();
+        otherTable.add(pathValueLabel).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().padLeft(stage.getWidth() * 0.03f).row();
+        otherTable.add().expand().fill().row();
+
+        otherTable.setVisible(false);
+        otherTable.setDebug(DEBUG);
+        content.add(otherTable);
+        // fill in the UI
+
+        content.setWidth(stage.getWidth() * 0.6f);
+        content.setHeight(stage.getHeight() * 0.7f);
+        content.setX(stage.getWidth() * 0.35f);
+        content.setY(stage.getHeight() * 0.10f);
+
+        stage.addActor(content);
+        stage.addActor(tabbedPane);
+
+        ChangeListener tabListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                volumeTable.setVisible(volumeSettingsTabButton.isChecked());
+                offsetTable.setVisible(offsetSettingsTabButton.isChecked());
+                scoringTable.setVisible(scoreSettingsTabButton.isChecked());
+                otherTable.setVisible(otherSettingsTabButton.isChecked());
+            }
+        };
+        volumeSettingsTabButton.addListener(tabListener);
+        offsetSettingsTabButton.addListener(tabListener);
+        scoreSettingsTabButton.addListener(tabListener);
+        otherSettingsTabButton.addListener(tabListener);
+
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -224,26 +321,25 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == songVolumeSlider) {
             GlobalConfiguration.songVolume = (int) ((Slider) actor).getValue();
             songVolumeValueLabel.setText(Integer.toString(GlobalConfiguration.songVolume));
-            songVolumeValueLabel.setX(actor.getX() + actor.getWidth() - songVolumeValueLabel.getWidth());
         }
         if (actor == feedbackVolumeSlider) {
             GlobalConfiguration.feedbackVolume = (int) ((Slider) actor).getValue();
             feedbackVolumeValueLabel.setText(Integer.toString(GlobalConfiguration.feedbackVolume));
-            feedbackVolumeValueLabel.setX(actor.getX() + actor.getWidth() - feedbackVolumeValueLabel.getWidth());
         }
         if (actor == offsetSlider) {
             GlobalConfiguration.offset = (int) ((Slider) actor).getValue();
             offsetValueLabel.setText((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.");
-            offsetValueLabel.setX(actor.getX() + actor.getWidth() - offsetValueLabel.getWidth());
+        }
+        if (actor == inputOffsetSlider) {
+            GlobalConfiguration.inputOffset = (int) ((Slider) actor).getValue();
+            inputOffsetValueLabel.setText((GlobalConfiguration.inputOffset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.inputOffset) + " ms.");
         }
         if (actor == teamSrengthSlider) {
             GlobalConfiguration.teamStrength = (int) ((Slider) actor).getValue();
             teamStrengthValueLabel.setText(Integer.toString(GlobalConfiguration.teamStrength));
-            teamStrengthValueLabel.setX(actor.getX() + actor.getWidth() - teamStrengthValueLabel.getWidth());
         }
-        if (actor == playHintSoundCheckbox)
-        {
-            GlobalConfiguration.playHintSounds = ((CheckBox)(actor)).isChecked();
+        if (actor == playHintSoundCheckbox) {
+            GlobalConfiguration.playHintSounds = ((CheckBox) (actor)).isChecked();
             playHintSoundCheckbox.setText("Hint Sounds (" + (playHintSoundCheckbox.isChecked() ? "X" : " ") + ")");
         }
     }
