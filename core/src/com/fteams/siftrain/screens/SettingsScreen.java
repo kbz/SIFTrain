@@ -61,7 +61,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     private CheckBox playHintSoundCheckbox;
 
-    private final static boolean DEBUG= false;
+    private final static boolean DEBUG = false;
 
     private Label pathValueLabel = new Label(GlobalConfiguration.pathToBeatmaps, Assets.menuSkin, "song_style_result");
 
@@ -288,6 +288,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.offset = newGlobalOffset;
                 GlobalConfiguration.inputOffset = newInputOffset;
                 GlobalConfiguration.teamStrength = newTeamStrength;
+                GlobalConfiguration.playHintSounds = newHitSoundsSetting;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -337,7 +338,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     @Override
     public void changed(ChangeEvent event, Actor actor) {
         if (actor == songVolumeSlider) {
-            newVolume  = (int) ((Slider) actor).getValue();
+            newVolume = (int) ((Slider) actor).getValue();
             songVolumeValueLabel.setText(Integer.toString(newVolume));
         }
         if (actor == feedbackVolumeSlider) {
