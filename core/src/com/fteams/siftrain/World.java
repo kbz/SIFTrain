@@ -59,8 +59,11 @@ public class World {
     private void createWorld() {
         float x = 0f;
         float y = 0f;
-        Double noteSpeed = Assets.selectedSong.song_info.get(0).notes_speed == null ?
-                SongUtils.getDefaultNoteSpeedForDifficulty(Assets.selectedSong.difficulty) : Assets.selectedSong.song_info.get(0).notes_speed;
+        if ( Assets.selectedSong.song_info.get(0).notes_speed == null)
+        {
+            Assets.selectedSong.song_info.get(0).notes_speed = SongUtils.getDefaultNoteSpeedForDifficulty(Assets.selectedSong.difficulty);
+        }
+        Double noteSpeed = Assets.selectedSong.song_info.get(0).notes_speed;
         score = 0;
         if (Assets.selectedSong.rank_info != null && !Assets.selectedSong.rank_info.isEmpty() && Assets.selectedSong.rank_info.size() >= 4) {
             // rank array is sorted in ascending order, the first element is most likely a 0
