@@ -67,6 +67,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     private TextButton returnButton = new TextButton("Save and Return", Assets.menuSkin, "item1");
 
+    private Integer newVolume;
+    private Integer newFeedbackVolume;
+    private Integer newGlobalOffset;
+    private Integer newInputOffset;
+    private Integer newTeamStrength;
+    private Boolean newHitSoundsSetting;
+
     @Override
     public void show() {
         float fontScale = stage.getHeight() / GlobalConfiguration.BASE_HEIGHT;
@@ -79,6 +86,12 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         otherSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
         returnButton.getLabel().setFontScale(fontScale * 0.7f);
 
+        newVolume = GlobalConfiguration.songVolume;
+        newFeedbackVolume = GlobalConfiguration.feedbackVolume;
+        newGlobalOffset = GlobalConfiguration.offset;
+        newInputOffset = GlobalConfiguration.inputOffset;
+        newTeamStrength = GlobalConfiguration.teamStrength;
+        newHitSoundsSetting = GlobalConfiguration.playHintSounds;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
@@ -270,6 +283,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         returnButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                GlobalConfiguration.songVolume = newVolume;
+                GlobalConfiguration.feedbackVolume = newFeedbackVolume;
+                GlobalConfiguration.offset = newGlobalOffset;
+                GlobalConfiguration.inputOffset = newInputOffset;
+                GlobalConfiguration.teamStrength = newTeamStrength;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -319,27 +337,27 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     @Override
     public void changed(ChangeEvent event, Actor actor) {
         if (actor == songVolumeSlider) {
-            GlobalConfiguration.songVolume = (int) ((Slider) actor).getValue();
-            songVolumeValueLabel.setText(Integer.toString(GlobalConfiguration.songVolume));
+            newVolume  = (int) ((Slider) actor).getValue();
+            songVolumeValueLabel.setText(Integer.toString(newVolume));
         }
         if (actor == feedbackVolumeSlider) {
-            GlobalConfiguration.feedbackVolume = (int) ((Slider) actor).getValue();
-            feedbackVolumeValueLabel.setText(Integer.toString(GlobalConfiguration.feedbackVolume));
+            newFeedbackVolume = (int) ((Slider) actor).getValue();
+            feedbackVolumeValueLabel.setText(Integer.toString(newFeedbackVolume));
         }
         if (actor == offsetSlider) {
-            GlobalConfiguration.offset = (int) ((Slider) actor).getValue();
-            offsetValueLabel.setText((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.");
+            newGlobalOffset = (int) ((Slider) actor).getValue();
+            offsetValueLabel.setText((newGlobalOffset > 0 ? "+" : "") + Integer.toString(newGlobalOffset) + " ms.");
         }
         if (actor == inputOffsetSlider) {
-            GlobalConfiguration.inputOffset = (int) ((Slider) actor).getValue();
-            inputOffsetValueLabel.setText((GlobalConfiguration.inputOffset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.inputOffset) + " ms.");
+            newInputOffset = (int) ((Slider) actor).getValue();
+            inputOffsetValueLabel.setText((newInputOffset > 0 ? "+" : "") + Integer.toString(newInputOffset) + " ms.");
         }
         if (actor == teamSrengthSlider) {
-            GlobalConfiguration.teamStrength = (int) ((Slider) actor).getValue();
-            teamStrengthValueLabel.setText(Integer.toString(GlobalConfiguration.teamStrength));
+            newTeamStrength = (int) ((Slider) actor).getValue();
+            teamStrengthValueLabel.setText(Integer.toString(newTeamStrength));
         }
         if (actor == playHintSoundCheckbox) {
-            GlobalConfiguration.playHintSounds = ((CheckBox) (actor)).isChecked();
+            newHitSoundsSetting = ((CheckBox) (actor)).isChecked();
             playHintSoundCheckbox.setText("Hint Sounds (" + (playHintSoundCheckbox.isChecked() ? "X" : " ") + ")");
         }
     }
@@ -351,7 +369,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.BACK) {
+        if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
             // do nothing
             // Return without saving the changes
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
