@@ -38,10 +38,8 @@ public class BeatmapLoadingScreen implements Screen {
         backgroundImage.setWidth(stage.getWidth());
         stage.addActor(backgroundImage);
 
-
-        SimpleSong song = Assets.selectedSong;
         SimpleSongLoader loader = new SimpleSongLoader();
-        loader.validateSong(song);
+        SimpleSong song = loader.loadSong(Assets.selectedBeatmap);
 
         Table table = new Table();
         table.setX(stage.getWidth() * 0.15f);
@@ -82,7 +80,7 @@ public class BeatmapLoadingScreen implements Screen {
                 Label errorLabel = new Label(error, Assets.menuSkin, "song_style_result");
                 errorLabel.setFontScale(scaleFactor);
                 errorLabel.setWrap(true);
-                errorTable.add(errorLabel).width(stage.getWidth()*0.7f).left().fillX().row();
+                errorTable.add(errorLabel).width(stage.getWidth() * 0.7f).left().fillX().row();
             }
             ScrollPane errorPane = new ScrollPane(errorTable);
             table.add(errorPane).width(stage.getWidth() * 0.7f).height(stage.getHeight() * 0.25f).row();
@@ -96,7 +94,7 @@ public class BeatmapLoadingScreen implements Screen {
                     Label warningLabel = new Label(warning, Assets.menuSkin, "song_style_result");
                     warningLabel.setFontScale(scaleFactor);
                     warningLabel.setWrap(true);
-                    warningTable.add(warningLabel).width(stage.getWidth()*0.7f).left().fillX().row();
+                    warningTable.add(warningLabel).width(stage.getWidth() * 0.7f).left().fillX().row();
                 }
                 ScrollPane warningPane = new ScrollPane(warningTable);
                 table.add(warningPane).width(stage.getWidth() * 0.7f).height(stage.getHeight() * 0.25f).row();

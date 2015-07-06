@@ -38,7 +38,7 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<BeatmapDesc
             beatmap.setFileName(fileName);
         }
         finally {
-            beatmap.setResourceName(handle.file().getName().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)|(\\.rs)", ""));
+            beatmap.setResourceName(handle.nameWithoutExtension().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)", ""));
         }
     }
 

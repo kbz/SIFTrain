@@ -57,6 +57,9 @@ public class Assets {
         internalManager.load("fonts/song-font.fnt", BitmapFont.class);
         if (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles").exists()) {
             for (String fileName : Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles").file().list()) {
+                String fullPath = Gdx.files.getExternalStoragePath() + "beatmaps/datafiles/" + fileName;
+                if (Gdx.files.absolute(fullPath).isDirectory() || !fileName.endsWith(".rs"))
+                    continue;
                 externalManager.load("beatmaps/datafiles/" + fileName, BeatmapDescription.class);
             }
         } else {

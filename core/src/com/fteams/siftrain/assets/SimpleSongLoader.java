@@ -42,10 +42,12 @@ public class SimpleSongLoader {
             song = new SimpleSong();
             song.song_name = "Invalid JSON Format: " + handle.file().getName();
             song.difficulty = 1;
+            beatmap.song_name = "Error: Invalid JSON Format. (" + handle.file().getName() + ")";
+            errors.add("Invalid JSON Format");
             song.setValid(false);
         } finally {
             if (song != null) {
-                song.setResourceName(handle.file().getName().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)|(\\.rs)", ""));
+                song.setResourceName(handle.nameWithoutExtension().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)", ""));
             }
         }
         return song;

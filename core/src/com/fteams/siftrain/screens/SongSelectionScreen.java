@@ -82,7 +82,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                 Assets.setSelectedBeatmap(songList.getSelected());
                 SimpleSongLoader loader = new SimpleSongLoader();
                 Assets.selectedSong = loader.loadSong(Assets.selectedBeatmap);
-                if (loader.getErrors().size() > 0 || loader.getWarnings().size() > 0)
+                if (!Assets.selectedSong.getValid() || loader.getErrors().size() > 0 || loader.getWarnings().size() > 0)
                 {
                     ((Game) Gdx.app.getApplicationListener()).setScreen(new BeatmapLoadingScreen());
                 }
