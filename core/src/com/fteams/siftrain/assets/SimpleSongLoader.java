@@ -47,7 +47,7 @@ public class SimpleSongLoader {
             song.setValid(false);
         } finally {
             if (song != null) {
-                song.setResourceName(handle.nameWithoutExtension().replaceAll("(_easy)|(_normal)|(_hard)|(_expert)", ""));
+                song.setResourceName(handle.nameWithoutExtension().replaceAll("_(easy|norma|hard|expert)$", ""));
             }
         }
         return song;
