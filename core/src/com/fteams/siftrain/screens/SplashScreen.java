@@ -23,6 +23,7 @@ public class SplashScreen implements Screen {
     private ProgressBar loadingProgress = new ProgressBar(0.0f, 100f, 0.1f, false, skin);
 
     public boolean animationDone = false;
+    int phase = 0;
 
     @Override
     public void render(float delta) {
@@ -36,14 +37,22 @@ public class SplashScreen implements Screen {
             if (animationDone) { // when the animation is finished, go to MainMenu()
                 // load the assets to into the Assets class
                 Assets.setMenuSkin();
-                Assets.setSongs();
                 Assets.setHitsounds();
                 Assets.setTextures();
                 Assets.setFonts();
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
+                if (phase == 1)
+                {
+                    Assets.setSongs();
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
+                }
+                if (phase == 0)
+                {
+                    phase++;
+                    Assets.reloadBeatmaps();
+                }
             }
         }
-        loadingProgress.setValue(Assets.getProgress() * 100f);
+        loadingProgress.setValue(phase == 0 ? Assets.getProgress() * 100f : (Assets.getProgress() - 0.5f)*200f);
         loadingProgress.act(delta);
     }
 
@@ -76,6 +85,13 @@ public class SplashScreen implements Screen {
                 animationDone = true;
             }
         })));
+        // Queue loading will load 2 sets of assets:
+        // internal assets: images and hit sounds
+        // external assets: beatmaps
+        // while processing external assets, it may also install .osz beatmaps
+        // or convert .osu files, which is why after the first pass is completed,
+        // we update the set of loaded maps to include the recently extracted maps
+        // if nothing was installed or changed, the second phase won't last long.
         Assets.queueLoading();
         GlobalConfiguration.loadConfiguration();
     }

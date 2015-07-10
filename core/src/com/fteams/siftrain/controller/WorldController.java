@@ -74,7 +74,7 @@ public class WorldController implements Music.OnCompletionListener {
         this.lastmtime = 0f;
         this.time = 0f;
         this.oldTime = 0f;
-        theSong = SongLoader.loadSongFile(Assets.selectedSong.getResourceName());
+        theSong = SongLoader.loadSongFile();
         this.hasMusic = theSong != null;
         this.timeSyncAcc = 0f;
     }

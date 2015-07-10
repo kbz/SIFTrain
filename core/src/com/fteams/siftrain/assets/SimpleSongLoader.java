@@ -2,11 +2,10 @@ package com.fteams.siftrain.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.fteams.siftrain.entities.BeatmapDescription;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.entities.SimpleSong;
-import com.fteams.siftrain.util.SongUtils;
+import com.fteams.siftrain.entities.SongFileInfo;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class SimpleSongLoader {
         return warnings;
     }
 
-    public SimpleSong loadSong(BeatmapDescription beatmap) {
+    public SimpleSong loadSong(SongFileInfo beatmap) {
         FileHandle handle = Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "/" + beatmap.getFileName());
         SimpleSong song = null;
         String jsonDefinition = handle.readString("UTF-8");

@@ -90,11 +90,9 @@ public class World {
             Assets.selectedSong.rank_info.add(new SimpleRankInfo(sScore));
             Assets.selectedSong.rank_info.add(new SimpleRankInfo(0));
         }
-        Double firstNote = Assets.selectedSong.song_info.get(0).notes.get(0).timing_sec;
-        delay = 0f;
-        if (firstNote < noteSpeed) {
-            delay = (float) (noteSpeed - firstNote) + 0.5f;
-        }
+
+        delay = Assets.selectedSong.lead_in != null ? Assets.selectedSong.lead_in : 0f;
+
         for (SimpleNotesInfo notesInfo : Assets.selectedSong.song_info.get(0).notes) {
             CircleMark mark = new CircleMark(x, y, notesInfo, noteSpeed, delay);
             marks.add(mark);

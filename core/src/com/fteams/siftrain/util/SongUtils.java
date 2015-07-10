@@ -15,8 +15,7 @@ public class SongUtils {
     }
 
     public static Double getDefaultNoteSpeedForDifficulty(Integer difficulty) {
-        switch(difficulty)
-        {
+        switch (difficulty) {
             case 1:
                 return 1.6;
             case 2:
@@ -30,30 +29,61 @@ public class SongUtils {
         }
     }
 
-    static float rankMultiplier [][] = {{1, 1.5f, 2, 2.5f},{1, 2, 2.5f, 3},{1, 2.5f, 3, 3.5f},{1, 2.75f, 3, 3.25f}};
-    static float difficultyMultiplier [] = {88, 129, 170, 211};
+    static float rankMultiplier[][] = {{1, 1.5f, 2, 2.5f}, {1, 2, 2.5f, 3}, {1, 2.5f, 3, 3.5f}, {1, 2.75f, 3, 3.25f}};
+    static float difficultyMultiplier[] = {88, 129, 170, 211};
 
     public static int getCScoreForSong(int size, Integer difficulty) {
-        float rMult = rankMultiplier[difficulty-1][0];
-        float dMult = difficultyMultiplier[difficulty-1];
-        return (int)Math.ceil(rMult * dMult * size );
+        float rMult = rankMultiplier[difficulty - 1][0];
+        float dMult = difficultyMultiplier[difficulty - 1];
+        return (int) Math.ceil(rMult * dMult * size);
     }
 
     public static int getBScoreForSong(int size, Integer difficulty) {
-        float rMult = rankMultiplier[difficulty-1][1];
-        float dMult = difficultyMultiplier[difficulty-1];
-        return (int)Math.ceil(rMult * dMult * size );
+        float rMult = rankMultiplier[difficulty - 1][1];
+        float dMult = difficultyMultiplier[difficulty - 1];
+        return (int) Math.ceil(rMult * dMult * size);
     }
 
     public static int getAScoreForSong(int size, Integer difficulty) {
-        float rMult = rankMultiplier[difficulty-1][2];
-        float dMult = difficultyMultiplier[difficulty-1];
-        return (int)Math.ceil(rMult * dMult * size );
+        float rMult = rankMultiplier[difficulty - 1][2];
+        float dMult = difficultyMultiplier[difficulty - 1];
+        return (int) Math.ceil(rMult * dMult * size);
     }
 
     public static int getSScoreForSong(int size, Integer difficulty) {
-        float rMult = rankMultiplier[difficulty-1][3];
-        float dMult = difficultyMultiplier[difficulty-1];
-        return (int)Math.ceil(rMult * dMult * size );
+        float rMult = rankMultiplier[difficulty - 1][3];
+        float dMult = difficultyMultiplier[difficulty - 1];
+        return (int) Math.ceil(rMult * dMult * size);
+    }
+
+    static double[] speedForApproachRate = {1.8, 1.68, 1.56, 1.44, 1.32, 1.2, 1.05, 0.9, 0.75, 0.6, 0.45};
+
+    public static Double getDefaultNoteSpeedForApproachRate(int i) {
+        return speedForApproachRate[i];
+    }
+
+    static int[][] positionForMode = {
+            // 1:
+            {5},
+            // 2
+            {6, 4},
+            // 3
+            {7, 5, 3},
+            // 4
+            {8, 6, 4, 2},
+            // 5
+            {7, 6, 5, 4, 3},
+            // 6
+            {8, 7, 6, 4, 3, 2},
+            // 7
+            {8, 7, 6, 5, 4, 3, 2},
+            // 8
+            {9, 8, 7, 6, 4, 3, 2, 1},
+            // 9
+            {9, 8, 7, 6, 5, 4, 3, 2, 1}
+    };
+
+    public static int getPositionForMode(int mode, int position) {
+        return positionForMode[mode - 1][position];
     }
 }

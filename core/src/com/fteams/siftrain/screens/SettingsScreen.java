@@ -66,6 +66,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Label pathValueLabel = new Label(GlobalConfiguration.pathToBeatmaps, Assets.menuSkin, "song_style_result");
 
     private TextButton returnButton = new TextButton("Save and Return", Assets.menuSkin, "item1");
+    private TextButton reloadBeatmaps = new TextButton("Reload Beatmaps!", Assets.menuSkin, "item1");
 
     private Integer newVolume;
     private Integer newFeedbackVolume;
@@ -85,6 +86,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         scoreSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
         otherSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
         returnButton.getLabel().setFontScale(fontScale * 0.7f);
+        reloadBeatmaps.getLabel().setFontScale(fontScale * 0.7f);
 
         newVolume = GlobalConfiguration.songVolume;
         newFeedbackVolume = GlobalConfiguration.feedbackVolume;
@@ -251,6 +253,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
         otherTable.add(pathToBeatmaps).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().row();
         otherTable.add(pathValueLabel).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().padLeft(stage.getWidth() * 0.03f).row();
+        otherTable.add(reloadBeatmaps).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().padLeft(stage.getWidth() * 0.03f).row();
         otherTable.add().expand().fill().row();
 
         otherTable.setVisible(false);
@@ -279,6 +282,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetSettingsTabButton.addListener(tabListener);
         scoreSettingsTabButton.addListener(tabListener);
         otherSettingsTabButton.addListener(tabListener);
+
+        reloadBeatmaps.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Assets.hardReloadBeatmaps();
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new BeatmapReloadScreen());
+            }});
 
         returnButton.addListener(new ClickListener() {
             @Override

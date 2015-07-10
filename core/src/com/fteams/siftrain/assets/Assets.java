@@ -10,8 +10,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.fteams.siftrain.entities.BeatmapDescription;
 import com.fteams.siftrain.entities.SimpleSong;
+import com.fteams.siftrain.entities.SongFileInfo;
+
+import java.util.List;
 
 public class Assets {
 
@@ -19,11 +21,12 @@ public class Assets {
     public static AssetManager externalManager = new AssetManager(new ExternalFileHandleResolver());
 
     static {
-        externalManager.setLoader(BeatmapDescription.class, new SimplifiedBeatmapLoader(new ExternalFileHandleResolver()));
+        externalManager.setLoader(List.class, new SimplifiedBeatmapLoader(new ExternalFileHandleResolver()));
     }
 
-    public static BeatmapDescription selectedBeatmap;
     public static SimpleSong selectedSong;
+    public static SongFileInfo selectedMap;
+
     public static TextureAtlas atlas;
 
     public static Skin menuSkin;
@@ -38,7 +41,7 @@ public class Assets {
     public static Texture holdBG;
     public static Texture holdBGHolding;
 
-    public static Array<BeatmapDescription> beatmapList;
+    public static Array<SongFileInfo> beatmapList;
 
     // In here we'll put everything that needs to be loaded in this format:
     // manager.load("file location in assets", fileType.class);
@@ -55,18 +58,42 @@ public class Assets {
         internalManager.load("images/hold_background.png", Texture.class);
         internalManager.load("images/hold_background_holding.png", Texture.class);
         internalManager.load("fonts/song-font.fnt", BitmapFont.class);
+        reloadBeatmaps();
+    }
+
+    // thanks to libgdx, the manager will not actually load maps which were already loaded,
+    // so if the same file comes again, it will be skipped
+    public static void reloadBeatmaps() {
         if (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles").exists()) {
             for (String fileName : Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles").file().list()) {
                 String fullPath = Gdx.files.getExternalStoragePath() + "beatmaps/datafiles/" + fileName;
-                if (Gdx.files.absolute(fullPath).isDirectory() || !fileName.endsWith(".rs"))
+                // if for any reason the user placed .osu/.osz files in the datafiles, we process them
+                if (Gdx.files.absolute(fullPath).isDirectory() || (!fileName.endsWith(".rs") && !fileName.endsWith(".osz") && !fileName.endsWith(".osu")))
                     continue;
-                externalManager.load("beatmaps/datafiles/" + fileName, BeatmapDescription.class);
+
+                externalManager.load("beatmaps/datafiles/" + fileName, List.class);
+            }
+            // process osu files from the beatmaps folder
+            for (String fileName : Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/").file().list()) {
+                String fullPath = Gdx.files.getExternalStoragePath() + "beatmaps/" + fileName;
+                if (Gdx.files.absolute(fullPath).isDirectory() || (!fileName.endsWith(".osz") && !fileName.endsWith(".osu")))
+                    continue;
+                externalManager.load("beatmaps/" + fileName, List.class);
             }
         } else {
             (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps")).mkdirs();
             (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/datafiles")).mkdirs();
             (Gdx.files.absolute(Gdx.files.getExternalStoragePath() + "beatmaps/soundfiles")).mkdirs();
         }
+    }
+
+    // unlike the simple reload, in the hard reload we unload everything from the external manager
+    // and force a reload of the beatmaps - this will cause .osz files which weren't extracted
+    // to be processed, .osu files to be converted and music files within the .osz packages
+    // to be copied over to the /beatmaps/soundfiles/ folder.
+    public static void hardReloadBeatmaps() {
+        externalManager.clear();
+        reloadBeatmaps();
     }
 
     //In here we'll create our skin, so we only have to create it once.
@@ -106,16 +133,22 @@ public class Assets {
             perfectSound = internalManager.get("hitsounds/perfect.mp3");
     }
 
+    @SuppressWarnings("unchecked")
     public static void setSongs() {
         if (beatmapList == null) {
             beatmapList = new Array<>();
-            Array<String> assets = externalManager.getAssetNames();
-            for (String string : assets) {
-                beatmapList.add(externalManager.get(string, BeatmapDescription.class));
-            }
-
-            beatmapList.sort();
+        } else {
+            beatmapList.clear();
         }
+
+        Array<String> assets = externalManager.getAssetNames();
+        for (String string : assets) {
+            List<SongFileInfo> beatmaps = externalManager.get(string, List.class);
+            for (SongFileInfo beatmap : beatmaps) {
+                beatmapList.addAll(beatmap);
+            }
+        }
+        beatmapList.sort();
     }
 
     public static boolean update() {
@@ -124,10 +157,6 @@ public class Assets {
 
     public static float getProgress() {
         return (internalManager.getProgress() + externalManager.getProgress()) / 2;
-    }
-
-    public static void setSelectedBeatmap(BeatmapDescription beatmap) {
-        selectedBeatmap = beatmap;
     }
 
     public static void setSelectedSong(SimpleSong song) {

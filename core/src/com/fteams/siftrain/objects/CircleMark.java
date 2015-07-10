@@ -75,7 +75,7 @@ public class CircleMark implements Comparable<CircleMark> {
 
 
     public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed, float delay) {
-        float timing = (float) (delay + note.timing_sec * 1f - GlobalConfiguration.offset * 1f / 1000f);
+        float timing = (float) (delay + note.timing_sec * 1f + GlobalConfiguration.offset * 1f / 1000f);
         notePosition = note.position;
         this.position.x = x;
         this.position.y = y;
@@ -238,7 +238,6 @@ public class CircleMark implements Comparable<CircleMark> {
             // miss if we hold for too long
             if (holdEndEndWaitTime <= time && waitingEnd && !miss) {
                 //System.out.println("MISS-003: held for too long");
-                //System.out.println(stateMap);
                 miss = true;
                 waitingEnd = false;
                 holding = false;
