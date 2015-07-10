@@ -87,9 +87,9 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             List<SimpleSong> songs = new ArrayList<>();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
-                Long crc = entry.getCrc();
                 // get only osu files
                 if (entry.getName().endsWith(".osu")) {
+                    Long crc = entry.getCrc();
                     try {
                         // check if the beatmap already exists - was extracted before
                         // if the osz file was found in the root directory, we go down to datafiles
