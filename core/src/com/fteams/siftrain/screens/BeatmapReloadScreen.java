@@ -18,7 +18,7 @@ public class BeatmapReloadScreen implements Screen {
     int phase = 0;
     Label infoLabel = new Label("Performing a hard reload...\n\n" +
             "If any .osz or .osu beatmaps were added or updated, " +
-            "be sure to remove their their corresponding .rs files.\n\n" +
+            "their corresponding .rs files will be created or regenerated.\n\n" +
             "For .osz beatmap containers, sound files will be extracted " +
             "into beatmaps/soundfiles/, the beatmap files (.osu) will be " +
             "converted into .rs format and placed in beatmaps/datafiles/ " +

@@ -8,6 +8,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.compression.CRC;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.entities.SimpleSong;
@@ -29,11 +30,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, SimplifiedBeatmapLoader.BeatmapParameter> {
     private List<SongFileInfo> beatmaps;
+
+    static int BLOCK_SIZE = 8192;
 
     public SimplifiedBeatmapLoader(FileHandleResolver resolver) {
         super(resolver);
@@ -83,6 +87,7 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             List<SimpleSong> songs = new ArrayList<>();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
+                Long crc = entry.getCrc();
                 // get only osu files
                 if (entry.getName().endsWith(".osu")) {
                     try {
@@ -101,17 +106,24 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
                         // check if the entries already exist
                         for (FileHandle fh : files) {
                             if (fh.name().equals(entry.getName().replace(".osu", ".rs"))) {
-                                found = true;
+                                Gdx.app.log("OSZ_LOADER", "Entry: [" + entry.getName().replace(".osu", ".rs") + "] exists, performing a crc check.");
+                                SongFileInfo info = new Gson().fromJson(fh.readString(), SongFileInfo.class);
+                                //
+                                if (info.getCrc() != null && entry.getCrc() == crc) {
+                                    // if the CRC matches, we skip the file. Otherwise we'll re-process it.
+                                    found = true;
+                                }
                                 break;
                             }
                         }
 
                         if (found) {
-                            Gdx.app.log("OSZ_LOADER", "Entry: [" + entry.getName().replace(".osu", ".rs") + "] exists, skipping.");
+                            Gdx.app.log("OSZ_LOADER", "Entry: [" + entry.getName().replace(".osu", ".rs") + "] has the same CRC, skipping.");
                             continue;
                         }
 
                         SimpleSong beatmap = processOsuStandardFile(osuZipFile.getInputStream(entry));
+                        beatmap.setCrc(crc);
                         songs.add(beatmap);
                         storeBeatmap(beatmap, "beatmaps/datafiles/" + entry.getName().replace(".osu", ".rs"));
                     } catch (Exception e) {
@@ -139,6 +151,8 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             Gdx.app.log("OSU_LOADER", "converting map: " + fileName);
             FileHandle handle = resolve(fileName);
 
+            Long crc = computeCRC(handle);
+
             FileHandle[] files;
             // if the osu file was in the root 'beatmaps' directory, go down to the datafiles directory
             if (handle.parent().name().equals("beatmaps")) {
@@ -151,7 +165,11 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             boolean found = false;
             for (FileHandle fh : files) {
                 if (fh.name().equals(handle.name().replace(".osu", ".rs"))) {
-                    found = true;
+                    Gdx.app.log("OSU_LOADER", "Map [" + handle.nameWithoutExtension() + ".rs] already exists, checking crc.");
+                    SongFileInfo info = new Gson().fromJson(fh.readString(), SongFileInfo.class);
+                    if (info.getCrc() != null && info.getCrc().equals(crc)) {
+                        found = true;
+                    }
                     break;
                 }
             }
@@ -159,18 +177,35 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             // if someone wants a hard reload, they can remove the .rs file
             // and have the game re-generate them
             if (found) {
-                Gdx.app.log("OSU_LOADER", "Map [" + handle.nameWithoutExtension() + ".rs] already exists, skipping.");
+                Gdx.app.log("OSU_LOADER", "Map [" + handle.nameWithoutExtension() + ".rs] crc match, skipping.");
                 return;
+            } else {
+                Gdx.app.log("OSU_LOADER", "Map [" + handle.nameWithoutExtension() + ".rs] crc didn't match - generating map.");
             }
 
             InputStream is = new FileInputStream(handle.file());
             SimpleSong beatmap = processOsuStandardFile(is);
+            beatmap.setCrc(crc);
             storeBeatmap(beatmap, "beatmaps/datafiles/" + fileName.split("\\\\|/", 2)[1].replace(".osu", ".rs"));
         } catch (Exception e) {
             // something happened while loading the file
             // just exit
             Gdx.app.log("OSZ_LOADER", "Attempted to load a non-mania map: " + fileName);
         }
+    }
+
+    private Long computeCRC(FileHandle handle) throws IOException {
+        File file = handle.file();
+        FileInputStream fis = new FileInputStream(file);
+        byte[] bytes = new byte[BLOCK_SIZE];
+        CRC32 crc32 = new CRC32();
+        int len = fis.read(bytes, 0, BLOCK_SIZE);
+        while (len != -1)
+        {
+            crc32.update(bytes, 0, len);
+            len = fis.read(bytes, 0, BLOCK_SIZE);
+        }
+        return crc32.getValue();
     }
 
     private void storeMusicFile(InputStream inputStream, String fileName) {
@@ -182,7 +217,6 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
         try {
             FileOutputStream fos = new FileOutputStream(output);
             // tried bigger blocks, didn't really get better performance.
-            int BLOCK_SIZE = 8192;
             byte[] buffer = new byte[BLOCK_SIZE];
             int len = inputStream.read(buffer, 0, BLOCK_SIZE);
             while (len != -1) {
