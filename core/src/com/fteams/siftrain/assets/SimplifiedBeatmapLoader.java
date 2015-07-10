@@ -8,7 +8,6 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.compression.CRC;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.entities.SimpleSong;
@@ -28,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.CRC32;
@@ -200,8 +200,7 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
         byte[] bytes = new byte[BLOCK_SIZE];
         CRC32 crc32 = new CRC32();
         int len = fis.read(bytes, 0, BLOCK_SIZE);
-        while (len != -1)
-        {
+        while (len != -1) {
             crc32.update(bytes, 0, len);
             len = fis.read(bytes, 0, BLOCK_SIZE);
         }
@@ -334,12 +333,24 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
     // since we're creating the maps, we need to make sure that notes which land at the same time are tagged as simultaneous
     private void processEffects(SimpleSong song) {
         SimpleSongInfo info = song.song_info.get(0);
-        for (SimpleNotesInfo note : info.notes) {
-            for (SimpleNotesInfo note2 : info.notes) {
-                if (note2.timing_sec.equals(note.timing_sec) && !note.equals(note2)) {
-                    note.effect = note.effect | SongUtils.NOTE_TYPE_SIMULT_START;
-                    // todo: if the note is a hold, check if the release time matches the timing or release timing of another note as well.
+        List<SimpleNotesInfo> notes = info.notes;
+        // sort the notes by timing and position
+        Collections.sort(notes);
+        for (int i = 0; i < notes.size(); i++) {
+            SimpleNotesInfo currentNote = notes.get(i);
+            if ((currentNote.effect | SongUtils.NOTE_TYPE_SIMULT_START) != 0)
+                continue;
+
+            for (int j = i + 1; j < notes.size(); j++) {
+                SimpleNotesInfo nextNote = notes.get(j);
+                // if the next note spawns after this note is gone, we can stop checking this note.
+                if (nextNote.timing_sec > currentNote.timing_sec) {
                     break;
+                }
+                // we only look for notes which start at the same time
+                if (nextNote.timing_sec.equals(currentNote.timing_sec)) {
+                    currentNote.effect = currentNote.effect | SongUtils.NOTE_TYPE_SIMULT_START;
+                    nextNote.effect = nextNote.effect | SongUtils.NOTE_TYPE_SIMULT_START;
                 }
             }
         }

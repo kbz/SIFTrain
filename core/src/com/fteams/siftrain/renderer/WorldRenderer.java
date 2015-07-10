@@ -329,7 +329,7 @@ public class WorldRenderer {
                     spriteBatch.draw(new PolygonRegion(mark.holding ? holdBGHolding : holdBG, points, triangles), centerX, centerY);
                 }
                 if (mark.endVisible) {
-                    TextureRegion region = circleHoldEnd;
+                    TextureRegion region = (mark.effect & SongUtils.NOTE_TYPE_SIMULT_END) != 0 ? circleHoldEndSim : circleHoldEnd;
                     spriteBatch.draw(region, centerX - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().x * ppuX, centerY - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().y * ppuY, size * mark.getSize2(), size * mark.getSize2());
                 }
                 // coordinates for the beam start and end
