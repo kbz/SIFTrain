@@ -13,6 +13,9 @@ public class SongUtils {
     public final static Integer SORTING_MODE_FILE_NAME = 0;
     public final static Integer SORTING_MODE_SONG_NAME = 1;
 
+    public final static Integer RANDOM_MODE_OLD = 0;
+    public final static Integer RANDOM_MODE_NEW = 1;
+
     public static String getDifficulty(Integer difficulty) {
         return DIFF[difficulty - 1];
     }

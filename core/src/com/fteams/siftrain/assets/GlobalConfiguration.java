@@ -2,6 +2,7 @@ package com.fteams.siftrain.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.fteams.siftrain.util.SongUtils;
 
 public class GlobalConfiguration {
     public static int songVolume;
@@ -16,6 +17,8 @@ public class GlobalConfiguration {
     public static boolean playHintSounds;
     // sorting related
     public static int sortMode;
+    // randomizer config
+    public static int randomMode;
 
     // other - per session configs
     public static boolean random;
@@ -31,7 +34,10 @@ public class GlobalConfiguration {
         feedbackVolume = prefs.getInteger("feedback_vol", 100);
         pathToBeatmaps = prefs.getString("path_to_beatmaps", Gdx.files.getExternalStoragePath() + "beatmaps");
         playHintSounds = prefs.getBoolean("play_hint_sounds", false);
-        sortMode = prefs.getInteger("sorting_mode", 1);
+        // default to song name sorting
+        sortMode = prefs.getInteger("sorting_mode", SongUtils.SORTING_MODE_SONG_NAME);
+        // default to the new mode
+        randomMode = prefs.getInteger("random_mode", SongUtils.RANDOM_MODE_NEW);
 
     }
 
@@ -45,6 +51,7 @@ public class GlobalConfiguration {
         prefs.putString("path_to_beatmaps", pathToBeatmaps);
         prefs.putBoolean("play_hint_sounds", playHintSounds);
         prefs.putInteger("sorting_mode", sortMode);
+        prefs.putInteger("random_mode", randomMode);
         prefs.flush();
     }
 }

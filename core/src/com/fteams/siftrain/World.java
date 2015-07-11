@@ -9,7 +9,8 @@ import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
-import com.fteams.siftrain.util.Randomizer;
+import com.fteams.siftrain.util.NewAlgorithmRandomizer;
+import com.fteams.siftrain.util.OldAlgorithmRandomizer;
 import com.fteams.siftrain.util.SongUtils;
 
 import java.util.ArrayList;
@@ -100,8 +101,19 @@ public class World {
         marks.sort();
 
         if (GlobalConfiguration.random) {
-            Randomizer randomizer = new Randomizer();
-            randomizer.randomize(marks);
+            switch (GlobalConfiguration.randomMode)
+            {
+                case 0:
+                    OldAlgorithmRandomizer oldAlgorithmRandomizer = new OldAlgorithmRandomizer();
+                    oldAlgorithmRandomizer.randomize(marks);
+                    break;
+                case 1:
+                    NewAlgorithmRandomizer newAlgorithmRandomizer = new NewAlgorithmRandomizer();
+                    newAlgorithmRandomizer.randomize(marks);
+                    break;
+                default:
+                    break;
+            }
         }
 
         float step = (float) (Math.PI / 8);

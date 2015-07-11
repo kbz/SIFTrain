@@ -6,7 +6,7 @@ import com.fteams.siftrain.objects.CircleMark;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Randomizer {
+public class NewAlgorithmRandomizer {
 
     private boolean left;
     private boolean holding;
@@ -19,7 +19,6 @@ public class Randomizer {
         marks.sort();
 
         double averageDistance = calculateAverageDistance(marks);
-        int processed = 0;
 
         holding = false;
         // set the position for each note

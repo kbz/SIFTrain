@@ -61,8 +61,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     private CheckBox playHintSoundCheckbox;
     private CheckBox sortingModeChooser;
+    private CheckBox randomModeChooser;
 
     private String[] sortingModes = {"File Name", "Song Name"};
+    private String [] randomModes = {"Old mode", "New mode"};
 
     private final static boolean DEBUG = false;
 
@@ -78,6 +80,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Integer newTeamStrength;
     private Boolean newHitSoundsSetting;
     private Integer newSortingMode;
+    private Integer newRandomMode;
 
     @Override
     public void show() {
@@ -99,6 +102,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         newTeamStrength = GlobalConfiguration.teamStrength;
         newHitSoundsSetting = GlobalConfiguration.playHintSounds;
         newSortingMode = GlobalConfiguration.sortMode;
+        newRandomMode = GlobalConfiguration.randomMode;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
@@ -257,6 +261,12 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         sortingModeChooser.getImageCell().width(0);
         sortingModeChooser.addListener(this);
 
+        // extras - random mode
+        randomModeChooser = new CheckBox("Random Mode: " + randomModes[GlobalConfiguration.randomMode], Assets.menuSkin);;
+        randomModeChooser.getLabel().setFontScale(fontScale);
+        randomModeChooser.getImageCell().width(0);
+        randomModeChooser.addListener(this);
+
         final Table otherTable = new Table();
 
         otherTable.setHeight(stage.getHeight() * 0.7f);
@@ -265,6 +275,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         otherTable.add(pathToBeatmaps).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().row();
         otherTable.add(pathValueLabel).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().padLeft(stage.getWidth() * 0.03f).row();
         otherTable.add(sortingModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
+        otherTable.add(randomModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add().expand().fill().row();
         otherTable.add(reloadBeatmaps).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
 
@@ -313,6 +324,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.teamStrength = newTeamStrength;
                 GlobalConfiguration.playHintSounds = newHitSoundsSetting;
                 GlobalConfiguration.sortMode = newSortingMode;
+                GlobalConfiguration.randomMode = newRandomMode;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -388,6 +400,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == sortingModeChooser) {
             newSortingMode = (newSortingMode + 1) % sortingModes.length;
             sortingModeChooser.setText("Sorting Mode: " + sortingModes[newSortingMode]);
+        }
+        if (actor == randomModeChooser) {
+            newRandomMode = (newRandomMode + 1) % randomModes.length;
+            randomModeChooser.setText("Random Mode: " + randomModes[newRandomMode]);
         }
     }
 
