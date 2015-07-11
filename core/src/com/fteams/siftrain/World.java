@@ -9,8 +9,11 @@ import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
-import com.fteams.siftrain.util.NewAlgorithmRandomizer;
-import com.fteams.siftrain.util.OldAlgorithmRandomizer;
+import com.fteams.siftrain.util.random.KeepSidesRandomizer;
+import com.fteams.siftrain.util.random.MirroredKeepSidesRandomizer;
+import com.fteams.siftrain.util.random.Randomizer;
+import com.fteams.siftrain.util.random.NewAlgorithmRandomizer;
+import com.fteams.siftrain.util.random.OldAlgorithmRandomizer;
 import com.fteams.siftrain.util.SongUtils;
 
 import java.util.ArrayList;
@@ -60,8 +63,7 @@ public class World {
     private void createWorld() {
         float x = 0f;
         float y = 0f;
-        if ( Assets.selectedSong.song_info.get(0).notes_speed == null)
-        {
+        if (Assets.selectedSong.song_info.get(0).notes_speed == null) {
             Assets.selectedSong.song_info.get(0).notes_speed = SongUtils.getDefaultNoteSpeedForDifficulty(Assets.selectedSong.difficulty);
         }
         Double noteSpeed = Assets.selectedSong.song_info.get(0).notes_speed;
@@ -80,8 +82,7 @@ public class World {
             bScore = SongUtils.getBScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
             aScore = SongUtils.getAScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
             sScore = SongUtils.getSScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
-            if (Assets.selectedSong.rank_info == null)
-            {
+            if (Assets.selectedSong.rank_info == null) {
                 Assets.selectedSong.rank_info = new ArrayList<>();
             }
             Assets.selectedSong.rank_info.clear();
@@ -101,16 +102,27 @@ public class World {
         marks.sort();
 
         if (GlobalConfiguration.random) {
-            switch (GlobalConfiguration.randomMode)
-            {
-                case 0:
-                    OldAlgorithmRandomizer oldAlgorithmRandomizer = new OldAlgorithmRandomizer();
+            switch (GlobalConfiguration.randomMode) {
+                case 0: {
+                    Randomizer oldAlgorithmRandomizer = new OldAlgorithmRandomizer();
                     oldAlgorithmRandomizer.randomize(marks);
                     break;
-                case 1:
-                    NewAlgorithmRandomizer newAlgorithmRandomizer = new NewAlgorithmRandomizer();
+                }
+                case 1: {
+                    Randomizer newAlgorithmRandomizer = new NewAlgorithmRandomizer();
                     newAlgorithmRandomizer.randomize(marks);
                     break;
+                }
+                case 2: {
+                    Randomizer keepSidesRandomizer = new KeepSidesRandomizer();
+                    keepSidesRandomizer.randomize(marks);
+                    break;
+                }
+                case 3: {
+                    Randomizer mirroredKeepSidesRandomizer = new MirroredKeepSidesRandomizer();
+                    mirroredKeepSidesRandomizer.randomize(marks);
+                    break;
+                }
                 default:
                     break;
             }

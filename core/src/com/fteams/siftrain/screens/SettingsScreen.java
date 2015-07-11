@@ -64,7 +64,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private CheckBox randomModeChooser;
 
     private String[] sortingModes = {"File Name", "Song Name"};
-    private String [] randomModes = {"Old mode", "New mode"};
+    private String [] randomModes = {"Old mode", "New mode","Keep Sides mode", "Mirrored Keep Sides mode"};
 
     private final static boolean DEBUG = false;
 

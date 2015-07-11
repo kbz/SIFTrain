@@ -1,12 +1,10 @@
-package com.fteams.siftrain.util;
+package com.fteams.siftrain.util.random;
 
 import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.objects.CircleMark;
+import com.fteams.siftrain.util.SongUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class OldAlgorithmRandomizer {
+public class OldAlgorithmRandomizer extends Randomizer {
 
     private double holdEndTime;
 
@@ -46,23 +44,4 @@ public class OldAlgorithmRandomizer {
         }
     }
 
-    private double calculateAverageDistance(Array<CircleMark> marks) {
-
-        List<Double> distances = new ArrayList<>();
-        for (int i = 0; i < marks.size - 1; i++) {
-            if (marks.get(i).getNote().timing_sec.equals(marks.get(i + 1).getNote().timing_sec))
-                continue;
-            distances.add(Math.abs(marks.get(i + 1).getNote().timing_sec - marks.get(i).getNote().timing_sec));
-        }
-        double averageDistance = 0.0;
-        for (Double distance : distances) {
-            averageDistance += distance;
-        }
-        averageDistance = averageDistance / distances.size();
-        return averageDistance;
-    }
-
-    public Integer getRandomPosition() {
-        return (int)(Math.random() * 100) % 9;
-    }
 }

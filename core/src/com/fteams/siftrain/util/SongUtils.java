@@ -15,6 +15,8 @@ public class SongUtils {
 
     public final static Integer RANDOM_MODE_OLD = 0;
     public final static Integer RANDOM_MODE_NEW = 1;
+    public final static Integer RANDOM_MODE_KEEP_SIDES = 2;
+    public final static Integer RANDOM_MODE_MIRRORED_KEEP_SIDES = 3;
 
     public static String getDifficulty(Integer difficulty) {
         return DIFF[difficulty - 1];
