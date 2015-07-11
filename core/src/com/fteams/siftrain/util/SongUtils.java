@@ -10,6 +10,9 @@ public class SongUtils {
     public final static Integer NOTE_TYPE_SIMULT_END = 0b00100000;
     public final static Integer NOTE_TYPE_HOLD_END = 0b01000000;
 
+    public final static Integer SORTING_MODE_FILE_NAME = 0;
+    public final static Integer SORTING_MODE_SONG_NAME = 1;
+
     public static String getDifficulty(Integer difficulty) {
         return DIFF[difficulty - 1];
     }

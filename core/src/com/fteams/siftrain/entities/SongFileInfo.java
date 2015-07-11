@@ -1,8 +1,9 @@
 package com.fteams.siftrain.entities;
 
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.util.SongUtils;
 
-public class SongFileInfo implements Comparable<SongFileInfo>{
+public class SongFileInfo implements Comparable<SongFileInfo> {
     private String resourceName;
     public String song_name;
     public Integer difficulty;
@@ -25,15 +26,32 @@ public class SongFileInfo implements Comparable<SongFileInfo>{
 
     @Override
     public int compareTo(SongFileInfo o) {
-        if (!song_name.equals(o.song_name))
+        if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_FILE_NAME)
         {
-            return song_name.compareTo(o.song_name);
+            if (!o.getResourceName().equals(resourceName)) {
+                return resourceName.compareTo(o.getResourceName());
+            }
+            if (!song_name.equals(o.song_name))
+            {
+                return song_name.compareTo(o.song_name);
+            }
         }
-        if (!o.getResourceName().equals(resourceName)) {
-            return resourceName.compareTo(o.resourceName);
+        else if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_SONG_NAME)
+        {
+            if (!song_name.equals(o.song_name))
+            {
+                return song_name.compareTo(o.song_name);
+            }
+            if (!o.getResourceName().equals(resourceName)) {
+                return resourceName.compareTo(o.getResourceName());
+            }
         }
+        // always check difficulty last to keep them in order
         if (!difficulty.equals(o.difficulty)) {
             return difficulty.compareTo(o.difficulty);
+        }
+        if (difficulty_name != null && o.difficulty_name != null && !difficulty_name.equals(o.difficulty_name)) {
+            return difficulty_name.compareTo(o.difficulty_name);
         }
         return 0;
     }

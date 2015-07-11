@@ -28,8 +28,9 @@
     "song_result_song_title": { "font": jp-font-small, "fontColor": black},
   },
   "com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle": {
-  "default": {"background": "song_selection_menu_background", "fontColorUnselected": red, "selection": "selection_menu_selected", "fontColorSelected": black, "font": jp-font-small }
-},
+    "default": {"background": "song_selection_menu_background", "fontColorUnselected": red, "selection": "selection_menu_selected", "fontColorSelected": black, "font": jp-font-small },
+    "diff_list": {"background": "song_selection_menu_background", "fontColorUnselected": red, "selection": "selection_menu_selected", "fontColorSelected": black, "font": jp-font-small },
+  },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle":{
     "default": { }
   },

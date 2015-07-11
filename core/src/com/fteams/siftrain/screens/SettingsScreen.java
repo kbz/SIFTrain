@@ -60,6 +60,9 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Slider teamSrengthSlider;
 
     private CheckBox playHintSoundCheckbox;
+    private CheckBox sortingModeChooser;
+
+    private String[] sortingModes = {"File Name", "Song Name"};
 
     private final static boolean DEBUG = false;
 
@@ -74,6 +77,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Integer newInputOffset;
     private Integer newTeamStrength;
     private Boolean newHitSoundsSetting;
+    private Integer newSortingMode;
 
     @Override
     public void show() {
@@ -94,6 +98,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         newInputOffset = GlobalConfiguration.inputOffset;
         newTeamStrength = GlobalConfiguration.teamStrength;
         newHitSoundsSetting = GlobalConfiguration.playHintSounds;
+        newSortingMode = GlobalConfiguration.sortMode;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
@@ -246,6 +251,12 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         pathToBeatmaps.setFontScale(fontScale);
         pathValueLabel.setFontScale(fontScale);
 
+        // extras - sorting mode
+        sortingModeChooser = new CheckBox("Sorting Mode: " + sortingModes[GlobalConfiguration.sortMode], Assets.menuSkin);
+        sortingModeChooser.getLabel().setFontScale(fontScale);
+        sortingModeChooser.getImageCell().width(0);
+        sortingModeChooser.addListener(this);
+
         final Table otherTable = new Table();
 
         otherTable.setHeight(stage.getHeight() * 0.7f);
@@ -253,8 +264,9 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
         otherTable.add(pathToBeatmaps).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().row();
         otherTable.add(pathValueLabel).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().padLeft(stage.getWidth() * 0.03f).row();
-        otherTable.add(reloadBeatmaps).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().padLeft(stage.getWidth() * 0.03f).row();
+        otherTable.add(sortingModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add().expand().fill().row();
+        otherTable.add(reloadBeatmaps).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
 
         otherTable.setVisible(false);
         otherTable.setDebug(DEBUG);
@@ -283,12 +295,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         scoreSettingsTabButton.addListener(tabListener);
         otherSettingsTabButton.addListener(tabListener);
 
-        reloadBeatmaps.addListener(new ClickListener(){
+        reloadBeatmaps.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Assets.hardReloadBeatmaps();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new BeatmapReloadScreen());
-            }});
+            }
+        });
 
         returnButton.addListener(new ClickListener() {
             @Override
@@ -299,6 +312,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.inputOffset = newInputOffset;
                 GlobalConfiguration.teamStrength = newTeamStrength;
                 GlobalConfiguration.playHintSounds = newHitSoundsSetting;
+                GlobalConfiguration.sortMode = newSortingMode;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -370,6 +384,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == playHintSoundCheckbox) {
             newHitSoundsSetting = ((CheckBox) (actor)).isChecked();
             playHintSoundCheckbox.setText("Hint Sounds (" + (playHintSoundCheckbox.isChecked() ? "X" : " ") + ")");
+        }
+        if (actor == sortingModeChooser) {
+            newSortingMode = (newSortingMode + 1) % sortingModes.length;
+            sortingModeChooser.setText("Sorting Mode: " + sortingModes[newSortingMode]);
         }
     }
 

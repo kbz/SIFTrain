@@ -9,13 +9,16 @@ public class GlobalConfiguration {
     // team strength in SIF units
     public static int teamStrength;
     // offset in milliseconds
-    public static boolean random;
-
     public static int offset;
     public static int inputOffset;
     // path to beatmaps
     public static String pathToBeatmaps;
     public static boolean playHintSounds;
+    // sorting related
+    public static int sortMode;
+
+    // other - per session configs
+    public static boolean random;
 
     public final static int BASE_HEIGHT = 720;
 
@@ -28,6 +31,7 @@ public class GlobalConfiguration {
         feedbackVolume = prefs.getInteger("feedback_vol", 100);
         pathToBeatmaps = prefs.getString("path_to_beatmaps", Gdx.files.getExternalStoragePath() + "beatmaps");
         playHintSounds = prefs.getBoolean("play_hint_sounds", false);
+        sortMode = prefs.getInteger("sorting_mode", 1);
 
     }
 
@@ -40,6 +44,7 @@ public class GlobalConfiguration {
         prefs.putInteger("feedback_vol", feedbackVolume);
         prefs.putString("path_to_beatmaps", pathToBeatmaps);
         prefs.putBoolean("play_hint_sounds", playHintSounds);
+        prefs.putInteger("sorting_mode", sortMode);
         prefs.flush();
     }
 }

@@ -73,7 +73,12 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             info.difficulty = 1;
         } finally {
             info.setFileName(fileName);
-            info.setResourceName(handle.nameWithoutExtension().replaceAll("_(easy|normal|hard|expert)$", ""));
+            // naming scheme for the resources is:
+            // File Name[difficulty]
+            // File Name [difficulty]
+            // file_name_difficulty
+            // this will allow the resource name to be parsed correctly and group the songs by resource
+            info.setResourceName(handle.nameWithoutExtension().replaceAll("(_(easy|normal|hard|expert)|(\\s?\\[.+]))$", ""));
             beatmaps.add(info);
         }
     }
@@ -225,7 +230,7 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             inputStream.close();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Gdx.app.error("OSZ_MUSIC_LOADER", "Failed to store the music file.");
         }
     }
 
@@ -236,12 +241,8 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             FileOutputStream fos = new FileOutputStream(output);
             fos.write(json.getBytes("UTF-8"));
             fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            Gdx.app.error("BEATMAP_STORE", "Failed to store the beatmap file.");
         }
     }
 

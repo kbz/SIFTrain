@@ -11,9 +11,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.entities.SimpleSong;
+import com.fteams.siftrain.entities.SimpleSongGroup;
 import com.fteams.siftrain.entities.SongFileInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Assets {
 
@@ -25,7 +28,8 @@ public class Assets {
     }
 
     public static SimpleSong selectedSong;
-    public static SongFileInfo selectedMap;
+    public static SongFileInfo selectedBeatmap;
+    public static SimpleSongGroup selectedGroup;
 
     public static TextureAtlas atlas;
 
@@ -41,7 +45,7 @@ public class Assets {
     public static Texture holdBG;
     public static Texture holdBGHolding;
 
-    public static Array<SongFileInfo> beatmapList;
+    public static Array<SimpleSongGroup> songGroup;
 
     // In here we'll put everything that needs to be loaded in this format:
     // manager.load("file location in assets", fileType.class);
@@ -92,6 +96,9 @@ public class Assets {
     // to be processed, .osu files to be converted and music files within the .osz packages
     // to be copied over to the /beatmaps/soundfiles/ folder.
     public static void hardReloadBeatmaps() {
+        selectedSong = null;
+        selectedBeatmap = null;
+        selectedGroup = null;
         externalManager.clear();
         reloadBeatmaps();
     }
@@ -135,20 +142,42 @@ public class Assets {
 
     @SuppressWarnings("unchecked")
     public static void setSongs() {
-        if (beatmapList == null) {
-            beatmapList = new Array<>();
-        } else {
-            beatmapList.clear();
+        if (songGroup == null) {
+            songGroup = new Array<>();
+        }
+        else{
+            songGroup.clear();
         }
 
         Array<String> assets = externalManager.getAssetNames();
+        Map<String, SimpleSongGroup> groupMap = new HashMap<>();
+
         for (String string : assets) {
             List<SongFileInfo> beatmaps = externalManager.get(string, List.class);
-            for (SongFileInfo beatmap : beatmaps) {
-                beatmapList.addAll(beatmap);
+            if (!beatmaps.isEmpty())
+            {
+                String resourceName = beatmaps.get(0).getResourceName();
+                String songName = beatmaps.get(0).song_name;
+                if (groupMap.get(resourceName) == null)
+                {
+                    SimpleSongGroup group = new SimpleSongGroup();
+                    group.resource_name = resourceName;
+                    group.song_name = songName;
+                    group.songs = new Array<>();
+                    groupMap.put(resourceName, group);
+                }
+                SimpleSongGroup group = groupMap.get(resourceName);
+                for (SongFileInfo beatmap : beatmaps) {
+                    group.songs.add(beatmap);
+                }
+                group.songs.sort();
             }
         }
-        beatmapList.sort();
+        for (String key: groupMap.keySet())
+        {
+            songGroup.add(groupMap.get(key));
+        }
+        songGroup.sort();
     }
 
     public static boolean update() {

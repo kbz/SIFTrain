@@ -39,7 +39,7 @@ public class BeatmapLoadingScreen implements Screen {
         stage.addActor(backgroundImage);
 
         SimpleSongLoader loader = new SimpleSongLoader();
-        SimpleSong song = loader.loadSong(Assets.selectedMap);
+        SimpleSong song = loader.loadSong(Assets.selectedBeatmap);
 
         Table table = new Table();
         table.setX(stage.getWidth() * 0.15f);

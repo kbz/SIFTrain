@@ -18,19 +18,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.SimpleSongLoader;
+import com.fteams.siftrain.entities.SimpleSongGroup;
 import com.fteams.siftrain.entities.SongFileInfo;
 
 @SuppressWarnings("unchecked")
 public class SongSelectionScreen implements Screen, InputProcessor {
 
     private Stage stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-    private List<SongFileInfo> songList = new List<>(Assets.menuSkin);
+    private List<SimpleSongGroup> songList = new List<>(Assets.menuSkin);
     private ScrollPane songListPane = new ScrollPane(null, Assets.menuSkin);
+    private List<SongFileInfo> diffList = new List<>(Assets.menuSkin, "diff_list");
+    private ScrollPane diffListPane = new ScrollPane(null, Assets.menuSkin);
     private Table table = new Table();
     private TextButton nextButton = new TextButton("Next", Assets.menuSkin, "item1");
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
@@ -45,7 +47,49 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
         stage.addActor(backgroundImage);
 
-        songList.setItems((Array) Assets.beatmapList);
+        Assets.songGroup.sort();
+        songList.setItems(Assets.songGroup);
+
+        if (Assets.selectedGroup != null) {
+            songList.setSelected(Assets.selectedGroup);
+            diffList.setItems(Assets.selectedGroup.songs);
+        } else {
+            Assets.selectedGroup = songList.getItems().get(0);
+            diffList.setItems(Assets.selectedGroup.songs);
+        }
+
+        songList.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                SimpleSongGroup previousGroup = Assets.selectedGroup;
+                SimpleSongGroup newSelected = (SimpleSongGroup) ((List) actor).getSelected();
+                if (previousGroup == newSelected) {
+                    // if the same group was selected we ignore it
+                    return;
+                }
+
+                Assets.selectedGroup = newSelected;
+                diffList.setItems(newSelected.songs);
+            }
+        });
+
+        if (Assets.selectedBeatmap != null) {
+            diffList.setSelected(Assets.selectedBeatmap);
+        } else {
+            diffList.setSelected(diffList.getItems().size == 0 ? null : diffList.getItems().first());
+        }
+
+        diffList.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                SongFileInfo previous = Assets.selectedBeatmap;
+                SongFileInfo newSelection = (SongFileInfo) ((List) actor).getSelected();
+                if (previous == newSelection) {
+                    return;
+                }
+                Assets.selectedBeatmap = newSelection;
+            }
+        });
 
         nextButton.getLabel().setFontScale(scaleFactor);
         backButton.getLabel().setFontScale(scaleFactor);
@@ -53,34 +97,34 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         randomCheckbox.getImageCell().width(0f);
         randomCheckbox.setChecked(GlobalConfiguration.random);
 
-        if (Assets.selectedMap != null) {
-            songList.setSelected(Assets.selectedMap);
-        } else {
-            songList.setSelected(songList.getItems().size == 0 ? null : songList.getItems().first());
-        }
         songListPane.setWidget(songList);
         songListPane.setWidth(stage.getWidth());
 
-        table.add(songListPane).colspan(3).size(stage.getWidth() * 0.87f, stage.getHeight() * 0.65f).row();
+        diffListPane.setWidget(diffList);
+        diffListPane.setWidth(stage.getWidth());
+
+        table.add(songListPane).colspan(3).size(stage.getWidth() * 0.87f, stage.getHeight() * 0.49f).padBottom(stage.getHeight() * 0.01f).row();
+        table.add(diffListPane).colspan(3).size(stage.getWidth() * 0.87f, stage.getHeight() * 0.23f).padBottom(stage.getHeight() * 0.01f).padTop(stage.getHeight() * 0.01f).row();
         table.setWidth(stage.getWidth());
         table.setHeight(stage.getHeight());
 
         backButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Assets.selectedMap = songList.getSelected();
+                Assets.selectedGroup = songList.getSelected();
+                Assets.selectedBeatmap = diffList.getSelected();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
         }));
         nextButton.addListener((new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (songList.getSelected() == null) {
+                if (diffList.getSelected() == null) {
                     return;
                 }
-                Assets.selectedMap = songList.getSelected();
+                Assets.selectedBeatmap = diffList.getSelected();
                 SimpleSongLoader loader = new SimpleSongLoader();
-                Assets.selectedSong = loader.loadSong(Assets.selectedMap);
+                Assets.selectedSong = loader.loadSong(Assets.selectedBeatmap);
                 if (!Assets.selectedSong.getValid() || loader.getErrors().size() > 0 || loader.getWarnings().size() > 0) {
                     ((Game) Gdx.app.getApplicationListener()).setScreen(new BeatmapLoadingScreen());
                 } else {
@@ -97,9 +141,9 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
 
         });
-        table.add(backButton).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.2f);
-        table.add(nextButton).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.2f);
-        table.add(randomCheckbox).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.2f).row();
+        table.add(backButton).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.12f);
+        table.add(nextButton).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.12f);
+        table.add(randomCheckbox).size(stage.getWidth() * 0.87f / 3, stage.getHeight() * 0.12f).row();
         stage.addActor(table);
 
         InputMultiplexer impx = new InputMultiplexer();
@@ -154,7 +198,8 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
-            Assets.selectedMap = songList.getSelected();
+            Assets.selectedBeatmap = diffList.getSelected();
+            Assets.selectedGroup = songList.getSelected();
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             // do nothing
             return true;
