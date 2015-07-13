@@ -23,8 +23,4 @@ public class KeepSidesRandomizer extends Randomizer {
             mark.updateDestination(getPositionWithoutMiddle(left));
         }
     }
-
-    private boolean isLeft(CircleMark mark) {
-        return mark.getNote().position > 5;
-    }
 }

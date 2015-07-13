@@ -54,8 +54,12 @@ public class SongSelectionScreen implements Screen, InputProcessor {
             songList.setSelected(Assets.selectedGroup);
             diffList.setItems(Assets.selectedGroup.songs);
         } else {
-            Assets.selectedGroup = songList.getItems().get(0);
-            diffList.setItems(Assets.selectedGroup.songs);
+            if (songList.getItems().size != 0)
+            {
+                Assets.selectedGroup = songList.getItems().get(0);
+                diffList.setItems(Assets.selectedGroup.songs);
+            }
+
         }
 
         songList.addListener(new ChangeListener() {
