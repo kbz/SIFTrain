@@ -17,11 +17,13 @@ public class ExtremeRandomizer extends Randomizer {
         // sort marks by timing
         marks.sort();
 
+        double threshold = marks.get(0).speed / 32.0;
+
         for (int i = 0 ; i < marks.size; i++)
         {
             CircleMark mark = marks.get(i);
             Integer pos = getFreePosition(mark.getNote().timing_sec);
-            noteToReleaseTime.put(pos, mark.getNote().timing_sec + (mark.hold ? mark.getNote().effect_value : 0));
+            noteToReleaseTime.put(pos, mark.getNote().timing_sec + (mark.hold ? mark.getNote().effect_value : 0) + threshold);
             mark.updateDestination(pos);
         }
     }
