@@ -9,12 +9,14 @@ import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
+import com.fteams.siftrain.util.random.ExtremeRandomizer;
 import com.fteams.siftrain.util.random.KeepSidesRandomizer;
 import com.fteams.siftrain.util.random.MirroredKeepSidesRandomizer;
 import com.fteams.siftrain.util.random.Randomizer;
 import com.fteams.siftrain.util.random.NewAlgorithmRandomizer;
 import com.fteams.siftrain.util.random.OldAlgorithmRandomizer;
 import com.fteams.siftrain.util.SongUtils;
+import com.fteams.siftrain.util.random.SimpleRandomizer;
 
 import java.util.ArrayList;
 
@@ -121,6 +123,16 @@ public class World {
                 case 3: {
                     Randomizer mirroredKeepSidesRandomizer = new MirroredKeepSidesRandomizer();
                     mirroredKeepSidesRandomizer.randomize(marks);
+                    break;
+                }
+                case 4: {
+                    Randomizer simpleRandomizer = new SimpleRandomizer();
+                    simpleRandomizer.randomize(marks);
+                    break;
+                }
+                case 5:{
+                    Randomizer extremeRandomizer = new ExtremeRandomizer();
+                    extremeRandomizer.randomize(marks);
                     break;
                 }
                 default:

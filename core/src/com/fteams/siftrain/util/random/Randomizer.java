@@ -28,4 +28,8 @@ public abstract class Randomizer {
     protected Integer getRandomPosition() {
         return (int)(Math.random() * 100) % 9;
     }
+
+    protected boolean isLeft(CircleMark mark) {
+        return mark.getNote().position > 5;
+    }
 }
