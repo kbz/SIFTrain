@@ -14,7 +14,8 @@ public class OldAlgorithmRandomizer extends Randomizer {
     public void randomize(Array<CircleMark> marks) {
         // sort marks by timing
         marks.sort();
-        double averageDistance = calculateAverageDistance(marks);
+
+        double averageDistance = marks.get(0).speed / 4.0;
 
         // set the position for each note
         for (int i = 0; i < marks.size; i++) {
