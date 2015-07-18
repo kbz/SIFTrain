@@ -50,6 +50,7 @@ public class WorldController implements Music.OnCompletionListener {
     boolean songStarted;
 
     private Music theSong;
+    private Integer syncMode;
 
     public WorldController(World world) {
         this.world = world;
@@ -77,6 +78,7 @@ public class WorldController implements Music.OnCompletionListener {
         theSong = SongLoader.loadSongFile();
         this.hasMusic = theSong != null;
         this.timeSyncAcc = 0f;
+        this.syncMode = GlobalConfiguration.syncMode;
     }
 
     @Override
@@ -149,6 +151,7 @@ public class WorldController implements Music.OnCompletionListener {
                     theSong.play();
                     lastmtime = theSong.getPosition();
                     time = lastmtime + world.delay;
+                    timeSyncAcc = 0;
                 }
             }
         }
@@ -170,40 +173,73 @@ public class WorldController implements Music.OnCompletionListener {
     private void sync(float delta) {
         float theTime = time;
         if (hasMusic) {
-            mtime = theSong.getPosition();
-            if (mtime <= 0f && !songStarted) {
-                time += delta;
-                // use the first 300 ms of the song to sync
-            } else if (songStarted && mtime < 0.3f) {
-                time = mtime + world.delay;
-                lastmtime = mtime;
-                // if we haven't synced in a while
-            } else if (timeSyncAcc > 0.5f) {
-                lastmtime = mtime;
-                time = mtime + world.delay;
-                timeSyncAcc = 0f;
-                // if the time didn't update we interpolate the delta
-            } else if (lastmtime == mtime) {
-                time += delta;
-                timeSyncAcc += delta;
-                // if the new reading is behind the previous one, we interpolate the delta
-            } else if (mtime < lastmtime) {
-                time = lastmtime + world.delay + delta;
-                lastmtime = lastmtime + delta;
-                timeSyncAcc += delta;
-                // if the new reading is way ahead, we interpolate the delta
-            } else if (mtime > oldTime + 2 * delta) {
-                time = lastmtime + world.delay + delta;
-                lastmtime = lastmtime + delta;
-                timeSyncAcc += delta;
-            } else {
-                lastmtime = mtime;
-                time = mtime + world.delay;
-                timeSyncAcc = 0f;
+            switch (syncMode) {
+                case 0: {
+                    mtime = theSong.getPosition();
+                    if (mtime <= 0f && !songStarted) {
+                        time += delta;
+                        // use the first 300 ms of the song to sync
+                    } else if (songStarted && mtime < 0.3f) {
+                        time = mtime + world.delay;
+                        lastmtime = mtime;
+                        // if we haven't synced in a while
+                    } else if (timeSyncAcc > 0.5f) {
+                        lastmtime = mtime;
+                        time = mtime + world.delay;
+                        timeSyncAcc = 0f;
+                        // if the time didn't update we interpolate the delta
+                    } else if (lastmtime == mtime) {
+                        time += delta;
+                        timeSyncAcc += delta;
+                        // if the new reading is behind the previous one, we interpolate the delta
+                    } else if (mtime < lastmtime) {
+                        time = lastmtime + world.delay + delta;
+                        lastmtime = lastmtime + delta;
+                        timeSyncAcc += delta;
+                        // if the new reading is way ahead, we interpolate the delta
+                    } else if (mtime > oldTime + 2 * delta) {
+                        time = lastmtime + world.delay + delta;
+                        lastmtime = lastmtime + delta;
+                        timeSyncAcc += delta;
+                    } else {
+                        lastmtime = mtime;
+                        time = mtime + world.delay;
+                        timeSyncAcc = 0f;
+                    }
+                    // smoothen transitions if the new time is ahead or behind of the time + delta
+                    float theDiff = time - (theTime + delta);
+                    time = theTime + delta + theDiff * 1 / Gdx.graphics.getFramesPerSecond();
+                    break;
+                }
+                case 1: {
+                    mtime = theSong.getPosition();
+                    if (mtime <= lastmtime) {
+                        time += delta;
+                    } else {
+                        time = mtime + world.delay;
+                    }
+                    break;
+                }
+                case 2: {
+                    mtime = theSong.getPosition();
+                    if (timeSyncAcc < 0.5f) {
+                        if (mtime <= lastmtime) {
+                            time += delta;
+                        } else {
+                            time = mtime + world.delay;
+                            lastmtime = mtime;
+                        }
+                    } else {
+                        time += delta;
+                    }
+                    timeSyncAcc += delta;
+                    break;
+                }
+                default:
+                    time += delta;
+                    break;
             }
-            // smoothen transitions if the new time is ahead or behind of the time + delta
-            float theDiff = time - (theTime + delta);
-            time = theTime + delta + theDiff * 1 / Gdx.graphics.getFramesPerSecond();
+
         } else
         // otherwise just play the beatmap
         {
@@ -550,7 +586,8 @@ public class WorldController implements Music.OnCompletionListener {
             if (hasMusic) {
                 theSong.pause();
                 lastmtime = theSong.getPosition();
-                time = lastmtime;
+                time = lastmtime + world.delay;
+                timeSyncAcc = 0;
             }
         }
     }

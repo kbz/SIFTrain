@@ -18,6 +18,15 @@ public class SongUtils {
     public final static Integer RANDOM_MODE_KEEP_SIDES = 2;
     public final static Integer RANDOM_MODE_MIRRORED_KEEP_SIDES = 3;
 
+    public final static Integer SYNC_MODE_1 = 0;
+    public final static Integer SYNC_MODE_2 = 1;
+    public final static Integer SYNC_MODE_3 = 2;
+    public final static Integer SYNC_DISABLED = 2;
+
+    public final static String[] randomModes = {"Old mode", "New mode", "Keep Sides mode", "Mirrored Keep Sides mode", "Simple mode", "Extreme mode"};
+    public final static String[] syncModes = {"Default", "Constant Sync", "Initial Sync", "Disabled"};
+
+
     public static String getDifficulty(Integer difficulty) {
         return DIFF[difficulty - 1];
     }

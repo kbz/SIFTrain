@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
+import com.fteams.siftrain.util.SongUtils;
 
 public class ResultsScreen implements Screen, InputProcessor {
 
@@ -45,6 +46,8 @@ public class ResultsScreen implements Screen, InputProcessor {
     private Label comboLabel = new Label("Largest Combo:", Assets.menuSkin, "song_style_result_values");
     private Label comboResultLabel;
     private Label titleLabel = new Label("Results/結果発表", Assets.menuSkin, "default");
+    private Label randomModeLabel = new Label("Random Mode:", Assets.menuSkin, "song_style_result_values");
+    private Label randomResultLabel;
 
     private float timeBeforeClose = 2f;
     private boolean canClose = false;
@@ -52,7 +55,7 @@ public class ResultsScreen implements Screen, InputProcessor {
     @Override
     public void show() {
         // title font scale = 1 for a 720 height
-        float fontScale = stage.getHeight()/ GlobalConfiguration.BASE_HEIGHT;
+        float fontScale = stage.getHeight() / GlobalConfiguration.BASE_HEIGHT;
 
         splashImage.setHeight(stage.getHeight());
         splashImage.setWidth(stage.getWidth());
@@ -74,6 +77,7 @@ public class ResultsScreen implements Screen, InputProcessor {
         greatResultLabel = new Label(Integer.toString(Results.greats), Assets.menuSkin, "song_style_result_values");
         perfectResultLabel = new Label(Integer.toString(Results.perfects), Assets.menuSkin, "song_style_result_values");
         comboResultLabel = new Label(Integer.toString(Results.combo) + (Results.combo == Assets.selectedSong.song_info.get(0).notes.size() ? (Results.bads > 0 || Results.goods > 0 ? "(Fake FC)" : " (FC)") : ""), Assets.menuSkin, "song_style_result_values");
+        randomResultLabel = new Label(SongUtils.randomModes[GlobalConfiguration.randomMode], Assets.menuSkin, "song_style_result_values");
 
         scoreResultLabel.setFontScale(fontScale);
         accuracyResultLabel.setFontScale(fontScale);
@@ -87,6 +91,7 @@ public class ResultsScreen implements Screen, InputProcessor {
         greatResultLabel.setFontScale(fontScale);
         perfectResultLabel.setFontScale(fontScale);
         comboResultLabel.setFontScale(fontScale);
+        randomResultLabel.setFontScale(fontScale);
 
         scoreLabel.setFontScale(fontScale);
         rankLabel.setFontScale(fontScale);
@@ -108,6 +113,12 @@ public class ResultsScreen implements Screen, InputProcessor {
 
         table.add(songResultTitle).colspan(3).row();
         table.add(titleLabel).colspan(3).padBottom(stage.getHeight() * 0.1f).row();
+        if (GlobalConfiguration.random)
+        {
+            table.add(randomModeLabel).fillX();
+            table.add().width(stage.getWidth() * 0.2f);
+            table.add(randomResultLabel).fillX().row();
+        }
         table.add(scoreLabel).fillX();
         table.add().width(stage.getWidth() * 0.2f);
         table.add(scoreResultLabel).fillX().row();

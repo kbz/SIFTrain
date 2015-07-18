@@ -19,6 +19,8 @@ public class GlobalConfiguration {
     public static int sortMode;
     // randomizer config
     public static int randomMode;
+    // sync config
+    public static int syncMode;
 
     // other - per session configs
     public static boolean random;
@@ -38,6 +40,8 @@ public class GlobalConfiguration {
         sortMode = prefs.getInteger("sorting_mode", SongUtils.SORTING_MODE_SONG_NAME);
         // default to the new mode
         randomMode = prefs.getInteger("random_mode", SongUtils.RANDOM_MODE_NEW);
+        // sync mode
+        syncMode = prefs.getInteger("sync_mode", SongUtils.SYNC_MODE_1);
 
     }
 
@@ -52,6 +56,7 @@ public class GlobalConfiguration {
         prefs.putBoolean("play_hint_sounds", playHintSounds);
         prefs.putInteger("sorting_mode", sortMode);
         prefs.putInteger("random_mode", randomMode);
+        prefs.putInteger("sync_mode", syncMode);
         prefs.flush();
     }
 }

@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
+import com.fteams.siftrain.util.SongUtils;
 
 @SuppressWarnings("unchecked")
 public class SettingsScreen extends ChangeListener implements Screen, InputProcessor {
@@ -60,11 +61,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Slider teamSrengthSlider;
 
     private CheckBox playHintSoundCheckbox;
+    private CheckBox syncModeCheckbox;
     private CheckBox sortingModeChooser;
     private CheckBox randomModeChooser;
 
     private String[] sortingModes = {"File Name", "Song Name"};
-    private String [] randomModes = {"Old mode", "New mode","Keep Sides mode", "Mirrored Keep Sides mode", "Simple mode", "Extreme mode"};
 
     private final static boolean DEBUG = false;
 
@@ -81,6 +82,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Boolean newHitSoundsSetting;
     private Integer newSortingMode;
     private Integer newRandomMode;
+    private Integer newSyncMode;
 
     @Override
     public void show() {
@@ -103,6 +105,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         newHitSoundsSetting = GlobalConfiguration.playHintSounds;
         newSortingMode = GlobalConfiguration.sortMode;
         newRandomMode = GlobalConfiguration.randomMode;
+        newSyncMode = GlobalConfiguration.syncMode;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
@@ -203,6 +206,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         inputOffsetSlider.setValue(GlobalConfiguration.inputOffset);
         inputOffsetSlider.addListener(this);
 
+        syncModeCheckbox = new CheckBox("Sync Mode: " + SongUtils.syncModes[newSyncMode], Assets.menuSkin);
+        syncModeCheckbox.getLabel().setFontScale(fontScale);
+        syncModeCheckbox.getImageCell().width(0);
+        syncModeCheckbox.addListener(this);
+
 
         final Table offsetTable = new Table();
         // global offset
@@ -219,6 +227,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetTable.add().width(stage.getWidth() * 0.20f);
         offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(inputOffsetSlider).width(stage.getWidth() * 0.6f).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        offsetTable.add().height(offsetValueLabel.getHeight()).row();
+
+        // sync mode setting
+        offsetTable.add(syncModeCheckbox).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().colspan(3).row();
 
         offsetTable.add().expand().fill().row();
         offsetTable.setVisible(false);
@@ -262,7 +274,8 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         sortingModeChooser.addListener(this);
 
         // extras - random mode
-        randomModeChooser = new CheckBox("Random Mode: " + randomModes[GlobalConfiguration.randomMode], Assets.menuSkin);;
+        randomModeChooser = new CheckBox("Random Mode: " + SongUtils.randomModes[GlobalConfiguration.randomMode], Assets.menuSkin);
+        ;
         randomModeChooser.getLabel().setFontScale(fontScale);
         randomModeChooser.getImageCell().width(0);
         randomModeChooser.addListener(this);
@@ -325,6 +338,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.playHintSounds = newHitSoundsSetting;
                 GlobalConfiguration.sortMode = newSortingMode;
                 GlobalConfiguration.randomMode = newRandomMode;
+                GlobalConfiguration.syncMode = newSyncMode;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -394,7 +408,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
             teamStrengthValueLabel.setText(Integer.toString(newTeamStrength));
         }
         if (actor == playHintSoundCheckbox) {
-            newHitSoundsSetting = ((CheckBox) (actor)).isChecked();
+            newHitSoundsSetting = playHintSoundCheckbox.isChecked();
             playHintSoundCheckbox.setText("Hint Sounds (" + (playHintSoundCheckbox.isChecked() ? "X" : " ") + ")");
         }
         if (actor == sortingModeChooser) {
@@ -402,8 +416,12 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
             sortingModeChooser.setText("Sorting Mode: " + sortingModes[newSortingMode]);
         }
         if (actor == randomModeChooser) {
-            newRandomMode = (newRandomMode + 1) % randomModes.length;
-            randomModeChooser.setText("Random Mode: " + randomModes[newRandomMode]);
+            newRandomMode = (newRandomMode + 1) % SongUtils.randomModes.length;
+            randomModeChooser.setText("Random Mode: " + SongUtils.randomModes[newRandomMode]);
+        }
+        if (actor == syncModeCheckbox) {
+            newSyncMode = (newSyncMode + 1) % 4;
+            syncModeCheckbox.setText("Sync Mode: " + SongUtils.syncModes[newSyncMode]);
         }
     }
 
