@@ -318,7 +318,23 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
         }
         processEffects(song);
         setRankInfo(song);
+        correctLeadIn(song);
         return song;
+    }
+
+    private void correctLeadIn(SimpleSong song) {
+        SimpleNotesInfo info = song.song_info.get(0).notes.get(0);
+        double current_leadin = song.lead_in;
+        if (info.timing_sec <= song.song_info.get(0).notes_speed)
+        {
+            float newLeadin = 1.5f + (float)(song.song_info.get(0).notes_speed - info.timing_sec);
+            System.out.println("We need to fix this!");
+            System.out.println("Specified LeadIn: " + current_leadin);
+            System.out.println("First Note: " + info.timing_sec);
+            System.out.println("Speed: " + song.song_info.get(0).notes_speed);
+            song.lead_in = newLeadin;
+        }
+
     }
 
     // if the game converts the maps, we set the rank tiers to prevent warning pop-ups for the user.
@@ -337,23 +353,17 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
         List<SimpleNotesInfo> notes = info.notes;
         // sort the notes by timing and position
         Collections.sort(notes);
-        for (int i = 0; i < notes.size(); i++) {
+        SimpleNotesInfo previousNote = notes.get(0);
+        for (int i = 1; i < notes.size(); i++) {
             SimpleNotesInfo currentNote = notes.get(i);
-            if ((currentNote.effect | SongUtils.NOTE_TYPE_SIMULT_START) != 0)
-                continue;
 
-            for (int j = i + 1; j < notes.size(); j++) {
-                SimpleNotesInfo nextNote = notes.get(j);
-                // if the next note spawns after this note is gone, we can stop checking this note.
-                if (nextNote.timing_sec > currentNote.timing_sec) {
-                    break;
-                }
-                // we only look for notes which start at the same time
-                if (nextNote.timing_sec.equals(currentNote.timing_sec)) {
-                    currentNote.effect = currentNote.effect | SongUtils.NOTE_TYPE_SIMULT_START;
-                    nextNote.effect = nextNote.effect | SongUtils.NOTE_TYPE_SIMULT_START;
-                }
+            // we only look for notes which start at the same time
+            if (currentNote.timing_sec.equals(previousNote.timing_sec)) {
+                previousNote.effect = previousNote.effect | SongUtils.NOTE_TYPE_SIMULT_START;
+                currentNote.effect = currentNote.effect | SongUtils.NOTE_TYPE_SIMULT_START;
             }
+            previousNote = currentNote;
+
         }
     }
 
