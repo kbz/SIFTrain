@@ -2,20 +2,22 @@ package com.fteams.siftrain.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
 import com.fteams.siftrain.util.SongUtils;
 
-public class ResultsScreen implements Screen, InputProcessor {
+public class ResultsScreen implements Screen {
 
     Stage stage = new Stage();
     private Texture texture = Assets.mainMenuBackgroundTexture;
@@ -48,9 +50,6 @@ public class ResultsScreen implements Screen, InputProcessor {
     private Label titleLabel = new Label("Results/結果発表", Assets.menuSkin, "default");
     private Label randomModeLabel = new Label("Random Mode:", Assets.menuSkin, "song_style_result_values");
     private Label randomResultLabel;
-
-    private float timeBeforeClose = 2f;
-    private boolean canClose = false;
 
     @Override
     public void show() {
@@ -100,6 +99,7 @@ public class ResultsScreen implements Screen, InputProcessor {
         accuracyLabel.setFontScale(fontScale);
         accuracyRangeLabel.setFontScale(fontScale);
         unstableRatingLabel.setFontScale(fontScale);
+        randomModeLabel.setFontScale(fontScale);
 
         perfectLabel.setFontScale(fontScale);
         greatLabel.setFontScale(fontScale);
@@ -112,9 +112,8 @@ public class ResultsScreen implements Screen, InputProcessor {
 
 
         table.add(songResultTitle).colspan(3).row();
-        table.add(titleLabel).colspan(3).padBottom(stage.getHeight() * 0.1f).row();
-        if (GlobalConfiguration.random)
-        {
+        table.add(titleLabel).colspan(3).padBottom(stage.getHeight() * 0.04f).row();
+        if (GlobalConfiguration.random) {
             table.add(randomModeLabel).fillX();
             table.add().width(stage.getWidth() * 0.2f);
             table.add(randomResultLabel).fillX().row();
@@ -158,10 +157,31 @@ public class ResultsScreen implements Screen, InputProcessor {
         table.add().width(stage.getWidth() * 0.2f);
         table.add(missResultLabel).fillX().row();
 
+        TextButton retryButton = new TextButton("Retry", Assets.menuSkin, "item1");
+        TextButton continueButton = new TextButton("Continue", Assets.menuSkin, "item1");
+
+        retryButton.getLabel().setFontScale(fontScale);
+        continueButton.getLabel().setFontScale(fontScale);
+
+        retryButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
+            }
+        });
+        continueButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new SongSelectionScreen());
+            }
+        });
+
+        table.add(retryButton).width(stage.getWidth() * 0.3f).height(stage.getHeight() * 0.1f);
+        table.add().fillX();
+        table.add(continueButton).width(stage.getWidth() * 0.3f).height(stage.getHeight() * 0.1f).row();
         stage.addActor(table);
 
-        Gdx.input.setInputProcessor(this);
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -170,11 +190,6 @@ public class ResultsScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
-
-        timeBeforeClose -= delta;
-        if (timeBeforeClose <= 0) {
-            canClose = true;
-        }
     }
 
     @Override
@@ -200,48 +215,5 @@ public class ResultsScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         stage.dispose();
-    }
-
-    @Override
-    public boolean keyDown(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (canClose) {
-            ((Game) Gdx.app.getApplicationListener()).setScreen(new SongSelectionScreen());
-        }
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(int amount) {
-        return false;
     }
 }
