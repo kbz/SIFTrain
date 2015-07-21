@@ -12,6 +12,7 @@ import com.fteams.siftrain.World;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.AccuracyMarker;
+import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
@@ -62,6 +63,15 @@ public class WorldRenderer {
     TextureRegion bRankKnob;
     TextureRegion aRankKnob;
     TextureRegion sRankKnob;
+
+    TextureRegion missMark;
+    TextureRegion badLateMark;
+    TextureRegion badSoonMark;
+    TextureRegion goodLateMark;
+    TextureRegion goodSoonMark;
+    TextureRegion greatLateMark;
+    TextureRegion greatSoonMark;
+    TextureRegion perfectMark;
 
     BitmapFont font;
 
@@ -141,6 +151,16 @@ public class WorldRenderer {
         bRankKnob = atlas.findRegion("b_marker");
         aRankKnob = atlas.findRegion("a_marker");
         sRankKnob = atlas.findRegion("s_marker");
+
+        missMark = atlas.findRegion("miss");
+        badLateMark = atlas.findRegion("bad_late");
+        badSoonMark = atlas.findRegion("bad_soon");
+        goodLateMark = atlas.findRegion("good_late");
+        goodSoonMark = atlas.findRegion("good_soon");
+        greatLateMark = atlas.findRegion("great_late");
+        greatSoonMark = atlas.findRegion("great_soon");
+        perfectMark = atlas.findRegion("perfect");
+
         font = Assets.font;
     }
 
@@ -157,8 +177,7 @@ public class WorldRenderer {
         if (!world.started) {
             drawTapToBeginMessage();
         }
-        if (!world.paused)
-        {
+        if (!world.paused) {
             drawAccuracy();
         }
         if (world.paused) {
@@ -174,17 +193,17 @@ public class WorldRenderer {
         float zone = (float) (Assets.selectedSong.song_info.get(0).notes_speed / 2);
 
         // draw the background (bad level)
-        spriteBatch.draw(accBadBackground, centerX - width / 6f, y, width / 3f, height * 0.02f);
+        spriteBatch.draw(accBadBackground, centerX - width / 6f, y, width / 3f, height * 0.01f);
         // draw the background (good level)
-        spriteBatch.draw(accGoodBackground, centerX - 0.4f*width / 6f, y, 0.4f*width / 3f, height * 0.02f);
+        spriteBatch.draw(accGoodBackground, centerX - 0.4f * width / 6f, y, 0.4f * width / 3f, height * 0.01f);
         // draw the background (great level)
-        spriteBatch.draw(accGreatBackground, centerX - 0.3f*width / 6f, y, 0.3f*width / 3f, height * 0.02f);
+        spriteBatch.draw(accGreatBackground, centerX - 0.3f * width / 6f, y, 0.3f * width / 3f, height * 0.01f);
         // draw the background (perfect level)
-        spriteBatch.draw(accPerfectBackground, centerX - 0.1f*width / 6f, y, 0.1f * width / 3f, height * 0.02f);
+        spriteBatch.draw(accPerfectBackground, centerX - 0.1f * width / 6f, y, 0.1f * width / 3f, height * 0.01f);
         // draw each of the 'markers'
         for (AccuracyMarker accMarker : world.getAccuracyMarkers()) {
             if (accMarker.display)
-                spriteBatch.draw(accHitMark, centerX - (accMarker.getTime()) * (width / 6) / zone - accHitMark.getRegionWidth(), y, 1f, height * 0.02f);
+                spriteBatch.draw(accHitMark, centerX - (accMarker.getTime()) * (width / 6) / zone - accHitMark.getRegionWidth(), y - height * 0.01f, 3f, height * 0.03f);
         }
     }
 
@@ -252,12 +271,29 @@ public class WorldRenderer {
     }
 
     private void drawAccuracy() {
+        float scale = height / GlobalConfiguration.BASE_HEIGHT;
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
-        if (world.accuracy != CircleMark.Accuracy.NONE) {
-            layout.setText(font, "" + world.accuracy);
-            font.draw(spriteBatch, "" + world.accuracy, centerX - layout.width / 2, centerY - layout.height / 2);
+        for (AccuracyPopup popup : world.getAccuracyPopups()) {
+            if (popup.show) {
+                TextureRegion region = perfectMark;
+                if (popup.accuracy == CircleMark.Accuracy.MISS) {
+                    region = missMark;
+                }
+                if (popup.accuracy == CircleMark.Accuracy.BAD) {
+                    region = popup.soon ? badSoonMark : badLateMark;
+                }
+                if (popup.accuracy == CircleMark.Accuracy.GOOD) {
+                    region = popup.soon ? goodSoonMark : goodLateMark;
+                }
+                if (popup.accuracy == CircleMark.Accuracy.GREAT) {
+                    region = popup.soon ? greatSoonMark : greatLateMark;
+                }
+                spriteBatch.setColor(1, 1, 1, popup.getAlpha());
+                spriteBatch.draw(region, centerX - scale * region.getRegionWidth() * popup.getSize() / 2, centerY - scale * region.getRegionHeight() * popup.getSize() / 2, scale * region.getRegionWidth() * popup.getSize(), scale * region.getRegionHeight() * popup.getSize());
+            }
         }
+        spriteBatch.setColor(1, 1, 1, 1);
     }
 
     private void drawCombo() {
@@ -277,15 +313,14 @@ public class WorldRenderer {
         float width = layout.width;
         float height = layout.height;
         font.draw(spriteBatch, text, centerX - width / 2, centerY - height / 2);
-        for (ScoreDiffMarker marker : world.getScoreMarkers())
-        {
+        for (ScoreDiffMarker marker : world.getScoreMarkers()) {
             if (!marker.display)
                 continue;
 
-            String markerValue = "(+" +marker.value+")";
+            String markerValue = "(+" + marker.value + ")";
             layout.setText(font, markerValue);
 
-            font.draw(spriteBatch, markerValue, centerX + (marker.left ? -width/2-layout.width-layout.width/2 : width/2+layout.width/2), centerY - height/2);
+            font.draw(spriteBatch, markerValue, centerX + (marker.left ? -width / 2 - layout.width - layout.width / 2 : width / 2 + layout.width / 2), centerY - height / 2);
         }
 
     }

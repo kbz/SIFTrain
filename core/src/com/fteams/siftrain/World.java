@@ -6,6 +6,7 @@ import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
 import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.objects.AccuracyMarker;
+import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
@@ -39,13 +40,13 @@ public class World {
     Array<CircleMark> marks = new Array<>();
 
     public int combo;
-    public CircleMark.Accuracy accuracy;
     public boolean started;
     public int offsetX;
     public int offsetY;
 
     private Array<AccuracyMarker> accuracyMarkers;
     private Array<ScoreDiffMarker> scoreMarkers;
+    private Array<AccuracyPopup> accuracyPopups;
 
     public boolean paused;
 
@@ -150,9 +151,9 @@ public class World {
             TapZone zone = new TapZone(x, y, i + 1);
             zones.add(zone);
         }
-        accuracy = CircleMark.Accuracy.NONE;
         this.accuracyMarkers = new Array<>();
         this.scoreMarkers = new Array<>();
+        this.accuracyPopups = new Array<>();
         paused = false;
     }
 
@@ -173,5 +174,9 @@ public class World {
 
     public Array<ScoreDiffMarker> getScoreMarkers() {
         return scoreMarkers;
+    }
+
+    public Array<AccuracyPopup> getAccuracyPopups() {
+        return accuracyPopups;
     }
 }

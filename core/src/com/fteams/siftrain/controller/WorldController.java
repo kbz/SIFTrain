@@ -9,6 +9,7 @@ import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
 import com.fteams.siftrain.objects.AccuracyMarker;
+import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
@@ -26,6 +27,7 @@ public class WorldController implements Music.OnCompletionListener {
     private final Array<TapZone> tapZones;
     private final Array<AccuracyMarker> accuracyMarkers;
     private final Array<ScoreDiffMarker> scoreMarkers;
+    private final Array<AccuracyPopup> accuracyPopups;
 
     public boolean done;
     private boolean hasMusic;
@@ -65,6 +67,7 @@ public class WorldController implements Music.OnCompletionListener {
         this.missCount = 0;
         this.largestCombo = 0;
         this.accuracyList = new ArrayList<>();
+        this.accuracyPopups = world.getAccuracyPopups();
         this.scoreMarkers = world.getScoreMarkers();
         this.acted = false;
         this.leftMark = true;
@@ -101,6 +104,7 @@ public class WorldController implements Music.OnCompletionListener {
         Results.accuracy = calculateAccuracy();
         Results.normalizedAccuracy = calculateNormalizedAccuracy();
         accuracyMarkers.clear();
+        accuracyPopups.clear();
         marks.clear();
         tapZones.clear();
         ((Game) Gdx.app.getApplicationListener()).setScreen(new ResultsScreen());
@@ -166,6 +170,9 @@ public class WorldController implements Music.OnCompletionListener {
         }
         for (ScoreDiffMarker marker : world.getScoreMarkers()) {
             marker.update(delta);
+        }
+        for (AccuracyPopup popup: world.getAccuracyPopups()) {
+            popup.update(delta);
         }
         processInput();
     }
@@ -485,7 +492,6 @@ public class WorldController implements Music.OnCompletionListener {
                     continue;
 
                 playSoundForAccuracy(accuracy);
-                world.accuracy = accuracy;
                 if (!mark.hold) {
                     processAccuracy(accuracy, null, false);
                     int score = calculateScore(accuracy, null, false);
@@ -500,6 +506,7 @@ public class WorldController implements Music.OnCompletionListener {
                     combo = 0;
                     world.combo = 0;
                 }
+                accuracyPopups.add(new AccuracyPopup(accuracy, mark.accuracyHitStartTime < 0));
                 accuracyMarkers.add(new AccuracyMarker(mark.accuracyHitStartTime));
                 accuracyList.add(accuracy);
                 // 1 mark per tap
@@ -531,9 +538,9 @@ public class WorldController implements Music.OnCompletionListener {
                     world.score += score;
                     accuracyMarkers.add(new AccuracyMarker(mark.accuracyHitEndTime));
                 }
+                accuracyPopups.add(new AccuracyPopup(accuracy, mark.accuracyHitEndTime < 0));
                 processAccuracy(mark.accuracyStart, accuracy, true);
                 accuracyList.add(accuracy);
-                world.accuracy = accuracy;
                 // 1 mark per release
                 break;
             }
@@ -551,21 +558,19 @@ public class WorldController implements Music.OnCompletionListener {
                 mark.processed = true;
                 if (!mark.hold) {
                     if (mark.accuracyStart == CircleMark.Accuracy.MISS) {
+                        accuracyPopups.add(new AccuracyPopup(CircleMark.Accuracy.MISS, mark.accuracyHitEndTime > 0));
                         processAccuracy(mark.accuracyStart, null, false);
                         accuracyList.add(mark.accuracyStart);
-                        world.accuracy = CircleMark.Accuracy.MISS;
                     }
                 } else {
                     if (mark.accuracyStart == CircleMark.Accuracy.MISS) {
+                        accuracyPopups.add(new AccuracyPopup(CircleMark.Accuracy.MISS, mark.accuracyHitEndTime > 0));
                         processAccuracy(mark.accuracyStart, null, false);
-                        world.accuracy = CircleMark.Accuracy.MISS;
                         accuracyList.add(mark.accuracyStart);
 
                     } else if (mark.accuracyEnd == CircleMark.Accuracy.MISS) {
                         processAccuracy(mark.accuracyEnd, null, false);
-                        world.accuracy = CircleMark.Accuracy.MISS;
-
-
+                        accuracyPopups.add(new AccuracyPopup(CircleMark.Accuracy.MISS, mark.accuracyHitEndTime > 0));
                     }
                 }
             }
