@@ -20,12 +20,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -325,16 +323,14 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
     private void correctLeadIn(SimpleSong song) {
         SimpleNotesInfo info = song.song_info.get(0).notes.get(0);
         double current_leadin = song.lead_in;
-        if (info.timing_sec <= song.song_info.get(0).notes_speed)
-        {
-            float newLeadin = 1.5f + (float)(song.song_info.get(0).notes_speed - info.timing_sec);
-            System.out.println("We need to fix this!");
-            System.out.println("Specified LeadIn: " + current_leadin);
-            System.out.println("First Note: " + info.timing_sec);
-            System.out.println("Speed: " + song.song_info.get(0).notes_speed);
-            song.lead_in = newLeadin;
+        if (info.timing_sec <= song.song_info.get(0).notes_speed) {
+            float newLeadin = 0.5f + (float) (song.song_info.get(0).notes_speed - info.timing_sec);
+            if (current_leadin + info.timing_sec < song.song_info.get(0).notes_speed) {
+                {
+                    song.lead_in = newLeadin;
+                }
+            }
         }
-
     }
 
     // if the game converts the maps, we set the rank tiers to prevent warning pop-ups for the user.
