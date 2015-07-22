@@ -202,9 +202,13 @@ public class WorldRenderer {
         spriteBatch.draw(accPerfectBackground, centerX - 0.1f * width / 6f, y, 0.1f * width / 3f, height * 0.01f);
         // draw each of the 'markers'
         for (AccuracyMarker accMarker : world.getAccuracyMarkers()) {
-            if (accMarker.display)
+            if (accMarker.display){
+
+                spriteBatch.setColor(1, 1, 1, accMarker.getAlpha());
                 spriteBatch.draw(accHitMark, centerX + (accMarker.getTime()) * (width / 6) / zone - accHitMark.getRegionWidth(), y - height * 0.01f, 3f, height * 0.03f);
+            }
         }
+        spriteBatch.setColor(1, 1, 1, 1);
     }
 
     private void drawTapToBeginMessage() {

@@ -20,6 +20,11 @@ public class AccuracyMarker {
         }
     }
 
+    public float getAlpha() {
+        float alpha = displayTime / 5f;
+        return (alpha >= 1f ? 1f : (alpha <= 0f ? 0f : alpha));
+    }
+
     public float getTime() {
         return time;
     }
