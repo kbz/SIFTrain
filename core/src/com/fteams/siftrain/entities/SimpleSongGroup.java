@@ -8,6 +8,7 @@ public class SimpleSongGroup implements Comparable<SimpleSongGroup> {
     public Array<SongFileInfo> songs;
     public String song_name;
     public String resource_name;
+    public String music_file;
 
     public String toString()
     {

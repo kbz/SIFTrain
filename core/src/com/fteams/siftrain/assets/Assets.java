@@ -157,11 +157,13 @@ public class Assets {
             if (!beatmaps.isEmpty())
             {
                 String resourceName = beatmaps.get(0).getResourceName();
+                String musicFile = beatmaps.get(0).music_file;
                 String songName = beatmaps.get(0).song_name;
                 if (groupMap.get(resourceName) == null)
                 {
                     SimpleSongGroup group = new SimpleSongGroup();
                     group.resource_name = resourceName;
+                    group.music_file = musicFile;
                     group.song_name = songName;
                     group.songs = new Array<>();
                     groupMap.put(resourceName, group);
@@ -173,8 +175,7 @@ public class Assets {
                 group.songs.sort();
             }
         }
-        for (String key: groupMap.keySet())
-        {
+        for (String key: groupMap.keySet()) {
             songGroup.add(groupMap.get(key));
         }
         songGroup.sort();

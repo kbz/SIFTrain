@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.SimpleSongLoader;
+import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleSongGroup;
 import com.fteams.siftrain.entities.SongFileInfo;
 
@@ -38,6 +40,35 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
     private CheckBox randomCheckbox = new CheckBox("Randomize Notes (" + (GlobalConfiguration.random ? "X" : " ") + ")", Assets.menuSkin);
+    private Music previewMusic = null;
+
+    private void stopPreviewSong() {
+        if(previewMusic != null) {
+            previewMusic.stop();
+            previewMusic.dispose();
+            previewMusic = null;
+        }
+    }
+
+    private void updatePreviewSong() {
+        stopPreviewSong();
+
+        if(Assets.selectedGroup == null)
+            return;
+
+        String musicFile = Assets.selectedGroup.music_file;
+        if(musicFile != null)
+            previewMusic = SongLoader.loadSongByName(musicFile);
+
+        if(previewMusic == null)
+            previewMusic = SongLoader.loadSongByName(Assets.selectedGroup.resource_name);
+
+        if(previewMusic != null) {
+            previewMusic.setLooping(true);
+            previewMusic.setVolume(GlobalConfiguration.songVolume / 100.0f);
+            previewMusic.play();
+        }
+    }
 
     @Override
     public void show() {
@@ -74,6 +105,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
                 Assets.selectedGroup = newSelected;
                 diffList.setItems(newSelected.songs);
+                updatePreviewSong();
             }
         });
 
@@ -117,6 +149,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
             public void clicked(InputEvent event, float x, float y) {
                 Assets.selectedGroup = songList.getSelected();
                 Assets.selectedBeatmap = diffList.getSelected();
+                stopPreviewSong();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
         }));
@@ -126,6 +159,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                 if (diffList.getSelected() == null) {
                     return;
                 }
+                stopPreviewSong();
                 Assets.selectedBeatmap = diffList.getSelected();
                 SimpleSongLoader loader = new SimpleSongLoader();
                 Assets.selectedSong = loader.loadSong(Assets.selectedBeatmap);
@@ -156,6 +190,8 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
         Gdx.input.setInputProcessor(impx);
         Gdx.input.setCatchBackKey(true);
+
+        updatePreviewSong();
     }
 
     @Override
