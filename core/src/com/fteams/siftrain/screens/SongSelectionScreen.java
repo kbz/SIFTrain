@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.SimpleSongLoader;
+import com.fteams.siftrain.controller.Crossfader;
 import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleSongGroup;
 import com.fteams.siftrain.entities.SongFileInfo;
@@ -40,34 +41,26 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
     private CheckBox randomCheckbox = new CheckBox("Randomize Notes (" + (GlobalConfiguration.random ? "X" : " ") + ")", Assets.menuSkin);
-    private Music previewMusic = null;
+    private Crossfader previewCrossfader = new Crossfader();
 
     private void stopPreviewSong() {
-        if(previewMusic != null) {
-            previewMusic.stop();
-            previewMusic.dispose();
-            previewMusic = null;
-        }
+        previewCrossfader.dispose();
     }
 
     private void updatePreviewSong() {
-        stopPreviewSong();
-
         if(Assets.selectedGroup == null)
             return;
 
+        Music previewMusic = null;
         String musicFile = Assets.selectedGroup.music_file;
+
         if(musicFile != null)
             previewMusic = SongLoader.loadSongByName(musicFile);
 
         if(previewMusic == null)
             previewMusic = SongLoader.loadSongByName(Assets.selectedGroup.resource_name);
 
-        if(previewMusic != null) {
-            previewMusic.setLooping(true);
-            previewMusic.setVolume(GlobalConfiguration.songVolume / 100.0f);
-            previewMusic.play();
-        }
+        previewCrossfader.enqueue(previewMusic);
     }
 
     @Override
@@ -199,6 +192,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        previewCrossfader.update(delta);
         songListPane.act(delta);
         stage.act();
         stage.draw();
