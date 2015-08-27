@@ -221,6 +221,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
+        stopPreviewSong();
         stage.dispose();
     }
 
@@ -234,6 +235,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
             Assets.selectedBeatmap = diffList.getSelected();
             Assets.selectedGroup = songList.getSelected();
+            stopPreviewSong();
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             // do nothing
             return true;
