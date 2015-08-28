@@ -370,7 +370,18 @@ public class WorldRenderer {
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height - height * 0.25f;
         float size = height * 0.2f;
+        Color c = null;
+
         for (CircleMark mark : world.getMarks()) {
+            if(!mark.visible && !mark.hold)
+                continue;
+
+            float alpha = mark.alpha;
+            if(alpha < 1f) {
+                c = spriteBatch.getColor();
+                spriteBatch.setColor(c.r, c.g, c.b, alpha);
+            }
+
             if (mark.hold) {
                 if (mark.waiting) {
                     float[] points = {
@@ -391,9 +402,16 @@ public class WorldRenderer {
                 }
                 // coordinates for the beam start and end
             }
+
             if (mark.visible) {
                 int effectMask = mark.getEffectMask();
+
                 spriteBatch.draw(selectTextureForCircle(effectMask), centerX - size * mark.getSize() / 2 + mark.getPosition().x * ppuX, centerY - size * mark.getSize() / 2 + mark.getPosition().y * ppuY, size * mark.getSize(), size * mark.getSize());
+
+            }
+
+            if(alpha < 1f) {
+                spriteBatch.setColor(c);
             }
         }
 
