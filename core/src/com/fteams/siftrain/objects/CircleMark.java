@@ -1,5 +1,7 @@
 package com.fteams.siftrain.objects;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
@@ -48,8 +50,11 @@ public class CircleMark implements Comparable<CircleMark> {
     public boolean waitingEnd;
     public boolean processed;
     public boolean hold;
+    public boolean soundPlayed;
+    public boolean sound2Played;
 
     public boolean left;
+    Vector2 origin = new Vector2();
     Vector2 position = new Vector2();
     Vector2 holdReleasePosition = new Vector2();
     Vector2 velocity = new Vector2();
@@ -68,6 +73,8 @@ public class CircleMark implements Comparable<CircleMark> {
     private float holdEndStartWaitTime;
     private float holdEndEndWaitTime;
 
+    public  float alpha = 1f;
+    public  float alpha2 = 1f;
     public Integer effect;
     // only for holds
     private float size;
@@ -77,6 +84,8 @@ public class CircleMark implements Comparable<CircleMark> {
     public CircleMark(float x, float y, SimpleNotesInfo note, Double noteSpeed, float delay) {
         float timing = (float) (delay + note.timing_sec * 1f + GlobalConfiguration.offset * 1f / 1000f);
         notePosition = note.position;
+        this.origin.x = x;
+        this.origin.y = y;
         this.position.x = x;
         this.position.y = y;
         this.holdReleasePosition.x = x;
@@ -134,6 +143,10 @@ public class CircleMark implements Comparable<CircleMark> {
         waitingStart = false;
         waitingEnd = false;
         processed = false;
+        soundPlayed = false;
+        sound2Played = false;
+        alpha = 1f;
+        alpha2 = 1f;
     }
 
     private void initializeVelocity() {
@@ -173,18 +186,35 @@ public class CircleMark implements Comparable<CircleMark> {
         if (spawnTime <= time && despawnTime > time && !visible) {
             visible = true;
         }
-        if (spawnTime >= time || despawnTime <= time) {
-            if (visible) {
-                if (GlobalConfiguration.playHintSounds) {
-                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
-                }
-                visible = false;
+
+        if (spawnTime >= time && visible)
+            visible = false;
+
+        if (visible && despawnTime <= time) {
+            if(GlobalConfiguration.playHintSounds && !soundPlayed) {
+                Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
+                soundPlayed = true;
+            }
+
+            if(holding) {
+                alpha = 1f;
+            } else {
+                alpha = MathUtils.clamp((endWaitTime - time) / (endWaitTime - despawnTime), 0f, 1f);
+                if(alpha == 0f)
+                    visible = false;
             }
         }
 
         if (visible) {
-            updateSize(despawnTime - time);
-            position.add(velocity.cpy().scl(time - previousTime));
+            float scl = time - spawnTime;
+
+            if(holding) {
+                scl = speed.floatValue();
+                updateSize(Math.max(0f, despawnTime - time));
+            } else
+                updateSize(despawnTime - time);
+
+            position.set(origin.cpy().add(velocity.cpy().scl(scl)));
         }
         if (startWaitTime <= time && endWaitTime > time && !waiting) {
             waiting = true;
@@ -198,14 +228,21 @@ public class CircleMark implements Comparable<CircleMark> {
             endVisible = true;
             waitingEnd = true;
         }
-        if (holdEndSpawnTime >= time || holdEndDespawnTime <= time) {
-            if (endVisible) {
-                if (GlobalConfiguration.playHintSounds) {
-                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
-                }
-                endVisible = false;
+
+        if (holdEndSpawnTime >= time && endVisible)
+            endVisible = false;
+
+        if (endVisible && holdEndDespawnTime <= time) {
+            if (GlobalConfiguration.playHintSounds && !sound2Played) {
+                Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
+                sound2Played = true;
             }
+
+            alpha2 = MathUtils.clamp((holdEndEndWaitTime - time) / (holdEndEndWaitTime - holdEndDespawnTime), 0f, 1f);
+            if(alpha2 == 0f)
+                endVisible = false;
         }
+
         if (endVisible) {
             updateSize2(holdEndDespawnTime - time);
             holdReleasePosition.add(velocity.cpy().scl(time - previousTime));
@@ -221,7 +258,6 @@ public class CircleMark implements Comparable<CircleMark> {
         if (hold && !firstHit && !holding && endWaitTime <= time && waitingStart && !miss) {
             waiting = false;
             endVisible = false;
-            visible = false;
             miss = true;
             accuracyStart = Accuracy.MISS;
             accuracyEnd = Accuracy.MISS;
@@ -229,7 +265,6 @@ public class CircleMark implements Comparable<CircleMark> {
         } else if (!hold && endWaitTime <= time && waitingStart && !miss) {
             waiting = false;
             endVisible = false;
-            visible = false;
             miss = true;
             accuracyStart = Accuracy.MISS;
             //System.out.println("MISS-002: didn't hit the note");
@@ -241,7 +276,6 @@ public class CircleMark implements Comparable<CircleMark> {
                 miss = true;
                 waitingEnd = false;
                 holding = false;
-                visible = false;
                 endVisible = false;
                 waiting = false;
                 accuracyEnd = Accuracy.MISS;
@@ -251,7 +285,6 @@ public class CircleMark implements Comparable<CircleMark> {
                 accuracyEnd = Accuracy.MISS;
                 waiting = false;
                 endVisible = false;
-                visible = false;
                 miss = true;
                 //System.out.println("MISS-004: released hold too early");
             }
@@ -280,9 +313,9 @@ public class CircleMark implements Comparable<CircleMark> {
             secondHit = true;
             processed = true;
             waiting = false;
+            visible = false;
         }
         waitingStart = false;
-        visible = false;
         // calculate hit accuracy
         return accuracyStart;
     }
@@ -318,5 +351,9 @@ public class CircleMark implements Comparable<CircleMark> {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public Vector2 getOriginalPosition() {
+        return origin;
     }
 }

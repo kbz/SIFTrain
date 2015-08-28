@@ -1,5 +1,7 @@
 package com.fteams.siftrain.renderer;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -8,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.fteams.siftrain.World;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
@@ -54,7 +58,6 @@ public class WorldRenderer {
     TextureRegion accPerfectBackground;
 
     TextureRegion holdBG;
-    TextureRegion holdBGHolding;
 
     TextureRegion accHitMark;
 
@@ -93,6 +96,8 @@ public class WorldRenderer {
     public float ppuX;
     // pixels per unit on Y
     public float ppuY;
+
+    private float time;
 
     public void setSize(int w, int h, int offsetX, int offsetY) {
         this.width = w;
@@ -144,7 +149,6 @@ public class WorldRenderer {
         accHitMark = atlas.findRegion("acc_mark");
 
         holdBG = new TextureRegion(Assets.holdBG);
-        holdBGHolding = new TextureRegion(Assets.holdBGHolding);
 
         scoreMarker = atlas.findRegion("score_marker");
         cRankKnob = atlas.findRegion("c_marker");
@@ -185,6 +189,7 @@ public class WorldRenderer {
         }
         renderer.end();
         spriteBatch.end();
+        time += Gdx.graphics.getDeltaTime();
     }
 
     private void drawAccuracyBar() {
@@ -329,7 +334,6 @@ public class WorldRenderer {
 
     }
 
-
     private void drawTapZones() {
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height - height * 0.25f;
@@ -341,10 +345,22 @@ public class WorldRenderer {
             if (tapZone.getState(TapZone.State.STATE_WARN)) {
                 region = tapZoneWarn;
             }
+
             if (tapZone.getState(TapZone.State.STATE_PRESSED)) {
-                region = tapZonePressed;
+                tapZone.touchTime = time;
             }
-            spriteBatch.draw(region, centerX + tapZone.getPosition().x * ppuX - size / 2, centerY + tapZone.getPosition().y * ppuY - size / 2, size, size);
+
+            final float x = centerX + tapZone.getPosition().x * ppuX - size / 2;
+            final float y = centerY + tapZone.getPosition().y * ppuY - size / 2;
+            spriteBatch.draw(region, x, y, size, size);
+
+            float alpha = 1f - MathUtils.clamp((time - tapZone.touchTime) * 5f, 0f, 1f);
+            if(alpha > 0) {
+                Color c = spriteBatch.getColor();
+                spriteBatch.setColor(c.r, c.g, c.b, Interpolation.pow2In.apply(alpha));
+                spriteBatch.draw(tapZonePressed, x, y, size, size);
+                spriteBatch.setColor(c);
+            }
         }
     }
 
@@ -352,37 +368,80 @@ public class WorldRenderer {
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height - height * 0.25f;
         float size = height * 0.2f;
+
         for (CircleMark mark : world.getMarks()) {
+            if(!mark.visible && !mark.hold)
+                continue;
+
+            float alpha = mark.alpha;
+            float alpha2 = mark.alpha2;
+            Color c = spriteBatch.getColor();
+
             if (mark.hold) {
                 if (mark.waiting) {
+                    // Here be dragons
+
+                    float w = holdBG.getRegionWidth();
+                    float h = holdBG.getRegionHeight();
+
+                    float ratio;
+
+                    if(mark.endVisible)
+                        ratio = 1f - (1f - mark.getSize2() / mark.getSize()) / 0.9f;
+                    else
+                        ratio = 0f;
+
                     float[] points = {
-                            (float) (mark.getHoldReleasePosition().x * ppuX - mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/ (float) (mark.getHoldReleasePosition().y * ppuY - mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
-                            (float) (mark.getPosition().x * ppuX - mark.getSize() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/ (float) (mark.getPosition().y * ppuY - mark.getSize() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
-                            (float) (mark.getPosition().x * ppuX + mark.getSize() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/ (float) (mark.getPosition().y * ppuY + mark.getSize() * size / 2 * Math.cos(mark.destination * Math.PI / 8)),
-                            (float) (mark.getHoldReleasePosition().x * ppuX + mark.getSize2() * size / 2 * Math.sin(mark.destination * Math.PI / 8)),
-                            /*centerY +*/  (float) (mark.getHoldReleasePosition().y * ppuY + mark.getSize2() * size / 2 * Math.cos(mark.destination * Math.PI / 8))
+                            w*0.5f * (1.0f - ratio * 0.95f),
+                            h * ratio,
+
+                            0f,
+                            h,
+
+                            w,
+                            h,
+
+                            w*0.5f * (1.0f + ratio * 0.95f),
+                            h * ratio
                     };
-                    spriteBatch.draw(new PolygonRegion(mark.holding ? holdBGHolding : holdBG, points, triangles), centerX, centerY);
+
+                    w = size * mark.getSize();
+                    PolygonRegion clamped = new PolygonRegion(holdBG, points, triangles);
+                    float scl = ppuY * (mark.getPosition().cpy().sub(mark.getOriginalPosition()).len()) / h;
+
+                    if(mark.holding)
+                        spriteBatch.setColor(1.0f, 1.0f, 0.5f, alpha * alpha2 * 0.45f * (0.75f + 0.25f * MathUtils.sin(time * 7f + mark.accuracyHitStartTime)));
+                    else
+                        spriteBatch.setColor(c.r, c.g, c.b, alpha * alpha * alpha2 * 0.45f);
+
+                    spriteBatch.draw(clamped, centerX - w * 0.5f, centerY, w * 0.5f, 0f, w, h, 1f, -scl, (90f - mark.destination * 180f / 8.0f));
+                    spriteBatch.setColor(c.r, c.g, c.b, alpha);
                 }
-                if (mark.endVisible) {
-                    TextureRegion region = circleHoldEnd;
-                    spriteBatch.draw(region, centerX - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().x * ppuX, centerY - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().y * ppuY, size * mark.getSize2(), size * mark.getSize2());
-                }
-                // coordinates for the beam start and end
             }
+
             if (mark.visible) {
                 int effectMask = mark.getEffectMask();
+
+                spriteBatch.setColor(c.r, c.g, c.b, alpha);
                 spriteBatch.draw(selectTextureForCircle(effectMask), centerX - size * mark.getSize() / 2 + mark.getPosition().x * ppuX, centerY - size * mark.getSize() / 2 + mark.getPosition().y * ppuY, size * mark.getSize(), size * mark.getSize());
+
             }
+
+            if (mark.endVisible) {
+                TextureRegion region = circleHoldEnd;
+                spriteBatch.setColor(c.r, c.g, c.b, alpha * alpha2);
+                spriteBatch.draw(region, centerX - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().x * ppuX, centerY - size * mark.getSize2() / 2 + mark.getHoldReleasePosition().y * ppuY, size * mark.getSize2(), size * mark.getSize2());
+            }
+
+            spriteBatch.setColor(c);
         }
 
     }
 
     private TextureRegion selectTextureForCircle(int effectMask) {
-        if ((effectMask & (SongUtils.NOTE_TYPE_NORMAL)) != 0) {
+        // TODO: Remove the holdStart texture as it's no longer used
+
+        if ((effectMask & (SongUtils.NOTE_TYPE_NORMAL | SongUtils.NOTE_TYPE_HOLD)) != 0) {
             if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0) {
                 return circleSim;
             } else return circle;
@@ -390,10 +449,6 @@ public class WorldRenderer {
             if ((effectMask & SongUtils.NOTE_TYPE_SIMULT_START) != 0) {
                 return circleSpecialSim;
             } else return circleSpecial;
-        } else if ((effectMask & SongUtils.NOTE_TYPE_HOLD) != 0) {
-            if ((effectMask & SongUtils.NOTE_TYPE_SIMULT_START) != 0) {
-                return circleHoldStartSim;
-            } else return circleHoldStart;
         } else {
             if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0) {
                 return circleTokenSim;

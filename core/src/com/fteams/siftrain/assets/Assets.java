@@ -43,7 +43,6 @@ public class Assets {
 
     public static Texture mainMenuBackgroundTexture;
     public static Texture holdBG;
-    public static Texture holdBGHolding;
 
     public static Array<SimpleSongGroup> songGroup;
 
@@ -60,7 +59,6 @@ public class Assets {
         internalManager.load("hitsounds/perfect.mp3", Sound.class);
         internalManager.load("bigimages/main_menu_background.jpg", Texture.class);
         internalManager.load("images/hold_background.png", Texture.class);
-        internalManager.load("images/hold_background_holding.png", Texture.class);
         internalManager.load("fonts/song-font.fnt", BitmapFont.class);
         reloadBeatmaps();
     }
@@ -118,9 +116,6 @@ public class Assets {
 
         if (holdBG == null)
             holdBG = internalManager.get("images/hold_background.png");
-
-        if (holdBGHolding == null)
-            holdBGHolding = internalManager.get("images/hold_background_holding.png");
     }
 
     public static void setFonts() {
