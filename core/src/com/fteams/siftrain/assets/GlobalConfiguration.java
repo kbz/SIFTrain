@@ -21,6 +21,7 @@ public class GlobalConfiguration {
     public static int randomMode;
     // sync config
     public static int syncMode;
+    public static float speedMultiplier;
 
     // other - per session configs
     public static boolean random;
@@ -42,7 +43,7 @@ public class GlobalConfiguration {
         randomMode = prefs.getInteger("random_mode", SongUtils.RANDOM_MODE_NEW);
         // sync mode
         syncMode = prefs.getInteger("sync_mode", SongUtils.SYNC_MODE_1);
-
+        speedMultiplier = prefs.getFloat("speed_multiplier", 1f);
     }
 
     public static void storeConfiguration() {
@@ -57,6 +58,7 @@ public class GlobalConfiguration {
         prefs.putInteger("sorting_mode", sortMode);
         prefs.putInteger("random_mode", randomMode);
         prefs.putInteger("sync_mode", syncMode);
+        prefs.putFloat("speed_multiplier", speedMultiplier);
         prefs.flush();
     }
 }

@@ -39,6 +39,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Label inputOffsetLabel = new Label("Input offset", Assets.menuSkin, "song_style_result");
     private Label teamStrengthLabel = new Label("Team Strength", Assets.menuSkin, "song_style_result");
     private Label pathToBeatmaps = new Label("Path to Beatmaps", Assets.menuSkin, "song_style_result");
+    private Label speedMultiplierLabel = new Label("Note speed multiplier", Assets.menuSkin, "song_style_result");
 
     private TextButton volumeSettingsTabButton = new TextButton("Volume Settings", Assets.menuSkin, "item1");
     private TextButton offsetSettingsTabButton = new TextButton("Timing Settings", Assets.menuSkin, "item1");
@@ -53,12 +54,14 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Label offsetValueLabel;
     private Label inputOffsetValueLabel;
     private Label teamStrengthValueLabel;
+    private Label speedMultiplierValueLabel;
 
     private Slider songVolumeSlider;
     private Slider feedbackVolumeSlider;
     private Slider offsetSlider;
     private Slider inputOffsetSlider;
     private Slider teamSrengthSlider;
+    private Slider speedMultiplierSlider;
 
     private CheckBox playHintSoundCheckbox;
     private CheckBox syncModeCheckbox;
@@ -83,6 +86,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Integer newSortingMode;
     private Integer newRandomMode;
     private Integer newSyncMode;
+    private Float newSpeedMultiplier;
 
     @Override
     public void show() {
@@ -106,6 +110,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         newSortingMode = GlobalConfiguration.sortMode;
         newRandomMode = GlobalConfiguration.randomMode;
         newSyncMode = GlobalConfiguration.syncMode;
+        newSpeedMultiplier = GlobalConfiguration.speedMultiplier;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
@@ -206,6 +211,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         inputOffsetSlider.setValue(GlobalConfiguration.inputOffset);
         inputOffsetSlider.addListener(this);
 
+        speedMultiplierLabel.setFontScale(fontScale);
+        speedMultiplierValueLabel = new Label((int)(GlobalConfiguration.speedMultiplier * 100) + "%", Assets.menuSkin, "song_style_result");
+        speedMultiplierValueLabel.setFontScale(fontScale);
+        speedMultiplierSlider = new Slider(0.5f, 2.0f, 0.05f, false, Assets.menuSkin);
+        speedMultiplierSlider.setValue(GlobalConfiguration.speedMultiplier);
+        speedMultiplierSlider.addListener(this);
+
         syncModeCheckbox = new CheckBox("Sync Mode: " + SongUtils.syncModes[newSyncMode], Assets.menuSkin);
         syncModeCheckbox.getLabel().setFontScale(fontScale);
         syncModeCheckbox.getImageCell().width(0);
@@ -228,6 +240,14 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(inputOffsetSlider).width(stage.getWidth() * 0.6f).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
         offsetTable.add().height(offsetValueLabel.getHeight()).row();
+
+        // speed multiplier
+        offsetTable.add(speedMultiplierLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
+        offsetTable.add().width(stage.getWidth() * 0.20f);
+        offsetTable.add(speedMultiplierValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(speedMultiplierSlider).width(stage.getWidth() * 0.6f).height(speedMultiplierLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        offsetTable.add().height(speedMultiplierValueLabel.getHeight()).row();
+
 
         // sync mode setting
         offsetTable.add(syncModeCheckbox).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().colspan(3).row();
@@ -339,6 +359,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.sortMode = newSortingMode;
                 GlobalConfiguration.randomMode = newRandomMode;
                 GlobalConfiguration.syncMode = newSyncMode;
+                GlobalConfiguration.speedMultiplier = newSpeedMultiplier;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
@@ -422,6 +443,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == syncModeCheckbox) {
             newSyncMode = (newSyncMode + 1) % 4;
             syncModeCheckbox.setText("Sync Mode: " + SongUtils.syncModes[newSyncMode]);
+        }
+        if (actor == speedMultiplierSlider) {
+            newSpeedMultiplier = ((Slider)actor).getValue();
+            speedMultiplierValueLabel.setText((int)(newSpeedMultiplier * 100f) + "%");
         }
     }
 

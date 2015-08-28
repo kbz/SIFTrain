@@ -195,7 +195,7 @@ public class WorldRenderer {
     private void drawAccuracyBar() {
         float centerX = this.positionOffsetX + width / 6;
         float y = this.positionOffsetY + height - height * 0.1f;
-        float zone = (float) (Assets.selectedSong.song_info.get(0).notes_speed / 2);
+        float zone = (float) ((Assets.selectedSong.song_info.get(0).notes_speed / GlobalConfiguration.speedMultiplier) / 2);
 
         // draw the background (bad level)
         spriteBatch.draw(accBadBackground, centerX - width / 6f, y, width / 3f, height * 0.01f);
