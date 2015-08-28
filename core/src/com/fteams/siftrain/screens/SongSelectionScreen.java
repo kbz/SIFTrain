@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,6 +23,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.SimpleSongLoader;
+import com.fteams.siftrain.controller.Crossfader;
+import com.fteams.siftrain.controller.SongLoader;
 import com.fteams.siftrain.entities.SimpleSongGroup;
 import com.fteams.siftrain.entities.SongFileInfo;
 
@@ -38,6 +41,27 @@ public class SongSelectionScreen implements Screen, InputProcessor {
     private TextButton backButton = new TextButton("Back", Assets.menuSkin, "item1");
     private Image backgroundImage = new Image(Assets.mainMenuBackgroundTexture);
     private CheckBox randomCheckbox = new CheckBox("Randomize Notes (" + (GlobalConfiguration.random ? "X" : " ") + ")", Assets.menuSkin);
+    private Crossfader previewCrossfader = new Crossfader();
+
+    private void stopPreviewSong() {
+        previewCrossfader.dispose();
+    }
+
+    private void updatePreviewSong() {
+        if(Assets.selectedGroup == null)
+            return;
+
+        Music previewMusic = null;
+        String musicFile = Assets.selectedGroup.music_file;
+
+        if(musicFile != null)
+            previewMusic = SongLoader.loadSongByName(musicFile);
+
+        if(previewMusic == null)
+            previewMusic = SongLoader.loadSongByName(Assets.selectedGroup.resource_name);
+
+        previewCrossfader.enqueue(previewMusic);
+    }
 
     @Override
     public void show() {
@@ -74,6 +98,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
                 Assets.selectedGroup = newSelected;
                 diffList.setItems(newSelected.songs);
+                updatePreviewSong();
             }
         });
 
@@ -117,6 +142,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
             public void clicked(InputEvent event, float x, float y) {
                 Assets.selectedGroup = songList.getSelected();
                 Assets.selectedBeatmap = diffList.getSelected();
+                stopPreviewSong();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             }
         }));
@@ -126,6 +152,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                 if (diffList.getSelected() == null) {
                     return;
                 }
+                stopPreviewSong();
                 Assets.selectedBeatmap = diffList.getSelected();
                 SimpleSongLoader loader = new SimpleSongLoader();
                 Assets.selectedSong = loader.loadSong(Assets.selectedBeatmap);
@@ -156,6 +183,8 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
         Gdx.input.setInputProcessor(impx);
         Gdx.input.setCatchBackKey(true);
+
+        updatePreviewSong();
     }
 
     @Override
@@ -163,6 +192,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        previewCrossfader.update(delta);
         songListPane.act(delta);
         stage.act();
         stage.draw();
@@ -191,6 +221,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
+        stopPreviewSong();
         stage.dispose();
     }
 
@@ -204,6 +235,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
         if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
             Assets.selectedBeatmap = diffList.getSelected();
             Assets.selectedGroup = songList.getSelected();
+            stopPreviewSong();
             ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
             // do nothing
             return true;
