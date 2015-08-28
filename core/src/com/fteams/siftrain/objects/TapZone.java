@@ -38,6 +38,7 @@ public class TapZone {
 
     Vector2 position = new Vector2();
     Integer id;
+    public float touchTime = -1f;
 
     public Vector2 getPosition() {
         return position;

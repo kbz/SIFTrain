@@ -1,5 +1,7 @@
 package com.fteams.siftrain.renderer;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -8,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.fteams.siftrain.World;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
@@ -93,6 +97,8 @@ public class WorldRenderer {
     public float ppuX;
     // pixels per unit on Y
     public float ppuY;
+
+    private float time;
 
     public void setSize(int w, int h, int offsetX, int offsetY) {
         this.width = w;
@@ -185,6 +191,7 @@ public class WorldRenderer {
         }
         renderer.end();
         spriteBatch.end();
+        time += Gdx.graphics.getDeltaTime();
     }
 
     private void drawAccuracyBar() {
@@ -329,7 +336,6 @@ public class WorldRenderer {
 
     }
 
-
     private void drawTapZones() {
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height - height * 0.25f;
@@ -341,10 +347,22 @@ public class WorldRenderer {
             if (tapZone.getState(TapZone.State.STATE_WARN)) {
                 region = tapZoneWarn;
             }
+
             if (tapZone.getState(TapZone.State.STATE_PRESSED)) {
-                region = tapZonePressed;
+                tapZone.touchTime = time;
             }
-            spriteBatch.draw(region, centerX + tapZone.getPosition().x * ppuX - size / 2, centerY + tapZone.getPosition().y * ppuY - size / 2, size, size);
+
+            final float x = centerX + tapZone.getPosition().x * ppuX - size / 2;
+            final float y = centerY + tapZone.getPosition().y * ppuY - size / 2;
+            spriteBatch.draw(region, x, y, size, size);
+
+            float alpha = 1f - MathUtils.clamp((time - tapZone.touchTime) * 5f, 0f, 1f);
+            if(alpha > 0) {
+                Color c = spriteBatch.getColor();
+                spriteBatch.setColor(c.r, c.g, c.b, Interpolation.pow2In.apply(alpha));
+                spriteBatch.draw(tapZonePressed, x, y, size, size);
+                spriteBatch.setColor(c);
+            }
         }
     }
 
