@@ -51,6 +51,7 @@ public class CircleMark implements Comparable<CircleMark> {
     public boolean processed;
     public boolean hold;
     public boolean soundPlayed;
+    public boolean sound2Played;
 
     public boolean left;
     Vector2 origin = new Vector2();
@@ -73,6 +74,7 @@ public class CircleMark implements Comparable<CircleMark> {
     private float holdEndEndWaitTime;
 
     public  float alpha = 1f;
+    public  float alpha2 = 1f;
     public Integer effect;
     // only for holds
     private float size;
@@ -142,7 +144,9 @@ public class CircleMark implements Comparable<CircleMark> {
         waitingEnd = false;
         processed = false;
         soundPlayed = false;
+        sound2Played = false;
         alpha = 1f;
+        alpha2 = 1f;
     }
 
     private void initializeVelocity() {
@@ -224,14 +228,21 @@ public class CircleMark implements Comparable<CircleMark> {
             endVisible = true;
             waitingEnd = true;
         }
-        if (holdEndSpawnTime >= time || holdEndDespawnTime <= time) {
-            if (endVisible) {
-                if (GlobalConfiguration.playHintSounds) {
-                    Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
-                }
-                endVisible = false;
+
+        if (holdEndSpawnTime >= time && endVisible)
+            endVisible = false;
+
+        if (endVisible && holdEndDespawnTime <= time) {
+            if (GlobalConfiguration.playHintSounds && !sound2Played) {
+                Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
+                sound2Played = true;
             }
+
+            alpha2 = MathUtils.clamp((holdEndEndWaitTime - time) / (holdEndEndWaitTime - holdEndDespawnTime), 0f, 1f);
+            if(alpha2 == 0f)
+                endVisible = false;
         }
+
         if (endVisible) {
             updateSize2(holdEndDespawnTime - time);
             holdReleasePosition.add(velocity.cpy().scl(time - previousTime));
@@ -340,5 +351,9 @@ public class CircleMark implements Comparable<CircleMark> {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public Vector2 getOriginalPosition() {
+        return origin;
     }
 }
