@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.fteams.siftrain.World;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
@@ -364,6 +365,37 @@ public class WorldRenderer {
         }
     }
 
+    private void drawHoldBeam(Vector2 from, Vector2 to, float orgSize, float dstSize) {
+        Vector2 delta = from.cpy().sub(to);
+
+        float w = Math.max(orgSize, dstSize);
+        float h = delta.len();
+
+        float tw = holdBG.getRegionWidth();
+        float th = holdBG.getRegionHeight();
+
+        float factorScale = (tw / w) * 0.5f;
+        float topFactor = Math.max(dstSize - orgSize, 0f) * factorScale;
+        float botFactor = Math.max(orgSize - dstSize, 0f) * factorScale;
+
+        float[] points = {
+                topFactor,
+                0f,
+
+                botFactor,
+                th,
+
+                tw - botFactor,
+                th,
+
+                tw - topFactor,
+                0f
+        };
+
+        PolygonRegion clamped = new PolygonRegion(holdBG, points, triangles);
+        spriteBatch.draw(clamped, from.x - w * 0.5f, from.y, w * 0.5f, 0f, w, h, 1f, 1f, delta.angle() + 90);
+    }
+
     private void drawCircles() {
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height - height * 0.25f;
@@ -377,46 +409,30 @@ public class WorldRenderer {
             float alpha2 = mark.alpha2;
             Color c = spriteBatch.getColor();
 
-            if (mark.hold) {
-                if (mark.waiting) {
-                    // Here be dragons
+            if (mark.hold && mark.waiting) {
+                if(mark.holding)
+                    spriteBatch.setColor(1.0f, 1.0f, 0.5f, alpha * alpha2 * 0.45f * (0.75f + 0.25f * MathUtils.sin(time * 7f + mark.accuracyHitStartTime)));
+                else
+                    spriteBatch.setColor(c.r, c.g, c.b, alpha * alpha * alpha2 * 0.45f);
 
-                    float w = holdBG.getRegionWidth();
-                    float h = holdBG.getRegionHeight();
+                float orgSize = mark.getSize2() * size;
+                float dstSize = mark.getSize()  * size;
 
-                    float ratio;
+                Vector2 org = mark.getHoldReleasePosition().cpy();
+                org.x *= ppuX;
+                org.y *= ppuY;
+                org.x += centerX;
+                org.y += centerY;
 
-                    if(mark.endVisible)
-                        ratio = 1f - (1f - mark.getSize2() / mark.getSize()) / 0.9f;
-                    else
-                        ratio = 0f;
+                Vector2 dst = mark.getPosition().cpy();
+                dst.x *= ppuX;
+                dst.y *= ppuY;
+                dst.x += centerX;
+                dst.y += centerY;
 
-                    float[] points = {
-                            w*0.5f * (1.0f - ratio * 0.95f),
-                            h * ratio,
+                drawHoldBeam(org, dst, orgSize, dstSize);
 
-                            0f,
-                            h,
-
-                            w,
-                            h,
-
-                            w*0.5f * (1.0f + ratio * 0.95f),
-                            h * ratio
-                    };
-
-                    w = size * mark.getSize();
-                    PolygonRegion clamped = new PolygonRegion(holdBG, points, triangles);
-                    float scl = ppuY * (mark.getPosition().cpy().sub(mark.getOriginalPosition()).len()) / h;
-
-                    if(mark.holding)
-                        spriteBatch.setColor(1.0f, 1.0f, 0.5f, alpha * alpha2 * 0.45f * (0.75f + 0.25f * MathUtils.sin(time * 7f + mark.accuracyHitStartTime)));
-                    else
-                        spriteBatch.setColor(c.r, c.g, c.b, alpha * alpha * alpha2 * 0.45f);
-
-                    spriteBatch.draw(clamped, centerX - w * 0.5f, centerY, w * 0.5f, 0f, w, h, 1f, -scl, (90f - mark.destination * 180f / 8.0f));
-                    spriteBatch.setColor(c.r, c.g, c.b, alpha);
-                }
+                spriteBatch.setColor(c.r, c.g, c.b, alpha);
             }
 
             if (mark.visible) {
