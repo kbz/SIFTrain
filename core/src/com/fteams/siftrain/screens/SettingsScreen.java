@@ -194,7 +194,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetValueLabel = new Label((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.", Assets.menuSkin, "song_style_result");
         offsetValueLabel.setFontScale(fontScale);
 
-        offsetSlider = new Slider(-250f, 250f, 1f, false, Assets.menuSkin);
+        offsetSlider = new Slider(-1000f, 1000f, 25f, false, Assets.menuSkin);
         offsetSlider.setValue(GlobalConfiguration.offset);
         offsetSlider.addListener(this);
 
