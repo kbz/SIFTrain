@@ -101,7 +101,7 @@ public class CircleMark implements Comparable<CircleMark> {
         this.endWaitTime = timing + (float) (0.5f * speed);
         this.despawnTime = timing * 1.0f;
         this.size = 0.1f;
-        this.size2 = 0.1f;
+        this.size2 = 0f;
         if (hold) {
             this.holdEndSpawnTime = (float) (timing + note.effect_value - speed);
             this.holdEndStartWaitTime = (float) (timing + note.effect_value - speed);
@@ -320,7 +320,6 @@ public class CircleMark implements Comparable<CircleMark> {
         return accuracyStart;
     }
 
-
     public Accuracy release() {
         if (!firstHit) {
             return Accuracy.NONE;
@@ -346,14 +345,10 @@ public class CircleMark implements Comparable<CircleMark> {
 
     private void updateSize2(float despawnTime) {
         float progress = (float) ((speed - despawnTime) / speed);
-        this.size2 = 0.1f + progress * 0.9f;
+        this.size2 = progress;
     }
 
     public Vector2 getPosition() {
         return position;
-    }
-
-    public Vector2 getOriginalPosition() {
-        return origin;
     }
 }
