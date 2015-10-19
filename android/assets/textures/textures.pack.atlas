@@ -6,49 +6,49 @@ filter: Nearest,Nearest
 repeat: none
 acc_mark
   rotate: false
-  xy: 506, 454
+  xy: 506, 208
   size: 1, 50
   orig: 1, 50
   offset: 0, 0
   index: -1
 circle
   rotate: false
-  xy: 2, 254
+  xy: 2, 2
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
 circle_hold_press_no_black
   rotate: false
-  xy: 2, 2
+  xy: 260, 260
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
 circle_hold_press_no_black_sim
   rotate: false
-  xy: 254, 254
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-circle_hold_release_no_black
-  rotate: false
   xy: 254, 2
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
+hold_background
+  rotate: false
+  xy: 2, 254
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
 selection_menu_background
   rotate: false
-  xy: 509, 454
+  xy: 509, 208
   size: 1, 50
   orig: 1, 50
   offset: 0, 0
   index: -1
 selection_menu_selected
   rotate: false
-  xy: 506, 402
+  xy: 506, 156
   size: 1, 50
   orig: 1, 50
   offset: 0, 0
@@ -59,28 +59,28 @@ size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-circle_hold_release_no_black_sim
+circle_hold_release_no_black
   rotate: false
   xy: 2, 254
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-circle_sim
+circle_hold_release_no_black_sim
   rotate: false
   xy: 2, 2
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-circle_special
+circle_sim
   rotate: false
   xy: 254, 254
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-circle_special_sim
+circle_special
   rotate: false
   xy: 254, 2
   size: 250, 250
@@ -93,28 +93,28 @@ size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-circle_token
+circle_special_sim
   rotate: false
   xy: 2, 254
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-circle_token_sim
+circle_token
   rotate: false
   xy: 2, 2
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-tap
+circle_token_sim
   rotate: false
   xy: 254, 254
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-tap_pressed
+tap
   rotate: false
   xy: 254, 2
   size: 250, 250
@@ -127,233 +127,143 @@ size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-a_marker
-  rotate: false
-  xy: 254, 384
-  size: 100, 125
-  orig: 100, 125
-  offset: 0, 0
-  index: -1
 acc_bad
   rotate: false
-  xy: 458, 459
+  xy: 324, 455
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 acc_good
   rotate: false
-  xy: 458, 407
+  xy: 376, 455
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 acc_great
   rotate: false
-  xy: 349, 300
+  xy: 428, 455
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
 acc_perfect
   rotate: false
-  xy: 401, 300
+  xy: 419, 65
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
-b_marker
-  rotate: false
-  xy: 356, 384
-  size: 100, 125
-  orig: 100, 125
-  offset: 0, 0
-  index: -1
 bad_late
   rotate: false
-  xy: 117, 2
+  xy: 324, 423
   size: 65, 30
   orig: 65, 30
   offset: 0, 0
   index: -1
 bad_soon
   rotate: false
-  xy: 369, 352
+  xy: 439, 391
   size: 65, 30
   orig: 65, 30
   offset: 0, 0
   index: -1
-c_marker
-  rotate: false
-  xy: 324, 161
-  size: 100, 125
-  orig: 100, 125
-  offset: 0, 0
-  index: -1
 good_late
   rotate: false
-  xy: 254, 320
+  xy: 324, 86
   size: 93, 30
   orig: 93, 30
   offset: 0, 0
   index: -1
 good_soon
   rotate: false
-  xy: 254, 288
+  xy: 324, 54
   size: 93, 30
   orig: 93, 30
   offset: 0, 0
   index: -1
 great_late
   rotate: false
-  xy: 254, 352
+  xy: 324, 391
   size: 113, 30
   orig: 113, 30
   offset: 0, 0
   index: -1
 great_soon
   rotate: false
-  xy: 2, 2
+  xy: 391, 423
   size: 113, 30
   orig: 113, 30
   offset: 0, 0
   index: -1
-hold_background
-  rotate: false
-  xy: 458, 355
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
-hold_background_holding
-  rotate: false
-  xy: 453, 303
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
 knob
   rotate: false
-  xy: 436, 362
+  xy: 480, 485
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 knob_after
   rotate: false
-  xy: 254, 266
+  xy: 480, 463
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 knob_before
   rotate: false
-  xy: 184, 12
+  xy: 484, 117
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 menu_item_down
   rotate: false
-  xy: 2, 157
+  xy: 2, 405
   size: 320, 100
   orig: 320, 100
   offset: 0, 0
   index: -1
 menu_item_idle
   rotate: false
-  xy: 2, 55
+  xy: 2, 37
   size: 320, 100
   orig: 320, 100
   offset: 0, 0
   index: -1
 miss
   rotate: false
-  xy: 162, 34
+  xy: 419, 44
   size: 90, 19
   orig: 90, 19
   offset: 0, 0
   index: -1
-no_rank_marker
-  rotate: false
-  xy: 324, 34
-  size: 100, 125
-  orig: 100, 125
-  offset: 0, 0
-  index: -1
 perfect
   rotate: false
-  xy: 2, 34
+  xy: 324, 118
   size: 158, 19
   orig: 158, 19
   offset: 0, 0
   index: -1
-progress_bar_a_score
-  rotate: false
-  xy: 254, 3
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
-progress_bar_b_score
-  rotate: false
-  xy: 426, 248
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
-progress_bar_c_score
-  rotate: false
-  xy: 426, 196
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
-progress_bar_no_score
-  rotate: false
-  xy: 426, 144
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
-progress_bar_s_score
-  rotate: false
-  xy: 426, 92
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
 song_selection_menu_background
   rotate: false
-  xy: 426, 40
+  xy: 324, 2
   size: 50, 50
   orig: 50, 50
   offset: 0, 0
   index: -1
-tap_warn
+tap_pressed
   rotate: false
-  xy: 2, 259
+  xy: 2, 153
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-
-textures.pack5.png
-size: 128,256
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-s_marker
+tap_warn
   rotate: false
-  xy: 2, 129
-  size: 100, 125
-  orig: 100, 125
-  offset: 0, 0
-  index: -1
-score_marker
-  rotate: false
-  xy: 2, 2
-  size: 100, 125
-  orig: 100, 125
+  xy: 254, 139
+  size: 250, 250
+  orig: 250, 250
   offset: 0, 0
   index: -1

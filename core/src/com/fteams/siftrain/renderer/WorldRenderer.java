@@ -46,12 +46,6 @@ public class WorldRenderer {
     TextureRegion tapZoneWarn;
     TextureRegion tapZonePressed;
 
-    TextureRegion progressBarNoScore;
-    TextureRegion progressBarCScore;
-    TextureRegion progressBarBScore;
-    TextureRegion progressBarAScore;
-    TextureRegion progressBarSScore;
-
     TextureRegion accBadBackground;
     TextureRegion accGoodBackground;
     TextureRegion accGreatBackground;
@@ -60,12 +54,6 @@ public class WorldRenderer {
     TextureRegion holdBG;
 
     TextureRegion accHitMark;
-
-    TextureRegion scoreMarker;
-    TextureRegion cRankKnob;
-    TextureRegion bRankKnob;
-    TextureRegion aRankKnob;
-    TextureRegion sRankKnob;
 
     TextureRegion missMark;
     TextureRegion badLateMark;
@@ -137,12 +125,6 @@ public class WorldRenderer {
         tapZonePressed = atlas.findRegion("tap_pressed");
         tapZoneWarn = atlas.findRegion("tap_warn");
 
-        progressBarNoScore = atlas.findRegion("progress_bar_no_score");
-        progressBarCScore = atlas.findRegion("progress_bar_c_score");
-        progressBarBScore = atlas.findRegion("progress_bar_b_score");
-        progressBarAScore = atlas.findRegion("progress_bar_a_score");
-        progressBarSScore = atlas.findRegion("progress_bar_s_score");
-
         accBadBackground = atlas.findRegion("acc_bad");
         accGoodBackground = atlas.findRegion("acc_good");
         accGreatBackground = atlas.findRegion("acc_great");
@@ -150,12 +132,6 @@ public class WorldRenderer {
         accHitMark = atlas.findRegion("acc_mark");
 
         holdBG = new TextureRegion(Assets.holdBG);
-
-        scoreMarker = atlas.findRegion("score_marker");
-        cRankKnob = atlas.findRegion("c_marker");
-        bRankKnob = atlas.findRegion("b_marker");
-        aRankKnob = atlas.findRegion("a_marker");
-        sRankKnob = atlas.findRegion("s_marker");
 
         missMark = atlas.findRegion("miss");
         badLateMark = atlas.findRegion("bad_late");
