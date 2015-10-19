@@ -1,0 +1,12 @@
+info face="‚Í‚È‚¼‚ßƒtƒHƒ“ƒg" size=100 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=100 base=86 scaleW=512 scaleH=512 pages=1 packed=0 alphaChnl=0 redChnl=4 greenChnl=4 blueChnl=4
+page id=0 file="title-font_0.png"
+chars count=8
+char id=70   x=117   y=0     width=46    height=75    xoffset=2     yoffset=17    xadvance=50    page=0  chnl=15
+char id=73   x=164   y=0     width=49    height=74    xoffset=1     yoffset=18    xadvance=50    page=0  chnl=15
+char id=83   x=20    y=0     width=46    height=76    xoffset=2     yoffset=18    xadvance=50    page=0  chnl=15
+char id=84   x=67    y=0     width=49    height=75    xoffset=1     yoffset=19    xadvance=50    page=0  chnl=15
+char id=97   x=256   y=0     width=49    height=56    xoffset=0     yoffset=37    xadvance=50    page=0  chnl=15
+char id=105  x=0     y=0     width=19    height=79    xoffset=14    yoffset=13    xadvance=50    page=0  chnl=15
+char id=110  x=306   y=0     width=46    height=54    xoffset=2     yoffset=37    xadvance=50    page=0  chnl=15
+char id=114  x=214   y=0     width=41    height=60    xoffset=5     yoffset=32    xadvance=50    page=0  chnl=15

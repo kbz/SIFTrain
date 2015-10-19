@@ -1,9 +1,9 @@
 package com.fteams.siftrain.assets;
 
 import com.fteams.siftrain.objects.CircleMark.Accuracy;
+import com.fteams.siftrain.util.SongUtils;
 
 public class Results {
-    public static Integer score;
     public static Integer combo;
     public static float accuracy;
     public static int miss;
@@ -15,58 +15,6 @@ public class Results {
     public static float minAccuracy;
     public static float normalizedAccuracy;
     public static float unstableRating;
-
-    public static Accuracy getAccuracyFor(float timing, double noteSpeed) {
-        // Perfect
-        if (Math.abs(timing) < noteSpeed * 0.05f) {
-            return Accuracy.PERFECT;
-        }
-        if (Math.abs(timing) < noteSpeed * 0.15f) {
-            return Accuracy.GREAT;
-        }
-        if (Math.abs(timing) < noteSpeed * 0.20f) {
-            return Accuracy.GOOD;
-        }
-        if (Math.abs(timing) < noteSpeed * 0.5f) {
-            return Accuracy.BAD;
-        }
-        return Accuracy.MISS;
-    }
-
-    public static float getMultiplierForAccuracy(Accuracy accuracy) {
-        if (accuracy == Accuracy.PERFECT) {
-            return 1.0f;
-        }
-        if (accuracy == Accuracy.GREAT) {
-            return 0.88f;
-        }
-        if (accuracy == Accuracy.GOOD) {
-            return 0.8f;
-        }
-        if (accuracy == Accuracy.BAD) {
-            return 0.4f;
-        }
-        return 0f;
-    }
-
-    public static float getMultiplierForCombo(int combo) {
-
-        if (combo <= 50) {
-            return 1.00f;
-        } else if (50 < combo && combo <= 100) {
-            return 1.10f;
-        } else if (100 < combo && combo <= 200) {
-            return 1.15f;
-        } else if (200 < combo && combo <= 400) {
-            return 1.20f;
-        } else if (400 < combo && combo <= 600) {
-            return 1.25f;
-        } else if (600 < combo && combo <= 800) {
-            return 1.30f;
-        } else {
-            return 1.35f;
-        }
-    }
 
     public static float getAccuracyMultiplierForAccuracy(Accuracy accuracy) {
         if (accuracy == Accuracy.PERFECT) {
@@ -84,26 +32,24 @@ public class Results {
         return 0f;
     }
 
-    public static String getRankString() {
-        // no rank
-        int shift = Assets.selectedSong.rank_info.get(0).rank_max == 0 ? 1 : 0;
-        if (score < Assets.selectedSong.rank_info.get(shift).rank_max) {
-            return "No Rank";
+    public static Accuracy getAccuracyFor(float timing) {
+        // Perfect
+        if (Math.abs(timing) < SongUtils.overallDiffPerfect[GlobalConfiguration.overallDifficulty] / 1000) {
+            return Accuracy.PERFECT;
         }
-        if (score < Assets.selectedSong.rank_info.get(shift + 1).rank_max) {
-            return "C Rank";
+        if (Math.abs(timing) < SongUtils.overallDiffGreat[GlobalConfiguration.overallDifficulty]/ 1000) {
+            return Accuracy.GREAT;
         }
-        if (score < Assets.selectedSong.rank_info.get(shift + 2).rank_max) {
-            return "B Rank";
+        if (Math.abs(timing) < SongUtils.overallDiffNice[GlobalConfiguration.overallDifficulty]/ 1000) {
+            return Accuracy.GOOD;
         }
-        if (score < Assets.selectedSong.rank_info.get(shift + 3).rank_max) {
-            return "A Rank";
+        if (Math.abs(timing) < SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty]/ 1000) {
+            return Accuracy.BAD;
         }
-        return "S rank";
+        return Accuracy.MISS;
     }
 
     public static void clear() {
-        score = 0;
         combo = 0;
         accuracy = 0;
         miss = 0;

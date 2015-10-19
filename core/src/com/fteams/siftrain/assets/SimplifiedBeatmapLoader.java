@@ -9,7 +9,6 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
-import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.entities.SimpleSong;
 import com.fteams.siftrain.entities.SimpleSongInfo;
 import com.fteams.siftrain.entities.SongFileInfo;
@@ -281,9 +280,6 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             if (contents.startsWith("CircleSize:")) {
                 mode = Integer.parseInt(contents.split(":", 2)[1].trim());
             }
-            if (contents.startsWith("ApproachRate:")) {
-                songInfo.notes_speed = SongUtils.getDefaultNoteSpeedForApproachRate(Integer.parseInt(contents.split(":", 2)[1].trim()));
-            }
 
             if (contents.equals("[HitObjects]")) {
                 // convert notes into CircleMarks
@@ -315,32 +311,7 @@ public class SimplifiedBeatmapLoader extends AsynchronousAssetLoader<List, Simpl
             contents = reader.readLine();
         }
         processEffects(song);
-        setRankInfo(song);
-        correctLeadIn(song);
         return song;
-    }
-
-    private void correctLeadIn(SimpleSong song) {
-        SimpleNotesInfo info = song.song_info.get(0).notes.get(0);
-        double current_leadin = song.lead_in;
-        if (info.timing_sec <= song.song_info.get(0).notes_speed) {
-            float newLeadin = 0.5f + (float) (song.song_info.get(0).notes_speed - info.timing_sec);
-            if (current_leadin + info.timing_sec < song.song_info.get(0).notes_speed) {
-                {
-                    song.lead_in = newLeadin;
-                }
-            }
-        }
-    }
-
-    // if the game converts the maps, we set the rank tiers to prevent warning pop-ups for the user.
-    private void setRankInfo(SimpleSong song) {
-        song.rank_info = new ArrayList<>();
-        song.rank_info.add(new SimpleRankInfo(SongUtils.getCScoreForSong(song.song_info.get(0).notes.size(), song.difficulty)));
-        song.rank_info.add(new SimpleRankInfo(SongUtils.getBScoreForSong(song.song_info.get(0).notes.size(), song.difficulty)));
-        song.rank_info.add(new SimpleRankInfo(SongUtils.getAScoreForSong(song.song_info.get(0).notes.size(), song.difficulty)));
-        song.rank_info.add(new SimpleRankInfo(SongUtils.getSScoreForSong(song.song_info.get(0).notes.size(), song.difficulty)));
-        song.rank_info.add(new SimpleRankInfo(0));
     }
 
     // since we're creating the maps, we need to make sure that notes which land at the same time are tagged as simultaneous

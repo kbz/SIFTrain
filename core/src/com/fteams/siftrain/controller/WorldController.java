@@ -11,7 +11,6 @@ import com.fteams.siftrain.assets.Results;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
-import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.screens.ResultsScreen;
 
@@ -26,7 +25,6 @@ public class WorldController implements Music.OnCompletionListener {
     private final Array<CircleMark> marks;
     private final Array<TapZone> tapZones;
     private final Array<AccuracyMarker> accuracyMarkers;
-    private final Array<ScoreDiffMarker> scoreMarkers;
     private final Array<AccuracyPopup> accuracyPopups;
 
     public boolean done;
@@ -68,7 +66,6 @@ public class WorldController implements Music.OnCompletionListener {
         this.largestCombo = 0;
         this.accuracyList = new ArrayList<>();
         this.accuracyPopups = world.getAccuracyPopups();
-        this.scoreMarkers = world.getScoreMarkers();
         this.acted = false;
         this.leftMark = true;
         this.songStart = world.delay;
@@ -100,7 +97,6 @@ public class WorldController implements Music.OnCompletionListener {
         Results.miss = missCount;
 
         Results.combo = largestCombo;
-        Results.score = world.score;
         Results.accuracy = calculateAccuracy();
         Results.normalizedAccuracy = calculateNormalizedAccuracy();
         accuracyMarkers.clear();
@@ -166,9 +162,6 @@ public class WorldController implements Music.OnCompletionListener {
             mark.update(time);
         }
         for (AccuracyMarker marker : world.getAccuracyMarkers()) {
-            marker.update(delta);
-        }
-        for (ScoreDiffMarker marker : world.getScoreMarkers()) {
             marker.update(delta);
         }
         for (AccuracyPopup popup: world.getAccuracyPopups()) {
@@ -367,26 +360,6 @@ public class WorldController implements Music.OnCompletionListener {
         }
     }
 
-    private int calculateScore(CircleMark.Accuracy accuracy1, CircleMark.Accuracy accuracy2, boolean hold) {
-
-        float accuracyMultiplier = Results.getMultiplierForAccuracy(accuracy1);
-        if (hold) {
-            accuracyMultiplier *= Results.getMultiplierForAccuracy(accuracy2);
-        }
-        float comboMultiplier = Results.getMultiplierForCombo(combo);
-        float noteTypeMultiplier;
-        float memberAttributeMultiplier;
-
-        if (hold) {
-            noteTypeMultiplier = 1.25f;
-        } else {
-            noteTypeMultiplier = 1.0f;
-        }
-        memberAttributeMultiplier = 1.10f;
-
-        return (int) Math.floor(GlobalConfiguration.teamStrength * 0.0125 * accuracyMultiplier * comboMultiplier * noteTypeMultiplier * memberAttributeMultiplier);
-    }
-
     private void playSoundForAccuracy(CircleMark.Accuracy accuracy) {
         if (accuracy == CircleMark.Accuracy.PERFECT) {
 
@@ -494,10 +467,7 @@ public class WorldController implements Music.OnCompletionListener {
                 playSoundForAccuracy(accuracy);
                 if (!mark.hold) {
                     processAccuracy(accuracy, null, false);
-                    int score = calculateScore(accuracy, null, false);
-                    scoreMarkers.add(new ScoreDiffMarker(score, (float) (mark.speed * 0.4f), leftMark));
                     leftMark = !leftMark;
-                    world.score += score;
                 }
                 if (mark.hold && accuracy.compareTo(CircleMark.Accuracy.GOOD) <= 0) {
                     if (combo > largestCombo) {
@@ -532,10 +502,7 @@ public class WorldController implements Music.OnCompletionListener {
                     continue;
                 if (accuracy != CircleMark.Accuracy.MISS) {
                     playSoundForAccuracy(accuracy);
-                    int score = calculateScore(mark.accuracyStart, mark.accuracyEnd, true);
-                    scoreMarkers.add(new ScoreDiffMarker(score, (float) (mark.speed * 0.4f), leftMark));
                     leftMark = !leftMark;
-                    world.score += score;
                     accuracyMarkers.add(new AccuracyMarker(mark.accuracyHitEndTime));
                 }
                 accuracyPopups.add(new AccuracyPopup(accuracy, mark.accuracyHitEndTime < 0));

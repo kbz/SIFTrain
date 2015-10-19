@@ -3,7 +3,6 @@ package com.fteams.siftrain.entities;
 import java.util.List;
 
 public class SimpleSong extends SongFileInfo {
-    public List<SimpleRankInfo> rank_info;
     public List<SimpleSongInfo> song_info;
     private Boolean valid;
     public Float lead_in;

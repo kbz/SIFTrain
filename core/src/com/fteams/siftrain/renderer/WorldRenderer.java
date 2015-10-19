@@ -19,7 +19,6 @@ import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
-import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.util.SongUtils;
 
@@ -78,6 +77,7 @@ public class WorldRenderer {
     TextureRegion perfectMark;
 
     BitmapFont font;
+    BitmapFont songFont;
 
     GlyphLayout layout;
 
@@ -167,6 +167,7 @@ public class WorldRenderer {
         perfectMark = atlas.findRegion("perfect");
 
         font = Assets.font;
+        songFont = Assets.songFont;
     }
 
     public void render() {
@@ -175,9 +176,7 @@ public class WorldRenderer {
         renderer.begin(ShapeRenderer.ShapeType.Line);
         drawTapZones();
         drawCircles();
-        drawScore();
         drawCombo();
-        drawProgressBar();
         drawAccuracyBar();
         if (!world.started) {
             drawTapToBeginMessage();
@@ -194,21 +193,26 @@ public class WorldRenderer {
     }
 
     private void drawAccuracyBar() {
-        float centerX = this.positionOffsetX + width / 6;
+        float centerX = this.positionOffsetX + width / 2;
         float y = this.positionOffsetY + height - height * 0.1f;
-        float zone = (float) (Assets.selectedSong.song_info.get(0).notes_speed / 2);
+
+        float bad = (float) (SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty] * 1f);
+        float nice = (float) (SongUtils.overallDiffNice[GlobalConfiguration.overallDifficulty] * 1f);
+        float great = (float) (SongUtils.overallDiffGreat[GlobalConfiguration.overallDifficulty] * 1f);
+        float perfect = (float) (SongUtils.overallDiffPerfect[GlobalConfiguration.overallDifficulty] * 1f);
+        float zone = bad / 1000f;
 
         // draw the background (bad level)
         spriteBatch.draw(accBadBackground, centerX - width / 6f, y, width / 3f, height * 0.01f);
         // draw the background (good level)
-        spriteBatch.draw(accGoodBackground, centerX - 0.4f * width / 6f, y, 0.4f * width / 3f, height * 0.01f);
+        spriteBatch.draw(accGoodBackground, centerX - nice / bad * width / 6f, y, nice / bad * width / 3f, height * 0.01f);
         // draw the background (great level)
-        spriteBatch.draw(accGreatBackground, centerX - 0.3f * width / 6f, y, 0.3f * width / 3f, height * 0.01f);
+        spriteBatch.draw(accGreatBackground, centerX - great / bad * width / 6f, y, great / bad * width / 3f, height * 0.01f);
         // draw the background (perfect level)
-        spriteBatch.draw(accPerfectBackground, centerX - 0.1f * width / 6f, y, 0.1f * width / 3f, height * 0.01f);
+        spriteBatch.draw(accPerfectBackground, centerX - perfect / bad * width / 6f, y, perfect / bad * width / 3f, height * 0.01f);
         // draw each of the 'markers'
         for (AccuracyMarker accMarker : world.getAccuracyMarkers()) {
-            if (accMarker.display){
+            if (accMarker.display) {
 
                 spriteBatch.setColor(1, 1, 1, accMarker.getAlpha());
                 spriteBatch.draw(accHitMark, centerX + (accMarker.getTime()) * (width / 6) / zone - accHitMark.getRegionWidth(), y - height * 0.01f, 3f, height * 0.03f);
@@ -221,63 +225,22 @@ public class WorldRenderer {
         String tapToBegin = "Tap to begin!";
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
-        layout.setText(font, tapToBegin);
-        font.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
+        layout.setText(songFont, tapToBegin);
+        songFont.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
     }
 
     private void drawTapToContinue() {
         String tapToBegin = "Tap to continue!";
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height / 2 + height * 0.15f;
-        layout.setText(font, tapToBegin);
-        font.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
+        layout.setText(songFont, tapToBegin);
+        songFont.draw(spriteBatch, tapToBegin, centerX - layout.width / 2, centerY - layout.height / 2);
 
         String backToExit = "Or press back again to skip to the Results screen.";
         centerX = this.positionOffsetX + width / 2;
         centerY = this.positionOffsetY + height / 2 + height * 0.1f;
-        layout.setText(font, backToExit);
-        font.draw(spriteBatch, backToExit, centerX - layout.width / 2, centerY - layout.height / 2);
-    }
-
-
-    private void drawProgressBar() {
-        float centerX = this.positionOffsetX;
-        float centerY = this.positionOffsetY + height - height * 0.07f;
-        float progress = (1.0f * world.score) / (world.sScore * 1.0f);
-        if (progress >= 1f)
-            progress = 1f;
-
-        spriteBatch.draw(selectTextureForProgressBar(), centerX, centerY + height * 0.035f, progress * width, height * 0.025f);
-        // S rank marker
-        spriteBatch.draw(sRankKnob, this.positionOffsetX + width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
-        // A rank marker
-        spriteBatch.draw(aRankKnob, this.positionOffsetX + (1.0f * world.aScore) / (world.sScore * 1.0f) * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
-        // B rank marker
-        spriteBatch.draw(bRankKnob, this.positionOffsetX + (1.0f * world.bScore) / (world.sScore * 1.0f) * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
-        // C rank marker
-        spriteBatch.draw(cRankKnob, this.positionOffsetX + (1.0f * world.cScore) / (world.sScore * 1.0f) * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
-        // No rank marker -> C -- Nozomi
-        if (world.score < world.sScore) {
-            progress = (1.0f * world.score) / (world.sScore * 1.0f);
-            spriteBatch.draw(scoreMarker, this.positionOffsetX + progress * width - height * 0.035f / 2, centerY, height * 0.035f, height * 0.035f);
-        }
-
-    }
-
-    private TextureRegion selectTextureForProgressBar() {
-        if (world.score > world.sScore) {
-            return progressBarSScore;
-        }
-        if (world.score > world.aScore) {
-            return progressBarAScore;
-        }
-        if (world.score > world.bScore) {
-            return progressBarBScore;
-        }
-        if (world.score > world.cScore) {
-            return progressBarCScore;
-        }
-        return progressBarNoScore;
+        layout.setText(songFont, backToExit);
+        songFont.draw(spriteBatch, backToExit, centerX - layout.width / 2, centerY - layout.height / 2);
     }
 
     private void drawAccuracy() {
@@ -315,26 +278,6 @@ public class WorldRenderer {
         }
     }
 
-    private void drawScore() {
-        float centerX = this.positionOffsetX + width / 2;
-        float centerY = height - height * 0.15f;
-        String text = world.score + "";
-        layout.setText(font, text);
-        float width = layout.width;
-        float height = layout.height;
-        font.draw(spriteBatch, text, centerX - width / 2, centerY - height / 2);
-        for (ScoreDiffMarker marker : world.getScoreMarkers()) {
-            if (!marker.display)
-                continue;
-
-            String markerValue = "(+" + marker.value + ")";
-            layout.setText(font, markerValue);
-
-            font.draw(spriteBatch, markerValue, centerX + (marker.left ? -width / 2 - layout.width - layout.width / 2 : width / 2 + layout.width / 2), centerY - height / 2);
-        }
-
-    }
-
     private void drawTapZones() {
         float centerX = this.positionOffsetX + width / 2;
         float centerY = this.positionOffsetY + height - height * 0.25f;
@@ -356,7 +299,7 @@ public class WorldRenderer {
             spriteBatch.draw(region, x, y, size, size);
 
             float alpha = 1f - MathUtils.clamp((time - tapZone.touchTime) * 5f, 0f, 1f);
-            if(alpha > 0) {
+            if (alpha > 0) {
                 Color c = spriteBatch.getColor();
                 spriteBatch.setColor(c.r, c.g, c.b, Interpolation.pow2In.apply(alpha));
                 spriteBatch.draw(tapZonePressed, x, y, size, size);
@@ -402,21 +345,21 @@ public class WorldRenderer {
         float size = height * 0.2f;
 
         for (CircleMark mark : world.getMarks()) {
-            if(!mark.visible && !mark.hold)
+            if (!mark.visible && !mark.hold)
                 continue;
 
             float alpha = mark.alpha;
             float alpha2 = mark.alpha2;
             Color c = spriteBatch.getColor();
 
-            if (mark.hold && mark.waiting) {
-                if(mark.holding)
+            if (mark.hold && mark.holdBeamVisible) {
+                if (mark.holding)
                     spriteBatch.setColor(1.0f, 1.0f, 0.5f, alpha * alpha2 * 0.45f * (0.75f + 0.25f * MathUtils.sin(time * 7f + mark.accuracyHitStartTime)));
                 else
                     spriteBatch.setColor(c.r, c.g, c.b, alpha * alpha * alpha2 * 0.45f);
 
                 float orgSize = mark.getSize2() * size;
-                float dstSize = mark.getSize()  * size;
+                float dstSize = mark.getSize() * size;
 
                 Vector2 org = mark.getHoldReleasePosition().cpy();
                 org.x *= ppuX;

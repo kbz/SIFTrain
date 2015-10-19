@@ -25,7 +25,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
     private TextButton buttonPlay = new TextButton("Play/プレイ", Assets.menuSkin, "item1");
     private TextButton buttonSettings = new TextButton("Settings/設定", Assets.menuSkin, "item1");
 
-    private Label title = new Label("SIF Train", Assets.menuSkin);
+    private Label title = new Label("SIF Train", Assets.menuSkin, "title");
 
     @Override
     public void render(float delta) {

@@ -26,32 +26,27 @@ public class SongFileInfo implements Comparable<SongFileInfo> {
 
     @Override
     public int compareTo(SongFileInfo o) {
-        if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_FILE_NAME)
-        {
+        if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_FILE_NAME) {
             if (!o.getResourceName().equals(resourceName)) {
-                return resourceName.compareTo(o.getResourceName());
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * resourceName.compareTo(o.getResourceName());
             }
-            if (!song_name.equals(o.song_name))
-            {
-                return song_name.compareTo(o.song_name);
+            if (!song_name.equals(o.song_name)) {
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * song_name.compareTo(o.song_name);
             }
-        }
-        else if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_SONG_NAME)
-        {
-            if (!song_name.equals(o.song_name))
-            {
-                return song_name.compareTo(o.song_name);
+        } else if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_SONG_NAME) {
+            if (!song_name.equals(o.song_name)) {
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * song_name.compareTo(o.song_name);
             }
             if (!o.getResourceName().equals(resourceName)) {
-                return resourceName.compareTo(o.getResourceName());
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * resourceName.compareTo(o.getResourceName());
             }
         }
         // always check difficulty last to keep them in order
         if (!difficulty.equals(o.difficulty)) {
-            return difficulty.compareTo(o.difficulty);
+            return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * difficulty.compareTo(o.difficulty);
         }
         if (difficulty_name != null && o.difficulty_name != null && !difficulty_name.equals(o.difficulty_name)) {
-            return difficulty_name.compareTo(o.difficulty_name);
+            return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * difficulty_name.compareTo(o.difficulty_name);
         }
         return 0;
     }

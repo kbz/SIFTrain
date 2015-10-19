@@ -31,18 +31,18 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Image splashImage = new Image(texture);
 
     private Stage stage = new Stage();
-    private Label titleLabel = new Label("Settings/設定", Assets.menuSkin, "default");
+    private Label titleLabel = new Label("Settings/設定", Assets.menuSkin, "settings_title");
 
     private Label songVolumeLabel = new Label("Song Volume", Assets.menuSkin, "song_style_result");
     private Label feedbackVolumeLabel = new Label("Touch Feedback Volume", Assets.menuSkin, "song_style_result");
     private Label offsetLabel = new Label("Global offset", Assets.menuSkin, "song_style_result");
     private Label inputOffsetLabel = new Label("Input offset", Assets.menuSkin, "song_style_result");
-    private Label teamStrengthLabel = new Label("Team Strength", Assets.menuSkin, "song_style_result");
+    private Label noteSpeedLabel = new Label("Note Speed (Approach Rate)", Assets.menuSkin, "song_style_result");
+    private Label overallDifficultyLabel = new Label("Timing Window (Overall Difficulty)", Assets.menuSkin, "song_style_result");
     private Label pathToBeatmaps = new Label("Path to Beatmaps", Assets.menuSkin, "song_style_result");
 
     private TextButton volumeSettingsTabButton = new TextButton("Volume Settings", Assets.menuSkin, "item1");
     private TextButton offsetSettingsTabButton = new TextButton("Timing Settings", Assets.menuSkin, "item1");
-    private TextButton scoreSettingsTabButton = new TextButton("Scoring Settings", Assets.menuSkin, "item1");
     private TextButton otherSettingsTabButton = new TextButton("Other", Assets.menuSkin, "item1");
 
     private Table tabbedPane = new Table();
@@ -52,20 +52,24 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Label feedbackVolumeValueLabel;
     private Label offsetValueLabel;
     private Label inputOffsetValueLabel;
-    private Label teamStrengthValueLabel;
+    private Label noteSpeedValueLabel;
+    private Label overallDifficultyValueLabel;
 
     private Slider songVolumeSlider;
     private Slider feedbackVolumeSlider;
     private Slider offsetSlider;
     private Slider inputOffsetSlider;
-    private Slider teamSrengthSlider;
+    private Slider noteSpeedSlider;
+    private Slider overallDifficultySlider;
 
     private CheckBox playHintSoundCheckbox;
     private CheckBox syncModeCheckbox;
     private CheckBox sortingModeChooser;
     private CheckBox randomModeChooser;
+    private CheckBox sortingOrderChooser;
 
     private String[] sortingModes = {"File Name", "Song Name"};
+    private String[] sortingOrders = {"Ascending", "Descending"};
 
     private final static boolean DEBUG = false;
 
@@ -78,11 +82,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Integer newFeedbackVolume;
     private Integer newGlobalOffset;
     private Integer newInputOffset;
-    private Integer newTeamStrength;
     private Boolean newHitSoundsSetting;
     private Integer newSortingMode;
     private Integer newRandomMode;
+    private Integer newSortingOrder;
     private Integer newSyncMode;
+    private Integer newNoteSpeed;
+    private Integer newOverallDifficulty;
 
     @Override
     public void show() {
@@ -92,7 +98,6 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
         volumeSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
         offsetSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
-        scoreSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
         otherSettingsTabButton.getLabel().setFontScale(fontScale * 0.7f);
         returnButton.getLabel().setFontScale(fontScale * 0.7f);
         reloadBeatmaps.getLabel().setFontScale(fontScale * 0.7f);
@@ -101,16 +106,17 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         newFeedbackVolume = GlobalConfiguration.feedbackVolume;
         newGlobalOffset = GlobalConfiguration.offset;
         newInputOffset = GlobalConfiguration.inputOffset;
-        newTeamStrength = GlobalConfiguration.teamStrength;
+        newNoteSpeed = GlobalConfiguration.noteSpeed;
+        newOverallDifficulty = GlobalConfiguration.overallDifficulty;
         newHitSoundsSetting = GlobalConfiguration.playHintSounds;
         newSortingMode = GlobalConfiguration.sortMode;
+        newSortingOrder = GlobalConfiguration.sortOrder;
         newRandomMode = GlobalConfiguration.randomMode;
         newSyncMode = GlobalConfiguration.syncMode;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
         buttonGroup.add(offsetSettingsTabButton);
-        buttonGroup.add(scoreSettingsTabButton);
         buttonGroup.add(otherSettingsTabButton);
         buttonGroup.setMaxCheckCount(1);
         buttonGroup.setMinCheckCount(1);
@@ -131,8 +137,6 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         tabbedPane.add(volumeSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
         tabbedPane.add().width(stage.getWidth() * 0.1f).row();
         tabbedPane.add(offsetSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
-        tabbedPane.add().width(stage.getWidth() * 0.1f).row();
-        tabbedPane.add(scoreSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
         tabbedPane.add().width(stage.getWidth() * 0.1f).row();
         tabbedPane.add(otherSettingsTabButton).padTop(stage.getHeight() * 0.005f).padBottom(stage.getHeight() * 0.005f).width(stage.getWidth() * 0.25f).height(stage.getHeight() * 0.14f);
         tabbedPane.add().width(stage.getWidth() * 0.1f).row();
@@ -206,6 +210,24 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         inputOffsetSlider.setValue(GlobalConfiguration.inputOffset);
         inputOffsetSlider.addListener(this);
 
+        // note speed
+        noteSpeedSlider = new Slider(0, 10, 1, false, Assets.menuSkin);
+        noteSpeedSlider.setValue(GlobalConfiguration.noteSpeed);
+        noteSpeedSlider.addListener(this);
+
+        noteSpeedLabel.setFontScale(fontScale);
+        noteSpeedValueLabel = new Label(Integer.toString(GlobalConfiguration.noteSpeed) + "", Assets.menuSkin, "song_style_result");
+        noteSpeedValueLabel.setFontScale(fontScale);
+
+        // timing window
+        overallDifficultySlider = new Slider(0, 10, 1, false, Assets.menuSkin);
+        overallDifficultySlider.setValue(GlobalConfiguration.overallDifficulty);
+        overallDifficultySlider.addListener(this);
+
+        overallDifficultyLabel.setFontScale(fontScale);
+        overallDifficultyValueLabel = new Label(Integer.toString(GlobalConfiguration.overallDifficulty) + "", Assets.menuSkin, "song_style_result");
+        overallDifficultyValueLabel.setFontScale(fontScale);
+
         syncModeCheckbox = new CheckBox("Sync Mode: " + SongUtils.syncModes[newSyncMode], Assets.menuSkin);
         syncModeCheckbox.getLabel().setFontScale(fontScale);
         syncModeCheckbox.getImageCell().width(0);
@@ -220,14 +242,26 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetTable.add().width(stage.getWidth() * 0.20f);
         offsetTable.add(offsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(offsetSlider).width(stage.getWidth() * 0.6f).height(offsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
-        offsetTable.add().height(offsetValueLabel.getHeight()).row();
+        offsetTable.add().height(offsetValueLabel.getHeight() / 2f).row();
 
         // input offset
         offsetTable.add(inputOffsetLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
         offsetTable.add().width(stage.getWidth() * 0.20f);
         offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(inputOffsetSlider).width(stage.getWidth() * 0.6f).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
-        offsetTable.add().height(offsetValueLabel.getHeight()).row();
+        offsetTable.add().height(offsetValueLabel.getHeight() / 2f).row();
+// note speed
+        offsetTable.add(noteSpeedLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
+        offsetTable.add().width(stage.getWidth() * 0.20f);
+        offsetTable.add(noteSpeedValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(noteSpeedSlider).width(stage.getWidth() * 0.6f).height(noteSpeedLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        offsetTable.add().height(noteSpeedValueLabel.getHeight() / 2f).row();
+
+        offsetTable.add(overallDifficultyLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
+        offsetTable.add().width(stage.getWidth() * 0.20f);
+        offsetTable.add(overallDifficultyValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(overallDifficultySlider).width(stage.getWidth() * 0.6f).height(overallDifficultyLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
+        offsetTable.add().height(overallDifficultyValueLabel.getHeight() / 2f).row();
 
         // sync mode setting
         offsetTable.add(syncModeCheckbox).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().colspan(3).row();
@@ -237,31 +271,6 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetTable.setDebug(DEBUG);
 
         content.add(offsetTable);
-
-        // strength block
-        teamStrengthLabel.setFontScale(fontScale);
-        teamStrengthValueLabel = new Label(Integer.toString(GlobalConfiguration.teamStrength), Assets.menuSkin, "song_style_result");
-        teamStrengthValueLabel.setFontScale(fontScale);
-
-        teamSrengthSlider = new Slider(0, 70000, 1f, false, Assets.menuSkin);
-        teamSrengthSlider.setValue(GlobalConfiguration.teamStrength);
-        teamSrengthSlider.addListener(this);
-
-        final Table scoringTable = new Table();
-
-        scoringTable.setHeight(stage.getHeight() * 0.7f);
-        scoringTable.setWidth(stage.getWidth() * 0.6f);
-
-        scoringTable.add(teamStrengthLabel).height(teamStrengthLabel.getHeight() * fontScale).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
-        scoringTable.add().width(stage.getWidth() * 0.20f);
-        scoringTable.add(teamStrengthValueLabel).width(stage.getWidth() * 0.10f).right().row();
-        scoringTable.add(teamSrengthSlider).height(teamStrengthLabel.getHeight() * fontScale).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
-        scoringTable.add().expand().fill().row();
-        scoringTable.setDebug(DEBUG);
-
-        scoringTable.setVisible(false);
-
-        content.add(scoringTable);
 
         // extras - path to beatmaps
         pathToBeatmaps.setFontScale(fontScale);
@@ -273,9 +282,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         sortingModeChooser.getImageCell().width(0);
         sortingModeChooser.addListener(this);
 
+        sortingOrderChooser = new CheckBox("Sorting Order: " + sortingOrders[GlobalConfiguration.sortOrder], Assets.menuSkin);
+        sortingOrderChooser.getLabel().setFontScale(fontScale);
+        sortingOrderChooser.getImageCell().width(0);
+        sortingOrderChooser.addListener(this);
+
         // extras - random mode
         randomModeChooser = new CheckBox("Random Mode: " + SongUtils.randomModes[GlobalConfiguration.randomMode], Assets.menuSkin);
-        ;
         randomModeChooser.getLabel().setFontScale(fontScale);
         randomModeChooser.getImageCell().width(0);
         randomModeChooser.addListener(this);
@@ -288,6 +301,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         otherTable.add(pathToBeatmaps).width(stage.getWidth() * 0.6f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().row();
         otherTable.add(pathValueLabel).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX().left().padLeft(stage.getWidth() * 0.03f).row();
         otherTable.add(sortingModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
+        otherTable.add(sortingOrderChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add(randomModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add().expand().fill().row();
         otherTable.add(reloadBeatmaps).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
@@ -310,13 +324,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
             public void changed(ChangeEvent event, Actor actor) {
                 volumeTable.setVisible(volumeSettingsTabButton.isChecked());
                 offsetTable.setVisible(offsetSettingsTabButton.isChecked());
-                scoringTable.setVisible(scoreSettingsTabButton.isChecked());
                 otherTable.setVisible(otherSettingsTabButton.isChecked());
             }
         };
         volumeSettingsTabButton.addListener(tabListener);
         offsetSettingsTabButton.addListener(tabListener);
-        scoreSettingsTabButton.addListener(tabListener);
         otherSettingsTabButton.addListener(tabListener);
 
         reloadBeatmaps.addListener(new ClickListener() {
@@ -334,9 +346,11 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.feedbackVolume = newFeedbackVolume;
                 GlobalConfiguration.offset = newGlobalOffset;
                 GlobalConfiguration.inputOffset = newInputOffset;
-                GlobalConfiguration.teamStrength = newTeamStrength;
+                GlobalConfiguration.noteSpeed = newNoteSpeed;
+                GlobalConfiguration.overallDifficulty = newOverallDifficulty;
                 GlobalConfiguration.playHintSounds = newHitSoundsSetting;
                 GlobalConfiguration.sortMode = newSortingMode;
+                GlobalConfiguration.sortOrder = newSortingOrder;
                 GlobalConfiguration.randomMode = newRandomMode;
                 GlobalConfiguration.syncMode = newSyncMode;
                 GlobalConfiguration.storeConfiguration();
@@ -403,9 +417,13 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
             newInputOffset = (int) ((Slider) actor).getValue();
             inputOffsetValueLabel.setText((newInputOffset > 0 ? "+" : "") + Integer.toString(newInputOffset) + " ms.");
         }
-        if (actor == teamSrengthSlider) {
-            newTeamStrength = (int) ((Slider) actor).getValue();
-            teamStrengthValueLabel.setText(Integer.toString(newTeamStrength));
+        if (actor == noteSpeedSlider) {
+            newNoteSpeed = (int) ((Slider) actor).getValue();
+            noteSpeedValueLabel.setText(newNoteSpeed + "");
+        }
+        if (actor == overallDifficultySlider) {
+            newOverallDifficulty = (int) ((Slider) actor).getValue();
+            overallDifficultyValueLabel.setText(newOverallDifficulty + "");
         }
         if (actor == playHintSoundCheckbox) {
             newHitSoundsSetting = playHintSoundCheckbox.isChecked();
@@ -414,6 +432,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == sortingModeChooser) {
             newSortingMode = (newSortingMode + 1) % sortingModes.length;
             sortingModeChooser.setText("Sorting Mode: " + sortingModes[newSortingMode]);
+        }
+        if (actor == sortingOrderChooser) {
+            newSortingOrder = (newSortingOrder + 1) % sortingOrders.length;
+            sortingOrderChooser.setText("Sorting Order: " + sortingOrders[newSortingOrder]);
         }
         if (actor == randomModeChooser) {
             newRandomMode = (newRandomMode + 1) % SongUtils.randomModes.length;

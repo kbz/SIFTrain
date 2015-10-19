@@ -4,11 +4,9 @@ import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.entities.SimpleNotesInfo;
-import com.fteams.siftrain.entities.SimpleRankInfo;
 import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
-import com.fteams.siftrain.objects.ScoreDiffMarker;
 import com.fteams.siftrain.objects.TapZone;
 import com.fteams.siftrain.util.random.ExtremeRandomizer;
 import com.fteams.siftrain.util.random.KeepSidesRandomizer;
@@ -19,17 +17,10 @@ import com.fteams.siftrain.util.random.OldAlgorithmRandomizer;
 import com.fteams.siftrain.util.SongUtils;
 import com.fteams.siftrain.util.random.SimpleRandomizer;
 
-import java.util.ArrayList;
-
 public class World {
 
     int width;
     int height;
-    public int score;
-    public int cScore;
-    public int bScore;
-    public int aScore;
-    public int sScore;
     /**
      * The 9 zones the user can tap
      */
@@ -45,7 +36,6 @@ public class World {
     public int offsetY;
 
     private Array<AccuracyMarker> accuracyMarkers;
-    private Array<ScoreDiffMarker> scoreMarkers;
     private Array<AccuracyPopup> accuracyPopups;
 
     public boolean paused;
@@ -66,35 +56,7 @@ public class World {
     private void createWorld() {
         float x = 0f;
         float y = 0f;
-        if (Assets.selectedSong.song_info.get(0).notes_speed == null) {
-            Assets.selectedSong.song_info.get(0).notes_speed = SongUtils.getDefaultNoteSpeedForDifficulty(Assets.selectedSong.difficulty);
-        }
-        Double noteSpeed = Assets.selectedSong.song_info.get(0).notes_speed;
-        score = 0;
-        if (Assets.selectedSong.rank_info != null && !Assets.selectedSong.rank_info.isEmpty() && Assets.selectedSong.rank_info.size() >= 4) {
-            // rank array is sorted in ascending order, the first element is most likely a 0
-            int shift = Assets.selectedSong.rank_info.get(0).rank_max == 0 ? 1 : 0;
-            cScore = Assets.selectedSong.rank_info.get(shift).rank_max;
-            bScore = Assets.selectedSong.rank_info.get(shift + 1).rank_max;
-            aScore = Assets.selectedSong.rank_info.get(shift + 2).rank_max;
-            sScore = Assets.selectedSong.rank_info.get(shift + 3).rank_max;
-
-        } else {
-            // ignore and set default values.
-            cScore = SongUtils.getCScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
-            bScore = SongUtils.getBScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
-            aScore = SongUtils.getAScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
-            sScore = SongUtils.getSScoreForSong(Assets.selectedSong.song_info.get(0).notes.size(), Assets.selectedSong.difficulty);
-            if (Assets.selectedSong.rank_info == null) {
-                Assets.selectedSong.rank_info = new ArrayList<>();
-            }
-            Assets.selectedSong.rank_info.clear();
-            Assets.selectedSong.rank_info.add(new SimpleRankInfo(cScore));
-            Assets.selectedSong.rank_info.add(new SimpleRankInfo(bScore));
-            Assets.selectedSong.rank_info.add(new SimpleRankInfo(aScore));
-            Assets.selectedSong.rank_info.add(new SimpleRankInfo(sScore));
-            Assets.selectedSong.rank_info.add(new SimpleRankInfo(0));
-        }
+        Double noteSpeed = SongUtils.getDefaultNoteSpeedForApproachRate(GlobalConfiguration.noteSpeed);
 
         delay = Assets.selectedSong.lead_in != null ? Assets.selectedSong.lead_in : 0f;
 
@@ -152,7 +114,6 @@ public class World {
             zones.add(zone);
         }
         this.accuracyMarkers = new Array<>();
-        this.scoreMarkers = new Array<>();
         this.accuracyPopups = new Array<>();
         paused = false;
     }
@@ -170,10 +131,6 @@ public class World {
 
     public Array<AccuracyMarker> getAccuracyMarkers() {
         return accuracyMarkers;
-    }
-
-    public Array<ScoreDiffMarker> getScoreMarkers() {
-        return scoreMarkers;
     }
 
     public Array<AccuracyPopup> getAccuracyPopups() {

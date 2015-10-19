@@ -1,10 +1,12 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
-    "font": { "file": "fonts/font.fnt" },
-    "jp-font": {"file": "fonts/jp-font.fnt"},
     "jp-font-small": {"file": "fonts/jp-font-small.fnt"},
     "song-font": {"file": "fonts/song-font.fnt"},
-    "result-font": {"file": "fonts/result-font.fnt"}
+    "result-font": {"file": "fonts/result-font.fnt"},
+    "title" : {"file":"fonts/title-font.fnt"},
+    "settings-title-font" : {"file": "fonts/settings-font.fnt"},
+    "combo" : {"file":"fonts/combo-font.fnt"},
+    "song-list" : {"file":"fonts/song-list.fnt"}
   },
   "com.badlogic.gdx.graphics.Color": {
   "green": { "a": 1, "b": 0, "g": 1, "r": 0 },
@@ -20,7 +22,11 @@
     "default": { "up": "selection_menu_background" , "down": "selection_menu_selected", "font": jp-font-small, "pressedOffsetY": -4 }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
-    "default": { "font": jp-font},
+    "default": { "font": jp-font-small},
+    "settings_title":{font:settings-title-font, fontColor: black}
+    "title": { "font": title, fontColor: black},
+    "results_title": { "font": song-list , "fontColor": black},
+    "results_song_title": { "font": song-list , "fontColor": black},
     "song_style_score": { "font": song-font },
     "song_style_combo": { "font": song-font },
     "song_style_result": { "font": song-font, "fontColor": black },
@@ -28,8 +34,7 @@
     "song_result_song_title": { "font": jp-font-small, "fontColor": black},
   },
   "com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle": {
-    "default": {"background": "song_selection_menu_background", "fontColorUnselected": red, "selection": "selection_menu_selected", "fontColorSelected": black, "font": jp-font-small },
-    "diff_list": {"background": "song_selection_menu_background", "fontColorUnselected": red, "selection": "selection_menu_selected", "fontColorSelected": black, "font": jp-font-small },
+    "diff_list": {"background": "song_selection_menu_background", "fontColorUnselected": black, "selection": "selection_menu_selected", "fontColorSelected": black, "font": song-list }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle":{
     "default": { }

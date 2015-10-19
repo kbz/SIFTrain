@@ -19,7 +19,7 @@ public class SplashScreen implements Screen {
     private Texture texture = new Texture(Gdx.files.internal("bigimages/splash.png"));
     private Image splashImage = new Image(texture);
     private Stage stage = new Stage();
-    private Skin skin = new Skin(Gdx.files.internal("skins/menuSkin.json"), new TextureAtlas(Gdx.files.internal("textures/textures.pack.atlas")));
+    private Skin skin = new Skin(Gdx.files.internal("skins/splashSkin.json"), new TextureAtlas(Gdx.files.internal("textures/textures.pack.atlas")));
     private ProgressBar loadingProgress = new ProgressBar(0.0f, 100f, 0.1f, false, skin);
 
     public boolean animationDone = false;

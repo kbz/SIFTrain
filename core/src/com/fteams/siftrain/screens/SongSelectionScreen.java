@@ -32,7 +32,7 @@ import com.fteams.siftrain.entities.SongFileInfo;
 public class SongSelectionScreen implements Screen, InputProcessor {
 
     private Stage stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-    private List<SimpleSongGroup> songList = new List<>(Assets.menuSkin);
+    private List<SimpleSongGroup> songList = new List<>(Assets.menuSkin, "diff_list");
     private ScrollPane songListPane = new ScrollPane(null, Assets.menuSkin);
     private List<SongFileInfo> diffList = new List<>(Assets.menuSkin, "diff_list");
     private ScrollPane diffListPane = new ScrollPane(null, Assets.menuSkin);

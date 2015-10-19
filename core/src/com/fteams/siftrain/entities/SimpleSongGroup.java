@@ -10,31 +10,25 @@ public class SimpleSongGroup implements Comparable<SimpleSongGroup> {
     public String resource_name;
     public String music_file;
 
-    public String toString()
-    {
+    public String toString() {
         return song_name + " (" + songs.size + ")";
     }
 
     @Override
     public int compareTo(SimpleSongGroup o) {
-        if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_FILE_NAME)
-        {
+        if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_FILE_NAME) {
             if (!o.resource_name.equals(resource_name)) {
-                return resource_name.compareTo(o.resource_name);
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * resource_name.compareTo(o.resource_name);
             }
-            if (!song_name.equals(o.song_name))
-            {
-                return song_name.compareTo(o.song_name);
+            if (!song_name.equals(o.song_name)) {
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * song_name.compareTo(o.song_name);
             }
-        }
-        else if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_SONG_NAME)
-        {
-            if (!song_name.equals(o.song_name))
-            {
-                return song_name.compareTo(o.song_name);
+        } else if (GlobalConfiguration.sortMode == SongUtils.SORTING_MODE_SONG_NAME) {
+            if (!song_name.equals(o.song_name)) {
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * song_name.compareTo(o.song_name);
             }
             if (!o.resource_name.equals(resource_name)) {
-                return resource_name.compareTo(o.resource_name);
+                return (GlobalConfiguration.sortOrder == SongUtils.SORTING_MODE_ASCENDING ? 1 : -1) * resource_name.compareTo(o.resource_name);
             }
         }
         return 0;

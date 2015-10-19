@@ -1,6 +1,5 @@
 package com.fteams.siftrain.objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.fteams.siftrain.assets.Assets;
@@ -42,6 +41,7 @@ public class CircleMark implements Comparable<CircleMark> {
     }
 
     public boolean visible;
+    public boolean holdBeamVisible;
     public boolean waiting;
     public boolean holding;
     public boolean miss;
@@ -73,8 +73,8 @@ public class CircleMark implements Comparable<CircleMark> {
     private float holdEndStartWaitTime;
     private float holdEndEndWaitTime;
 
-    public  float alpha = 1f;
-    public  float alpha2 = 1f;
+    public float alpha = 1f;
+    public float alpha2 = 1f;
     public Integer effect;
     // only for holds
     private float size;
@@ -97,15 +97,15 @@ public class CircleMark implements Comparable<CircleMark> {
         this.destination = note.position - 1;
         this.speed = noteSpeed;
         this.spawnTime = (float) (timing - speed);
-        this.startWaitTime = (float) (timing - speed);
-        this.endWaitTime = timing + (float) (0.5f * speed);
+        this.startWaitTime = (float) (timing - SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty] / 1000f);
+        this.endWaitTime = (float) (timing + SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty] / 1000f);
         this.despawnTime = timing * 1.0f;
         this.size = 0.1f;
         this.size2 = 0f;
         if (hold) {
             this.holdEndSpawnTime = (float) (timing + note.effect_value - speed);
-            this.holdEndStartWaitTime = (float) (timing + note.effect_value - speed);
-            this.holdEndEndWaitTime = (float) (timing + note.effect_value + 0.5f * speed);
+            this.holdEndStartWaitTime = (float) (timing + note.effect_value - SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty] / 1000f);
+            this.holdEndEndWaitTime = (float) (timing + note.effect_value + SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty] / 1000f);
             this.holdEndDespawnTime = (float) (timing + note.effect_value);
 
         }
@@ -136,6 +136,7 @@ public class CircleMark implements Comparable<CircleMark> {
 
     private void initializeStates() {
         visible = false;
+        holdBeamVisible = false;
         waiting = false;
         miss = false;
         holding = false;
@@ -166,6 +167,7 @@ public class CircleMark implements Comparable<CircleMark> {
         if (miss || (firstHit && secondHit)) {
             if (visible) {
                 visible = false;
+                holdBeamVisible = false;
             }
             if (endVisible) {
                 endVisible = false;
@@ -185,30 +187,37 @@ public class CircleMark implements Comparable<CircleMark> {
 
         if (spawnTime <= time && despawnTime > time && !visible) {
             visible = true;
+            holdBeamVisible = true;
         }
 
-        if (spawnTime >= time && visible)
+        if (spawnTime >= time && visible) {
             visible = false;
+            holdBeamVisible = false;
+        }
+
 
         if (visible && despawnTime <= time) {
-            if(GlobalConfiguration.playHintSounds && !soundPlayed) {
+            if (GlobalConfiguration.playHintSounds && !soundPlayed) {
                 Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 200f);
                 soundPlayed = true;
             }
 
-            if(holding) {
+            if (holding) {
                 alpha = 1f;
             } else {
                 alpha = MathUtils.clamp((endWaitTime - time) / (endWaitTime - despawnTime), 0f, 1f);
-                if(alpha == 0f)
+                if (alpha == 0f) {
                     visible = false;
+                    holdBeamVisible = false;
+                }
+
             }
         }
 
         if (visible) {
             float scl = time - spawnTime;
 
-            if(holding) {
+            if (holding) {
                 scl = speed.floatValue();
                 updateSize(Math.max(0f, despawnTime - time));
             } else
@@ -239,7 +248,7 @@ public class CircleMark implements Comparable<CircleMark> {
             }
 
             alpha2 = MathUtils.clamp((holdEndEndWaitTime - time) / (holdEndEndWaitTime - holdEndDespawnTime), 0f, 1f);
-            if(alpha2 == 0f)
+            if (alpha2 == 0f)
                 endVisible = false;
         }
 
@@ -296,7 +305,7 @@ public class CircleMark implements Comparable<CircleMark> {
     }
 
     public Accuracy hit() {
-        Accuracy accuracy = Results.getAccuracyFor(previousTime - despawnTime - GlobalConfiguration.inputOffset / 1000f, speed);
+        Accuracy accuracy = Results.getAccuracyFor(previousTime - despawnTime - GlobalConfiguration.inputOffset / 1000f);
         // If the note was tapped too early, we ignore the tap
         if (despawnTime > previousTime && accuracy == Accuracy.MISS) {
             return Accuracy.NONE;
@@ -314,6 +323,7 @@ public class CircleMark implements Comparable<CircleMark> {
             processed = true;
             waiting = false;
             visible = false;
+            holdBeamVisible = false;
         }
         waitingStart = false;
         // calculate hit accuracy
@@ -329,8 +339,9 @@ public class CircleMark implements Comparable<CircleMark> {
         waitingEnd = false;
         holding = false;
         endVisible = false;
+        holdBeamVisible = false;
         waiting = false;
-        accuracyEnd = Results.getAccuracyFor(previousTime - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f, speed);
+        accuracyEnd = Results.getAccuracyFor(previousTime - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f);
         if (accuracyEnd == Accuracy.MISS) {
             processed = true;
             //System.out.println("MISS-005: Released hold too early");

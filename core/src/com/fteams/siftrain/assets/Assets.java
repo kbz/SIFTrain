@@ -40,6 +40,7 @@ public class Assets {
     public static Sound perfectSound;
 
     public static BitmapFont font;
+    public static BitmapFont songFont;
 
     public static Texture mainMenuBackgroundTexture;
     public static Texture holdBG;
@@ -59,6 +60,7 @@ public class Assets {
         internalManager.load("hitsounds/perfect.mp3", Sound.class);
         internalManager.load("bigimages/main_menu_background.jpg", Texture.class);
         internalManager.load("images/hold_background.png", Texture.class);
+        internalManager.load("fonts/combo-font.fnt", BitmapFont.class);
         internalManager.load("fonts/song-font.fnt", BitmapFont.class);
         reloadBeatmaps();
     }
@@ -119,8 +121,12 @@ public class Assets {
     }
 
     public static void setFonts() {
-        if (font == null)
-            font = internalManager.get("fonts/song-font.fnt");
+        if (font == null) {
+            font = internalManager.get("fonts/combo-font.fnt");
+        }
+        if (songFont == null) {
+            songFont = internalManager.get("fonts/song-font.fnt");
+        }
 
     }
 
@@ -139,8 +145,7 @@ public class Assets {
     public static void setSongs() {
         if (songGroup == null) {
             songGroup = new Array<>();
-        }
-        else{
+        } else {
             songGroup.clear();
         }
 
@@ -149,13 +154,11 @@ public class Assets {
 
         for (String string : assets) {
             List<SongFileInfo> beatmaps = externalManager.get(string, List.class);
-            if (!beatmaps.isEmpty())
-            {
+            if (!beatmaps.isEmpty()) {
                 String resourceName = beatmaps.get(0).getResourceName();
                 String musicFile = beatmaps.get(0).music_file;
                 String songName = beatmaps.get(0).song_name;
-                if (groupMap.get(resourceName) == null)
-                {
+                if (groupMap.get(resourceName) == null) {
                     SimpleSongGroup group = new SimpleSongGroup();
                     group.resource_name = resourceName;
                     group.music_file = musicFile;
@@ -170,7 +173,7 @@ public class Assets {
                 group.songs.sort();
             }
         }
-        for (String key: groupMap.keySet()) {
+        for (String key : groupMap.keySet()) {
             songGroup.add(groupMap.get(key));
         }
         songGroup.sort();

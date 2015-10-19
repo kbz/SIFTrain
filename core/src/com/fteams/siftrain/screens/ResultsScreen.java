@@ -23,8 +23,11 @@ public class ResultsScreen implements Screen {
     private Texture texture = Assets.mainMenuBackgroundTexture;
     private Image splashImage = new Image(texture);
     private Table table = new Table();
-    private Label scoreLabel = new Label("Score:", Assets.menuSkin, "song_style_result_values");
-    private Label scoreResultLabel;
+
+    private Label approachRateLabel = new Label("Approach Rate:", Assets.menuSkin, "song_style_result_values");
+    private Label approachRateConfigLabel;
+    private Label overallDifficultyLabel = new Label("Overall Difficulty:", Assets.menuSkin, "song_style_result_values");
+    private Label overallDifficultyConfigLabel;
     private Label accuracyLabel = new Label("Avg. Accuracy:", Assets.menuSkin, "song_style_result_values");
     private Label accuracyResultLabel;
     private Label normalizedAccuracyLabel = new Label("% Accuracy:", Assets.menuSkin, "song_style_result_values");
@@ -33,8 +36,6 @@ public class ResultsScreen implements Screen {
     private Label accuracyRangeResultLabel;
     private Label unstableRatingLabel = new Label("Unstable Rating:", Assets.menuSkin, "song_style_result_values");
     private Label unstableRatingValueLabel;
-    private Label rankLabel = new Label("Score Rank:", Assets.menuSkin, "song_style_result_values");
-    private Label rankResultLabel;
     private Label badLabel = new Label("Bad:", Assets.menuSkin, "song_style_result_values");
     private Label badResultLabel;
     private Label goodLabel = new Label("Good:", Assets.menuSkin, "song_style_result_values");
@@ -47,7 +48,7 @@ public class ResultsScreen implements Screen {
     private Label missResultLabel;
     private Label comboLabel = new Label("Largest Combo:", Assets.menuSkin, "song_style_result_values");
     private Label comboResultLabel;
-    private Label titleLabel = new Label("Results/結果発表", Assets.menuSkin, "default");
+    private Label titleLabel = new Label("Results/結果発表", Assets.menuSkin, "results_title");
     private Label randomModeLabel = new Label("Random Mode:", Assets.menuSkin, "song_style_result_values");
     private Label randomResultLabel;
 
@@ -64,12 +65,13 @@ public class ResultsScreen implements Screen {
         titleLabel.setFontScale(fontScale);
 
         table.setFillParent(true);
-        scoreResultLabel = new Label(Integer.toString(Results.score), Assets.menuSkin, "song_style_result_values");
+
+        approachRateConfigLabel = new Label("AR-" + GlobalConfiguration.noteSpeed + " (" + SongUtils.getSpeedFromConfig(GlobalConfiguration.noteSpeed) + " ms)", Assets.menuSkin, "song_style_result_values");
+        overallDifficultyConfigLabel = new Label("OD-" + GlobalConfiguration.overallDifficulty + " (" + SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty] + " ms)", Assets.menuSkin, "song_style_result_values");
         accuracyResultLabel = new Label(String.format("%.2f", Results.accuracy * 1000) + " ms.", Assets.menuSkin, "song_style_result_values");
         accuracyRangeResultLabel = new Label(String.format("%.2f", Results.minAccuracy * 1000) + " ms. to " + String.format("%.2f", Results.maxAccuracy * 1000) + " ms.", Assets.menuSkin, "song_style_result_values");
         normalizedAccuracyResultLabel = new Label(String.format("%.2f", Results.normalizedAccuracy * 100f) + "%", Assets.menuSkin, "song_style_result_values");
         unstableRatingValueLabel = new Label(String.format("%.2f", Results.unstableRating * 1000), Assets.menuSkin, "song_style_result_values");
-        rankResultLabel = new Label(Results.getRankString(), Assets.menuSkin, "song_style_result_values");
         missResultLabel = new Label(Integer.toString(Results.miss), Assets.menuSkin, "song_style_result_values");
         badResultLabel = new Label(Integer.toString(Results.bads), Assets.menuSkin, "song_style_result_values");
         goodResultLabel = new Label(Integer.toString(Results.goods), Assets.menuSkin, "song_style_result_values");
@@ -78,12 +80,12 @@ public class ResultsScreen implements Screen {
         comboResultLabel = new Label(Integer.toString(Results.combo) + (Results.combo == Assets.selectedSong.song_info.get(0).notes.size() ? (Results.bads > 0 || Results.goods > 0 ? "(Fake FC)" : " (FC)") : ""), Assets.menuSkin, "song_style_result_values");
         randomResultLabel = new Label(SongUtils.randomModes[GlobalConfiguration.randomMode], Assets.menuSkin, "song_style_result_values");
 
-        scoreResultLabel.setFontScale(fontScale);
+        approachRateConfigLabel.setFontScale(fontScale);
+        overallDifficultyConfigLabel.setFontScale(fontScale);
         accuracyResultLabel.setFontScale(fontScale);
         accuracyRangeResultLabel.setFontScale(fontScale);
         normalizedAccuracyResultLabel.setFontScale(fontScale);
         unstableRatingValueLabel.setFontScale(fontScale);
-        rankResultLabel.setFontScale(fontScale);
         missResultLabel.setFontScale(fontScale);
         badResultLabel.setFontScale(fontScale);
         goodResultLabel.setFontScale(fontScale);
@@ -92,22 +94,21 @@ public class ResultsScreen implements Screen {
         comboResultLabel.setFontScale(fontScale);
         randomResultLabel.setFontScale(fontScale);
 
-        scoreLabel.setFontScale(fontScale);
-        rankLabel.setFontScale(fontScale);
-        comboLabel.setFontScale(fontScale);
-        normalizedAccuracyLabel.setFontScale(fontScale);
+        approachRateLabel.setFontScale(fontScale);
+        overallDifficultyLabel.setFontScale(fontScale);
         accuracyLabel.setFontScale(fontScale);
         accuracyRangeLabel.setFontScale(fontScale);
+        normalizedAccuracyLabel.setFontScale(fontScale);
         unstableRatingLabel.setFontScale(fontScale);
         randomModeLabel.setFontScale(fontScale);
-
-        perfectLabel.setFontScale(fontScale);
-        greatLabel.setFontScale(fontScale);
-        goodLabel.setFontScale(fontScale);
-        badLabel.setFontScale(fontScale);
         missLabel.setFontScale(fontScale);
+        badLabel.setFontScale(fontScale);
+        goodLabel.setFontScale(fontScale);
+        greatLabel.setFontScale(fontScale);
+        perfectLabel.setFontScale(fontScale);
+        comboLabel.setFontScale(fontScale);
 
-        Label songResultTitle = new Label(Assets.selectedSong.toString(), Assets.menuSkin, "song_result_song_title");
+        Label songResultTitle = new Label(Assets.selectedSong.toString(), Assets.menuSkin, "results_song_title");
         songResultTitle.setFontScale(fontScale);
 
 
@@ -118,16 +119,17 @@ public class ResultsScreen implements Screen {
             table.add().width(stage.getWidth() * 0.2f);
             table.add(randomResultLabel).fillX().row();
         }
-        table.add(scoreLabel).fillX();
-        table.add().width(stage.getWidth() * 0.2f);
-        table.add(scoreResultLabel).fillX().row();
-        table.add(rankLabel).fillX();
-        table.add().width(stage.getWidth() * 0.2f);
-        table.add(rankResultLabel).fillX().row();
+
         table.add(comboLabel).fillX().padBottom(20);
         table.add().width(stage.getWidth() * 0.2f).padBottom(20);
         table.add(comboResultLabel).fillX().padBottom(20).row();
 
+        table.add(approachRateLabel).fillX();
+        table.add().width(stage.getWidth() * 0.2f);
+        table.add(approachRateConfigLabel).fillX().row();
+        table.add(overallDifficultyLabel).fillX();
+        table.add().width(stage.getWidth() * 0.2f);
+        table.add(overallDifficultyConfigLabel).fillX().row();
         table.add(normalizedAccuracyLabel).fillX();
         table.add().width(stage.getWidth() * 0.2f);
         table.add(normalizedAccuracyResultLabel).fillX().row();
