@@ -112,6 +112,7 @@ public class CircleMark implements Comparable<CircleMark> {
         accuracyHitStartTime = -9f;
         accuracyHitEndTime = -9f;
         previousTime = 0f;
+        previousSystemTime = 0L;
 
         initializeVelocity();
         initializeStates();
@@ -162,6 +163,7 @@ public class CircleMark implements Comparable<CircleMark> {
     }
 
     float previousTime;
+    long previousSystemTime;
 
     public void update(float time) {
         if (miss || (firstHit && secondHit)) {
@@ -180,6 +182,7 @@ public class CircleMark implements Comparable<CircleMark> {
         }
         processMiss(time);
         previousTime = time;
+        previousSystemTime = System.currentTimeMillis();
     }
 
 
@@ -305,12 +308,15 @@ public class CircleMark implements Comparable<CircleMark> {
     }
 
     public Accuracy hit() {
-        Accuracy accuracy = Results.getAccuracyFor(previousTime - despawnTime - GlobalConfiguration.inputOffset / 1000f);
+        float delta = (System.currentTimeMillis() - previousSystemTime) / 1000f;
+        float hit = previousTime + delta - despawnTime - GlobalConfiguration.inputOffset / 1000f;
+
+        Accuracy accuracy = Results.getAccuracyFor(hit);
         // If the note was tapped too early, we ignore the tap
         if (despawnTime > previousTime && accuracy == Accuracy.MISS) {
             return Accuracy.NONE;
         }
-        accuracyHitStartTime = previousTime - despawnTime - GlobalConfiguration.inputOffset / 1000f;
+        accuracyHitStartTime = hit;
         if (hold) {
             holding = true;
             accuracyStart = accuracy;
@@ -335,13 +341,14 @@ public class CircleMark implements Comparable<CircleMark> {
             return Accuracy.NONE;
         }
         secondHit = true;
-        accuracyHitEndTime = previousTime - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f;
+        float delta = (System.currentTimeMillis() - previousSystemTime) / 1000f;
+        float hit = previousTime + delta - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f;
         waitingEnd = false;
         holding = false;
         endVisible = false;
         holdBeamVisible = false;
         waiting = false;
-        accuracyEnd = Results.getAccuracyFor(previousTime - holdEndDespawnTime - GlobalConfiguration.inputOffset / 1000f);
+        accuracyEnd = Results.getAccuracyFor(hit);
         if (accuracyEnd == Accuracy.MISS) {
             processed = true;
             //System.out.println("MISS-005: Released hold too early");

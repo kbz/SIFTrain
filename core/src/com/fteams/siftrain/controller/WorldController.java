@@ -253,14 +253,14 @@ public class WorldController implements Music.OnCompletionListener {
         List<Float> high = new ArrayList<>();
         List<Float> low = new ArrayList<>();
         for (AccuracyMarker hit : world.getAccuracyMarkers()) {
-            sum += (-hit.getTime());
+            sum += hit.getTime();
         }
         float average = sum / world.getAccuracyMarkers().size;
         for (AccuracyMarker value : world.getAccuracyMarkers()) {
-            if (-value.getTime() >= average) {
-                high.add(-value.getTime());
+            if (value.getTime() >= average) {
+                high.add(value.getTime());
             } else {
-                low.add(-value.getTime());
+                low.add(value.getTime());
             }
         }
 
