@@ -18,14 +18,14 @@ circle
   orig: 250, 250
   offset: 0, 0
   index: -1
-circle_hold_press_no_black
+circle_hold_release_no_black
   rotate: false
   xy: 260, 260
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-circle_hold_press_no_black_sim
+circle_sim
   rotate: false
   xy: 254, 2
   size: 250, 250
@@ -55,74 +55,6 @@ selection_menu_selected
   index: -1
 
 textures.pack2.png
-size: 512,512
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-circle_hold_release_no_black
-  rotate: false
-  xy: 2, 254
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-circle_hold_release_no_black_sim
-  rotate: false
-  xy: 2, 2
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-circle_sim
-  rotate: false
-  xy: 254, 254
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-circle_special
-  rotate: false
-  xy: 254, 2
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-
-textures.pack3.png
-size: 512,512
-format: RGBA8888
-filter: Nearest,Nearest
-repeat: none
-circle_special_sim
-  rotate: false
-  xy: 2, 254
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-circle_token
-  rotate: false
-  xy: 2, 2
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-circle_token_sim
-  rotate: false
-  xy: 254, 254
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-tap
-  rotate: false
-  xy: 254, 2
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-
-textures.pack4.png
 size: 512,512
 format: RGBA8888
 filter: Nearest,Nearest
@@ -253,16 +185,29 @@ song_selection_menu_background
   orig: 50, 50
   offset: 0, 0
   index: -1
-tap_pressed
+tap
   rotate: false
   xy: 2, 153
   size: 250, 250
   orig: 250, 250
   offset: 0, 0
   index: -1
-tap_warn
+tap_pressed
   rotate: false
   xy: 254, 139
+  size: 250, 250
+  orig: 250, 250
+  offset: 0, 0
+  index: -1
+
+textures.pack3.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+tap_warn
+  rotate: false
+  xy: 2, 2
   size: 250, 250
   orig: 250, 250
   offset: 0, 0

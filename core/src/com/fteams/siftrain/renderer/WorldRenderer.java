@@ -33,15 +33,7 @@ public class WorldRenderer {
     // textures
     TextureRegion circle;
     TextureRegion circleSim;
-    TextureRegion circleHoldStart;
-    TextureRegion circleHoldStartSim;
     TextureRegion circleHoldEnd;
-    TextureRegion circleHoldEndSim;
-    TextureRegion circleSpecial;
-    TextureRegion circleSpecialSim;
-    TextureRegion circleToken;
-    TextureRegion circleTokenSim;
-
     TextureRegion tapZoneIdle;
     TextureRegion tapZoneWarn;
     TextureRegion tapZonePressed;
@@ -112,14 +104,7 @@ public class WorldRenderer {
         TextureAtlas atlas = Assets.atlas;
         circle = atlas.findRegion("circle");
         circleSim = atlas.findRegion("circle_sim");
-        circleHoldStart = atlas.findRegion("circle_hold_press_no_black");
-        circleHoldStartSim = atlas.findRegion("circle_hold_press_no_black_sim");
         circleHoldEnd = atlas.findRegion("circle_hold_release_no_black");
-        circleHoldEndSim = atlas.findRegion("circle_hold_release_no_black_sim");
-        circleSpecial = atlas.findRegion("circle_special");
-        circleSpecialSim = atlas.findRegion("circle_special_sim");
-        circleToken = atlas.findRegion("circle_token");
-        circleTokenSim = atlas.findRegion("circle_token_sim");
 
         tapZoneIdle = atlas.findRegion("tap");
         tapZonePressed = atlas.findRegion("tap_pressed");
@@ -376,20 +361,8 @@ public class WorldRenderer {
     private TextureRegion selectTextureForCircle(int effectMask) {
         // TODO: Remove the holdStart texture as it's no longer used
 
-        if ((effectMask & (SongUtils.NOTE_TYPE_NORMAL | SongUtils.NOTE_TYPE_HOLD)) != 0) {
-            if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0) {
-                return circleSim;
-            } else return circle;
-        } else if ((effectMask & SongUtils.NOTE_TYPE_SPECIAL) != 0) {
-            if ((effectMask & SongUtils.NOTE_TYPE_SIMULT_START) != 0) {
-                return circleSpecialSim;
-            } else return circleSpecial;
-        } else {
-            if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0) {
-                return circleTokenSim;
-            } else {
-                return circleToken;
-            }
-        }
+        if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0) {
+            return circleSim;
+        } else return circle;
     }
 }

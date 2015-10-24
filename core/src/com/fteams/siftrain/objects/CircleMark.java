@@ -109,8 +109,6 @@ public class CircleMark implements Comparable<CircleMark> {
             this.holdEndDespawnTime = (float) (timing + note.effect_value);
 
         }
-        accuracyHitStartTime = -9f;
-        accuracyHitEndTime = -9f;
         previousTime = 0f;
         previousSystemTime = 0L;
 
@@ -124,8 +122,8 @@ public class CircleMark implements Comparable<CircleMark> {
     public Accuracy accuracyStart;
     public Accuracy accuracyEnd;
 
-    public float accuracyHitStartTime;
-    public float accuracyHitEndTime;
+    public Float accuracyHitStartTime;
+    public Float accuracyHitEndTime;
 
     public void updateDestination(int newDestination) {
         this.destination = newDestination;
@@ -352,6 +350,8 @@ public class CircleMark implements Comparable<CircleMark> {
         if (accuracyEnd == Accuracy.MISS) {
             processed = true;
             //System.out.println("MISS-005: Released hold too early");
+        } else {
+            accuracyHitEndTime = hit;
         }
         return accuracyEnd;
     }
