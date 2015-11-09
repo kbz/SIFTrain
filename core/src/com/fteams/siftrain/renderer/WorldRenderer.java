@@ -361,7 +361,7 @@ public class WorldRenderer {
     private TextureRegion selectTextureForCircle(int effectMask) {
         // TODO: Remove the holdStart texture as it's no longer used
 
-        if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0) {
+        if ((effectMask & (SongUtils.NOTE_TYPE_SIMULT_START)) != 0) {
             return circleSim;
         } else return circle;
     }

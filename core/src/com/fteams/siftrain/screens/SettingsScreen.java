@@ -50,8 +50,8 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
     private Label songVolumeValueLabel;
     private Label feedbackVolumeValueLabel;
-    private Label offsetValueLabel;
-    private Label inputOffsetValueLabel;
+    private CheckBox offsetValueLabel;
+    private CheckBox inputOffsetValueLabel;
     private Label noteSpeedValueLabel;
     private Label overallDifficultyValueLabel;
 
@@ -195,16 +195,22 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
 
         // timing block
         offsetLabel.setFontScale(fontScale);
-        offsetValueLabel = new Label((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.", Assets.menuSkin, "song_style_result");
-        offsetValueLabel.setFontScale(fontScale);
 
-        offsetSlider = new Slider(-1000f, 1000f, 25f, false, Assets.menuSkin);
+        offsetValueLabel = new CheckBox((GlobalConfiguration.offset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.offset) + " ms.", Assets.menuSkin);
+        offsetValueLabel.addListener(this);
+        offsetValueLabel.getLabel().setFontScale(fontScale);
+        offsetValueLabel.getImageCell().width(0);
+
+        offsetSlider = new Slider(-1000f, 1000f, 1f, false, Assets.menuSkin);
         offsetSlider.setValue(GlobalConfiguration.offset);
         offsetSlider.addListener(this);
 
         inputOffsetLabel.setFontScale(fontScale);
-        inputOffsetValueLabel = new Label((GlobalConfiguration.inputOffset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.inputOffset) + " ms.", Assets.menuSkin, "song_style_result");
-        inputOffsetValueLabel.setFontScale(fontScale);
+
+        inputOffsetValueLabel = new CheckBox((GlobalConfiguration.inputOffset > 0 ? "+" : "") + Integer.toString(GlobalConfiguration.inputOffset) + " ms.", Assets.menuSkin);
+        inputOffsetValueLabel.getLabel().setFontScale(fontScale);
+        inputOffsetValueLabel.getImageCell().width(0);
+        inputOffsetValueLabel.addListener(this);
 
         inputOffsetSlider = new Slider(-250f, 250f, 1f, false, Assets.menuSkin);
         inputOffsetSlider.setValue(GlobalConfiguration.inputOffset);
@@ -238,18 +244,18 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         // global offset
         offsetTable.setHeight(stage.getHeight() * 0.7f);
         offsetTable.setWidth(stage.getWidth() * 0.6f);
-        offsetTable.add(offsetLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f);
+        offsetTable.add(offsetLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
         offsetTable.add().width(stage.getWidth() * 0.20f);
-        offsetTable.add(offsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(offsetValueLabel).width(stage.getWidth() * 0.10f).height(offsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(offsetSlider).width(stage.getWidth() * 0.6f).height(offsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
-        offsetTable.add().height(offsetValueLabel.getHeight() / 2f).row();
+        offsetTable.add().height(offsetLabel.getHeight() / 2f).row();
 
         // input offset
         offsetTable.add(inputOffsetLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
         offsetTable.add().width(stage.getWidth() * 0.20f);
-        offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
+        offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).height(offsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(inputOffsetSlider).width(stage.getWidth() * 0.6f).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
-        offsetTable.add().height(offsetValueLabel.getHeight() / 2f).row();
+        offsetTable.add().height(inputOffsetLabel.getHeight() / 2f).row();
 
         // Approach Rate
         offsetTable.add(noteSpeedLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
@@ -446,6 +452,48 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == syncModeCheckbox) {
             newSyncMode = (newSyncMode + 1) % 4;
             syncModeCheckbox.setText("Sync Mode: " + SongUtils.syncModes[newSyncMode]);
+        }
+        if (actor == offsetValueLabel) {
+            Input.TextInputListener listener = new Input.TextInputListener() {
+
+                @Override
+                public void input(String text) {
+                    try {
+                        newGlobalOffset = Integer.parseInt(text);
+                        offsetValueLabel.setText((newGlobalOffset > 0 ? "+" : "") + Integer.toString(newGlobalOffset) + " ms.");
+                        offsetSlider.setValue(newGlobalOffset);
+                    } catch (Exception e) {
+                        // fail silently - we expect time in milliseconds
+                    }
+                }
+
+                @Override
+                public void canceled() {
+
+                }
+            };
+            Gdx.input.getTextInput(listener, "Offset", "", "Previous value: " + newGlobalOffset + " ms.");
+        }
+        if (actor == inputOffsetValueLabel) {
+            Input.TextInputListener listener = new Input.TextInputListener() {
+
+                @Override
+                public void input(String text) {
+                    try {
+                        newInputOffset = Integer.parseInt(text);
+                        inputOffsetValueLabel.setText((newInputOffset > 0 ? "+" : "") + Integer.toString(newInputOffset) + " ms.");
+                        inputOffsetSlider.setValue(newInputOffset);
+                    } catch (Exception e) {
+                        // fail silently - we expect time in milliseconds
+                    }
+                }
+
+                @Override
+                public void canceled() {
+
+                }
+            };
+            Gdx.input.getTextInput(listener, "Input Offset", "", "Previous value: " + newInputOffset + " ms.");
         }
     }
 

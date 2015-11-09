@@ -609,15 +609,7 @@ public class WorldController implements Music.OnCompletionListener {
         }
         if (isABRepeatMode) {
             if (time + world.delay >= bPosition) {
-                resetMarks();
-                if (hasMusic) {
-                    theSong.pause();
-                    theSong.setPosition(aPosition);
-                    theSong.play();
-                    lastmtime = theSong.getPosition();
-                    time = lastmtime + world.delay;
-                    timeSyncAcc = 0;
-                }
+                this.onCompletion(theSong);
             }
         }
         if (done && !hasMusic) {
