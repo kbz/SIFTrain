@@ -61,7 +61,7 @@ public class CircleMark implements Comparable<CircleMark> {
 
     public Integer notePosition;
     public Integer destination = 0;
-    public Double speed;
+    private Double speed;
     SimpleNotesInfo note;
 
     private float spawnTime;

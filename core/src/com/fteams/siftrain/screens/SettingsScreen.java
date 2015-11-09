@@ -210,7 +210,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         inputOffsetSlider.setValue(GlobalConfiguration.inputOffset);
         inputOffsetSlider.addListener(this);
 
-        // note speed
+        // Approach Rate
         noteSpeedSlider = new Slider(0, 10, 1, false, Assets.menuSkin);
         noteSpeedSlider.setValue(GlobalConfiguration.noteSpeed);
         noteSpeedSlider.addListener(this);
@@ -219,7 +219,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         noteSpeedValueLabel = new Label(Integer.toString(GlobalConfiguration.noteSpeed) + "", Assets.menuSkin, "song_style_result");
         noteSpeedValueLabel.setFontScale(fontScale);
 
-        // timing window
+        // Overall Difficulty
         overallDifficultySlider = new Slider(0, 10, 1, false, Assets.menuSkin);
         overallDifficultySlider.setValue(GlobalConfiguration.overallDifficulty);
         overallDifficultySlider.addListener(this);
@@ -250,13 +250,15 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         offsetTable.add(inputOffsetValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(inputOffsetSlider).width(stage.getWidth() * 0.6f).height(inputOffsetLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
         offsetTable.add().height(offsetValueLabel.getHeight() / 2f).row();
-// note speed
+
+        // Approach Rate
         offsetTable.add(noteSpeedLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
         offsetTable.add().width(stage.getWidth() * 0.20f);
         offsetTable.add(noteSpeedValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();
         offsetTable.add(noteSpeedSlider).width(stage.getWidth() * 0.6f).height(noteSpeedLabel.getHeight() * fontScale).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).colspan(3).row();
         offsetTable.add().height(noteSpeedValueLabel.getHeight() / 2f).row();
 
+        // Overall Difficulty
         offsetTable.add(overallDifficultyLabel).width(stage.getWidth() * 0.3f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).fillX();
         offsetTable.add().width(stage.getWidth() * 0.20f);
         offsetTable.add(overallDifficultyValueLabel).width(stage.getWidth() * 0.10f).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).right().row();

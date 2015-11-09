@@ -197,8 +197,8 @@ public class WorldController implements Music.OnCompletionListener {
         if (rewinding)
             return;
 
-        // some song files may start immediately and the beatmaps may have notes which start immediately with the songs
-        // so, allow them to have a (note_speed + 0.5) seconds of pre-time
+        // some song files may start immediately and the beatmaps may have notes which start
+        // immediately with the songs, so give them a small lead-in to spawn the notes
         if (!songStarted) {
             songStart -= delta;
             if (songStart <= 0) {
