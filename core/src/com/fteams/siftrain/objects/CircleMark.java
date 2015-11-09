@@ -149,6 +149,23 @@ public class CircleMark implements Comparable<CircleMark> {
         alpha2 = 1f;
     }
 
+    public void reset()
+    {
+        this.accuracyStart = null;
+        this.accuracyEnd = null;
+        this.accuracyHitStartTime = null;
+        this.accuracyHitEndTime = null;
+        this.position.x = this.origin.x;
+        this.position.y = this.origin.y;
+        this.holdReleasePosition.x = this.origin.x;
+        this.holdReleasePosition.y = this.origin.y;
+        this.size = 0.1f;
+        this.size2 = 0f;
+        firstHit = false;
+        secondHit = false;
+        initializeStates();
+    }
+
     private void initializeVelocity() {
         float xVel = (float) Math.cos((destination) * Math.PI / 8);
         float yVel = -(float) Math.sin((destination) * Math.PI / 8);

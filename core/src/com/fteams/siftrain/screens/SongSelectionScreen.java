@@ -159,7 +159,7 @@ public class SongSelectionScreen implements Screen, InputProcessor {
                 if (!Assets.selectedSong.getValid() || loader.getErrors().size() > 0 || loader.getWarnings().size() > 0) {
                     ((Game) Gdx.app.getApplicationListener()).setScreen(new BeatmapLoadingScreen());
                 } else {
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
+                    ((Game) Gdx.app.getApplicationListener()).setScreen(new LiveOptionsScreen());
                 }
             }
         }));

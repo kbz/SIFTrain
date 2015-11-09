@@ -4,6 +4,9 @@ import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.objects.CircleMark;
 
 public abstract class Randomizer {
+
+    static final double BUFFER_TIME = 0.005d;
+
     public abstract void randomize(Array<CircleMark> marks);
 
     protected Integer getPosition(boolean isLeft) {

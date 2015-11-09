@@ -1,6 +1,7 @@
 package com.fteams.siftrain.util.random;
 
 import com.badlogic.gdx.utils.Array;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.util.SongUtils;
 
@@ -15,7 +16,7 @@ public class SimpleRandomizer extends Randomizer {
     public void randomize(Array<CircleMark> marks) {
         marks.sort();
 
-        double threshold = marks.get(0).speed / 4.0;
+        double threshold = SongUtils.getDefaultNoteSpeedForApproachRate(GlobalConfiguration.noteSpeed) / 4.0;
 
         // set the position for each note
         for (int i = 0; i < marks.size; i++) {
@@ -24,7 +25,7 @@ public class SimpleRandomizer extends Randomizer {
             if (mark.hold) {
                 // if the note is a hold, we store the ending time and ignore any notes which appear until the hold ends
                 if (holdEndTime < mark.getNote().timing_sec + mark.getNote().effect_value) {
-                    holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value;
+                    holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value + BUFFER_TIME;
                     left = isLeft(mark);
                     continue;
                 }
@@ -32,7 +33,7 @@ public class SimpleRandomizer extends Randomizer {
             }
 
             // we give notes a bit of leeway for hold release to prevent having a note on the same side and almost simultaneously after the hold was released.
-            if (mark.getNote().timing_sec < holdEndTime + threshold) {
+            if (mark.getNote().timing_sec < holdEndTime) {
                 continue;
             }
 

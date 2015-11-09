@@ -28,6 +28,12 @@ public class GlobalConfiguration {
     // other - per session configs
     public static boolean random;
 
+    // not stored/remembered variables:
+    public static Float playbackRate;
+    public static Integer playbackMode;
+    public static Float aTime;
+    public static Float bTime;
+
     public final static int BASE_HEIGHT = 720;
 
     public static void loadConfiguration() {

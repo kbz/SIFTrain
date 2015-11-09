@@ -26,6 +26,9 @@ public class SongUtils {
     public final static Integer SYNC_MODE_3 = 2;
     public final static Integer SYNC_DISABLED = 3;
 
+    public final static Integer GAME_MODE_NORMAL = 0;
+    public final static Integer GAME_MODE_ABREPEAT = 1;
+
     public final static String[] randomModes = {"Old mode", "New mode", "Keep Sides mode", "Mirrored Keep Sides mode", "Simple mode", "Extreme mode"};
     public final static String[] syncModes = {"Default", "Constant Sync", "Initial Sync", "Disabled"};
 
@@ -42,22 +45,6 @@ public class SongUtils {
     public static String getDifficulty(Integer difficulty) {
         return DIFF[difficulty - 1];
     }
-
-    public static Double getDefaultNoteSpeedForDifficulty(Integer difficulty) {
-        switch (difficulty) {
-            case 1:
-                return 1.6;
-            case 2:
-                return 1.3;
-            case 3:
-                return 1.0;
-            case 4:
-                return 0.8;
-            default:
-                return 1.0;
-        }
-    }
-
 
     static double[] speedForApproachRate = {1.8, 1.68, 1.56, 1.44, 1.32, 1.2, 1.05, 0.9, 0.75, 0.6, 0.45};
 

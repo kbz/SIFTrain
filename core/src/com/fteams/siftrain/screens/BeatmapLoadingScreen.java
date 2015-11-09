@@ -113,7 +113,7 @@ public class BeatmapLoadingScreen implements Screen {
 
         play.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new SongScreen());
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new LiveOptionsScreen());
             }
         });
 

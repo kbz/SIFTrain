@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.assets.Results;
@@ -108,8 +109,9 @@ public class ResultsScreen implements Screen {
         perfectLabel.setFontScale(fontScale);
         comboLabel.setFontScale(fontScale);
 
-        Label songResultTitle = new Label(Assets.selectedSong.toString(), Assets.menuSkin, "results_song_title");
+        Label songResultTitle = new Label(Assets.selectedSong.to2LineString(), Assets.menuSkin, "results_song_title");
         songResultTitle.setFontScale(fontScale);
+        songResultTitle.setAlignment(Align.center);
 
 
         table.add(songResultTitle).colspan(3).row();

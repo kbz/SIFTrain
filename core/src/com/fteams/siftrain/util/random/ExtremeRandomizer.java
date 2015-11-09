@@ -1,7 +1,9 @@
 package com.fteams.siftrain.util.random;
 
 import com.badlogic.gdx.utils.Array;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.CircleMark;
+import com.fteams.siftrain.util.SongUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ public class ExtremeRandomizer extends Randomizer {
         // sort marks by timing
         marks.sort();
 
-        double threshold = marks.get(0).speed / 32.0;
+        double threshold = SongUtils.getDefaultNoteSpeedForApproachRate(GlobalConfiguration.noteSpeed) / 32.0;
 
         for (int i = 0 ; i < marks.size; i++)
         {

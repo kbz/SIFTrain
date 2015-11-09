@@ -13,7 +13,7 @@ public class SongFileInfo implements Comparable<SongFileInfo> {
     private Long crc;
 
     public String toString() {
-        return song_name + "[" + (difficulty_name == null ? SongUtils.getDifficulty(difficulty) : difficulty_name) + "]";
+        return (difficulty_name == null ? SongUtils.getDifficulty(difficulty) : difficulty_name);
     }
 
     public String getResourceName() {
@@ -65,5 +65,9 @@ public class SongFileInfo implements Comparable<SongFileInfo> {
 
     public void setCrc(Long crc) {
         this.crc = crc;
+    }
+
+    public String to2LineString() {
+        return song_name + "\n[" + (difficulty_name == null ? SongUtils.getDifficulty(difficulty) : difficulty_name) + "]";
     }
 }

@@ -1,6 +1,7 @@
 package com.fteams.siftrain.util.random;
 
 import com.badlogic.gdx.utils.Array;
+import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.util.SongUtils;
 
@@ -9,6 +10,7 @@ public class NewAlgorithmRandomizer extends Randomizer {
     private boolean left;
     private boolean holding;
     private double holdEndTime;
+    // 5 ms of buffer to prevent simultaneous notes on the same side
 
     /*
      * Info: by default beatmaps will use 2 notes at the same time at most. If there's more, things can get nasty and messy.
@@ -16,7 +18,7 @@ public class NewAlgorithmRandomizer extends Randomizer {
     public void randomize(Array<CircleMark> marks) {
         marks.sort();
 
-        double threshold = marks.get(0).speed / 4.0;
+        double threshold = SongUtils.getDefaultNoteSpeedForApproachRate(GlobalConfiguration.noteSpeed) / 4.0;
 
         holding = false;
         // set the position for each note
@@ -46,7 +48,7 @@ public class NewAlgorithmRandomizer extends Randomizer {
             // note during hold which ends after the current end time
             // swap times.
             if (mark.getNote().timing_sec + mark.getNote().effect_value > holdEndTime) {
-                holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value;
+                holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value + BUFFER_TIME;
                 left = !left;
                 Integer pos = getPositionWithoutMiddle(left);
                 mark.updateDestination(pos);
@@ -63,7 +65,7 @@ public class NewAlgorithmRandomizer extends Randomizer {
         } else {
             holding = true;
             double previousHoldEndTime = holdEndTime;
-            holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value;
+            holdEndTime = mark.getNote().timing_sec + mark.getNote().effect_value + BUFFER_TIME;
 
             // check the previous note for side calculation - just in case
             if (i >= 1) {

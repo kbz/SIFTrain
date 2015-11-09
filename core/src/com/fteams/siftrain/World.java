@@ -8,13 +8,13 @@ import com.fteams.siftrain.objects.AccuracyMarker;
 import com.fteams.siftrain.objects.AccuracyPopup;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.objects.TapZone;
+import com.fteams.siftrain.util.SongUtils;
 import com.fteams.siftrain.util.random.ExtremeRandomizer;
 import com.fteams.siftrain.util.random.KeepSidesRandomizer;
 import com.fteams.siftrain.util.random.MirroredKeepSidesRandomizer;
-import com.fteams.siftrain.util.random.Randomizer;
 import com.fteams.siftrain.util.random.NewAlgorithmRandomizer;
 import com.fteams.siftrain.util.random.OldAlgorithmRandomizer;
-import com.fteams.siftrain.util.SongUtils;
+import com.fteams.siftrain.util.random.Randomizer;
 import com.fteams.siftrain.util.random.SimpleRandomizer;
 
 public class World {
@@ -61,7 +61,25 @@ public class World {
         delay = Assets.selectedSong.lead_in != null ? Assets.selectedSong.lead_in : 0f;
 
         for (SimpleNotesInfo notesInfo : Assets.selectedSong.song_info.get(0).notes) {
-            CircleMark mark = new CircleMark(x, y, notesInfo, noteSpeed, delay);
+
+            SimpleNotesInfo copy = copy(notesInfo);
+            if (GlobalConfiguration.playbackMode != null && GlobalConfiguration.playbackMode.equals(SongUtils.GAME_MODE_ABREPEAT)) {
+                if (GlobalConfiguration.aTime != null) {
+                    if (copy.timing_sec < GlobalConfiguration.aTime) {
+                        continue;
+                    }
+                }
+                if (GlobalConfiguration.bTime != null) {
+                    if (copy.timing_sec > GlobalConfiguration.bTime + 2f) {
+                        continue;
+                    }
+                }
+            }
+            if (GlobalConfiguration.playbackRate != null) {
+                copy.timing_sec = copy.timing_sec / GlobalConfiguration.playbackRate;
+
+            }
+            CircleMark mark = new CircleMark(x, y, copy, noteSpeed, delay);
             marks.add(mark);
         }
         marks.sort();
@@ -93,7 +111,7 @@ public class World {
                     simpleRandomizer.randomize(marks);
                     break;
                 }
-                case 5:{
+                case 5: {
                     Randomizer extremeRandomizer = new ExtremeRandomizer();
                     extremeRandomizer.randomize(marks);
                     break;
@@ -116,6 +134,25 @@ public class World {
         this.accuracyMarkers = new Array<>();
         this.accuracyPopups = new Array<>();
         paused = false;
+    }
+
+    private SimpleNotesInfo copy(SimpleNotesInfo notesInfo) {
+        SimpleNotesInfo copy = new SimpleNotesInfo();
+        copy.timing_sec = notesInfo.timing_sec;
+        copy.position = notesInfo.position;
+        copy.effect = notesInfo.effect;
+        copy.effect_value = notesInfo.effect_value;
+        return copy;
+    }
+
+    public float getDuration() {
+        float timing = 0f;
+        for (SimpleNotesInfo note : Assets.selectedSong.song_info.get(0).notes) {
+            if (timing < note.timing_sec) {
+                timing = note.timing_sec.floatValue();
+            }
+        }
+        return timing;
     }
 
     public void setSize(int width, int height, int offsetX, int offsetY) {
