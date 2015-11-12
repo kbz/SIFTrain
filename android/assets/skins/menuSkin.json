@@ -27,6 +27,7 @@
     "title": { "font": title, fontColor: black},
     "results_title": { "font": song-list , "fontColor": black},
     "results_song_title": { "font": song-list , "fontColor": black},
+    "version_label": { "font": song-list , "fontColor": black},
     "song_style_score": { "font": song-font },
     "song_style_combo": { "font": song-font },
     "song_style_result": { "font": song-font, "fontColor": black },

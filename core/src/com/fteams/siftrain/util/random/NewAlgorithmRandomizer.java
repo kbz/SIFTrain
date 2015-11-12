@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.util.SongUtils;
+import com.sun.media.sound.SoftEnvelopeGenerator;
 
 public class NewAlgorithmRandomizer extends Randomizer {
 
@@ -113,7 +114,7 @@ public class NewAlgorithmRandomizer extends Randomizer {
             // pick the other side
             isLeft = !left;
             // if one side is holding, notes will never spawn in the middle lane
-            Integer pos = getPositionWithoutMiddle(isLeft);
+            Integer pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
             mark.updateDestination(pos);
             mark.left = isLeft;
             // we're not holding
@@ -126,31 +127,96 @@ public class NewAlgorithmRandomizer extends Randomizer {
                     isLeft = !previous.left;
                     // if notes are too close together, we don't pick up the center
                     // this also applies to simultaneous notes (distance will obviously be < average)
-                    Integer pos = getPositionWithoutMiddle(isLeft);
+                    Integer pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
+                    // we're not holding but there was a hold released close - swap sides
                 } else if (mark.getNote().timing_sec - holdEndTime < threshold) {
                     // they're far away and we may choose a side randomly
                     isLeft = !left;
-                    Integer pos = getPositionWithoutMiddle(isLeft);
+                    System.out.println("TEST-O");
+                    Integer pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                     // if they're not really close, just pick a random side
+                } else if (hasSimultEndBeforeCurrentNote(marks, i, i-1)) {
+                    isLeft = !left;
+                    System.out.println("TEST-O-O");
+                    Integer pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
+                    mark.updateDestination(pos);
+                    mark.left = isLeft;
+
                 } else {
+                    System.out.println("TEST-O-O-O!");
                     Integer pos = getPosition(isLeft);
                     // if the note is multi - don't pick the center
                     if ((mark.effect & (SongUtils.NOTE_TYPE_SIMULT_END | SongUtils.NOTE_TYPE_SIMULT_START)) != 0) {
-                        pos = getPositionWithoutMiddle(isLeft);
+                        pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
                     }
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                 }
                 // if this is the first note, just pick a random side
             } else {
-                Integer pos = getPosition(isLeft);
+                Integer pos = getPosition(isLeft, mark.getNote().timing_sec);
+                // if the first note is a simult, choose a random side - no center
+                if ((mark.effect & (SongUtils.NOTE_TYPE_SIMULT_START | SongUtils.NOTE_TYPE_SIMULT_END)) != 0)
+                {
+                    pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
+                }
                 mark.updateDestination(pos);
                 mark.left = isLeft;
             }
         }
     }
+
+    public Integer getPosition(boolean isLeft, Double timing) {
+        Integer newPosition = getPosition(isLeft);
+        // try to get a spot on one side
+        if (hasSpots(isLeft, timing))
+        {
+            while (inUse(newPosition, timing)) {
+                newPosition = getPosition(isLeft);
+            }
+        } else
+        // if we couldn't get a spot because all are on cooldown, use a spot from the other side
+        {
+            if (hasSpots(!isLeft, timing)){
+                while (inUse(newPosition, timing)) {
+                    newPosition = getPosition(!isLeft);
+                }
+            }
+            // if the spots are all in use, use the center.
+            else
+            {
+                newPosition = 4;
+            }
+        }
+        noteToReleaseTime.put(newPosition, timing + BUFFER_TIME);
+        return newPosition;
+    }
+
+    public Integer getPositionWithoutMiddle(boolean isLeft, Double timing) {
+        Integer newPosition = getPositionWithoutMiddle(isLeft);
+        if (hasSpots(isLeft, timing))
+        {
+            while (inUse(newPosition, timing)) {
+                newPosition = getPositionWithoutMiddle(isLeft);
+            }
+        } else
+        {
+            if (hasSpots(!isLeft, timing)){
+                while (inUse(newPosition, timing)) {
+                    newPosition = getPositionWithoutMiddle(!isLeft);
+                }
+            }
+            else
+            {
+                newPosition = 5;
+            }
+        }
+        noteToReleaseTime.put(newPosition, timing + BUFFER_TIME);
+        return newPosition;
+    }
+
 }

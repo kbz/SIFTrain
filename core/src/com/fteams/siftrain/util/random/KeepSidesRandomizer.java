@@ -20,7 +20,13 @@ public class KeepSidesRandomizer extends Randomizer {
                 continue;
             }
             boolean left = isLeft(mark);
-            mark.updateDestination(getPositionWithoutMiddle(left));
+            Integer newPosition = getPositionWithoutMiddle(left);
+            while (inUse(newPosition, mark.getNote().timing_sec))
+            {
+                newPosition = getPosition(left);
+            }
+            mark.updateDestination(newPosition);
+            noteToReleaseTime.put(newPosition, mark.getNote().timing_sec + BUFFER_TIME);
         }
     }
 }

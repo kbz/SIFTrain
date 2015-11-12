@@ -10,8 +10,6 @@ import java.util.Map;
 
 public class ExtremeRandomizer extends Randomizer {
 
-    private Map<Integer, Double> noteToReleaseTime = new HashMap<>();
-
     /*
      * Info: this is the only randomizer which works with ANY BEATMAP (even those with more than 2 notes at the same time!)
      */
@@ -32,7 +30,7 @@ public class ExtremeRandomizer extends Randomizer {
 
     private Integer getFreePosition(Double timing_sec) {
         Integer position = (int)(Math.random() * 100) % 9;
-        while (noteToReleaseTime.get(position) != null && noteToReleaseTime.get(position) >= timing_sec )
+        while (inUse(position, timing_sec) )
         {
             position = (int)(Math.random() * 100) % 9;
         }

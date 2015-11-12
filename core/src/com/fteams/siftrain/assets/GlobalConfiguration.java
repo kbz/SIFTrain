@@ -5,10 +5,12 @@ import com.badlogic.gdx.Preferences;
 import com.fteams.siftrain.util.SongUtils;
 
 public class GlobalConfiguration {
+
+    // package info
+    public static String appVersionName;
+
     public static int songVolume;
     public static int feedbackVolume;
-    // team strength in SIF units
-    public static int teamStrength;
     // offset in milliseconds
     public static int offset;
     public static int inputOffset;
@@ -38,7 +40,6 @@ public class GlobalConfiguration {
 
     public static void loadConfiguration() {
         Preferences prefs = Gdx.app.getPreferences("sif_train_config");
-        teamStrength = prefs.getInteger("team_str", 20000);
         offset = prefs.getInteger("offset", 0);
         inputOffset = prefs.getInteger("input_offset", 0);
         songVolume = prefs.getInteger("song_vol", 100);
@@ -59,7 +60,6 @@ public class GlobalConfiguration {
 
     public static void storeConfiguration() {
         Preferences prefs = Gdx.app.getPreferences("sif_train_config");
-        prefs.putInteger("team_str", teamStrength);
         prefs.putInteger("offset", offset);
         prefs.putInteger("input_offset", inputOffset);
         prefs.putInteger("song_vol", songVolume);

@@ -14,8 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.fteams.siftrain.assets.Assets;
 import com.fteams.siftrain.assets.GlobalConfiguration;
+import com.fteams.siftrain.util.Tips;
 
 public class MainMenuScreen implements Screen, InputProcessor {
     private Stage stage = new Stage();
@@ -67,6 +69,22 @@ public class MainMenuScreen implements Screen, InputProcessor {
 
         title.setFontScale(fontScale);
         table.add(title).padBottom(stage.getHeight()*0.1f).row();
+
+        Label versionLabel = new Label("VERSION: " + GlobalConfiguration.appVersionName, Assets.menuSkin, "version_label");
+        versionLabel.setFontScale(fontScale / 2f);
+        versionLabel.setX(stage.getWidth() * 0.075f);
+        versionLabel.setY(stage.getHeight() * 0.9f);
+
+        Label tipLabel = new Label(Tips.getRandomTip(), Assets.menuSkin, "default");
+        tipLabel.setFontScale(fontScale * 0.7f);
+        tipLabel.setWrap(true);
+        tipLabel.setX(stage.getWidth() * 0.10f);
+        tipLabel.setY(stage.getHeight() * 0.15f);
+        tipLabel.setWidth(stage.getWidth() * 0.8f);
+        tipLabel.setAlignment(Align.center);
+
+        stage.addActor(versionLabel);
+        stage.addActor(tipLabel);
 
         buttonPlay.getLabel().setFontScale(fontScale);
         buttonSettings.getLabel().setFontScale(fontScale);
