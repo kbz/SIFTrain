@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.fteams.siftrain.assets.GlobalConfiguration;
 import com.fteams.siftrain.objects.CircleMark;
 import com.fteams.siftrain.util.SongUtils;
-import com.sun.media.sound.SoftEnvelopeGenerator;
 
 public class NewAlgorithmRandomizer extends Randomizer {
 

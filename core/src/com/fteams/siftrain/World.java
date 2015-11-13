@@ -58,7 +58,7 @@ public class World {
         float y = 0f;
         Double noteSpeed = SongUtils.getDefaultNoteSpeedForApproachRate(GlobalConfiguration.noteSpeed);
 
-        delay = Assets.selectedSong.lead_in != null ? Assets.selectedSong.lead_in : 0f;
+        delay = Assets.selectedSong.lead_in != null ? Assets.selectedSong.lead_in : noteSpeed.floatValue();
 
         for (SimpleNotesInfo notesInfo : Assets.selectedSong.song_info.get(0).notes) {
 
