@@ -133,20 +133,17 @@ public class NewAlgorithmRandomizer extends Randomizer {
                 } else if (mark.getNote().timing_sec - holdEndTime < threshold) {
                     // they're far away and we may choose a side randomly
                     isLeft = !left;
-                    System.out.println("TEST-O");
                     Integer pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
                     // if they're not really close, just pick a random side
                 } else if (hasSimultEndBeforeCurrentNote(marks, i, i-1)) {
                     isLeft = !left;
-                    System.out.println("TEST-O-O");
                     Integer pos = getPositionWithoutMiddle(isLeft, mark.getNote().timing_sec);
                     mark.updateDestination(pos);
                     mark.left = isLeft;
 
                 } else {
-                    System.out.println("TEST-O-O-O!");
                     Integer pos = getPosition(isLeft);
                     // if the note is multi - don't pick the center
                     if ((mark.effect & (SongUtils.NOTE_TYPE_SIMULT_END | SongUtils.NOTE_TYPE_SIMULT_START)) != 0) {
