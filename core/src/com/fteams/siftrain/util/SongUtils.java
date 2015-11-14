@@ -76,4 +76,8 @@ public class SongUtils {
     public static int getPositionForMode(int mode, int position) {
         return positionForMode[mode - 1][position];
     }
+
+    public static int compare(int x, int y) {
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+    }
 }

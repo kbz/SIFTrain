@@ -31,7 +31,7 @@ public class CircleMark implements Comparable<CircleMark> {
         if (this.spawnTime != o.spawnTime) {
             return Float.compare(spawnTime, o.spawnTime);
         }
-        return Integer.compare(destination, o.destination);
+        return SongUtils.compare(destination, o.destination);
 
     }
 
