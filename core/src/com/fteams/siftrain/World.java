@@ -77,7 +77,9 @@ public class World {
             }
             if (GlobalConfiguration.playbackRate != null) {
                 copy.timing_sec = copy.timing_sec / GlobalConfiguration.playbackRate;
-
+                if ((copy.effect & SongUtils.NOTE_TYPE_HOLD) != 0 && copy.effect_value != null) {
+                    copy.effect_value = copy.effect_value / GlobalConfiguration.playbackRate;
+                }
             }
             CircleMark mark = new CircleMark(x, y, copy, noteSpeed, delay);
             marks.add(mark);
