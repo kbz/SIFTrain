@@ -173,6 +173,9 @@ public class WorldController implements Music.OnCompletionListener {
     }
 
     private float calculateNormalizedAccuracy() {
+        if (accuracyList.size() == 0)
+            return 0f;
+
         float sum = 0f;
         for (CircleMark.Accuracy accuracy : accuracyList) {
             sum += Results.getAccuracyMultiplierForAccuracy(accuracy);
@@ -316,6 +319,9 @@ public class WorldController implements Music.OnCompletionListener {
     }
 
     private float calculateAccuracy() {
+        if (world.getAccuracyMarkers().size == 0)
+            return 0f;
+
         float sum = 0f;
         List<Float> high = new ArrayList<>();
         List<Float> low = new ArrayList<>();
@@ -339,6 +345,9 @@ public class WorldController implements Music.OnCompletionListener {
     }
 
     private float calcAverage(List<Float> values) {
+        if (values.size() == 0)
+            return 0;
+
         float sum = 0;
         for (Float value : values) {
             sum += value;
