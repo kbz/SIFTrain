@@ -346,9 +346,9 @@ public class WorldController implements Music.OnCompletionListener {
 
     private float calcAverage(List<Float> values) {
         if (values.size() == 0)
-            return 0;
+            return 0f;
 
-        float sum = 0;
+        float sum = 0f;
         for (Float value : values) {
             sum += value;
         }
@@ -434,6 +434,7 @@ public class WorldController implements Music.OnCompletionListener {
         }
     }
 
+    //TODO calculate feedbackVolume somewhere else
     private void playSoundForAccuracy(CircleMark.Accuracy accuracy) {
         if (accuracy == CircleMark.Accuracy.PERFECT) {
 
@@ -511,13 +512,15 @@ public class WorldController implements Music.OnCompletionListener {
         float relativeAngle = (float) Math.acos(relativeX / relativeDistance);
 
         int matchedId = -1;
+        float piDiv16 = (float) Math.PI / 16;
         for (TapZone zone : tapZones) {
-            float x = zone.getPosition().x;
-            float y = zone.getPosition().y;
-            float tapZoneDistance = (float) Math.sqrt(x * x + y * y);
-            if (tapZoneDistance - circleRadius * 2 < relativeDistance && relativeDistance < tapZoneDistance + circleRadius * 2) {
-                float tapAngle = (float) Math.acos(x / tapZoneDistance);
-                if (tapAngle - Math.PI / 16 < relativeAngle && relativeAngle < tapAngle + Math.PI / 16 && relativeY < circleRadius) {
+            float tapZoneDistance = zone.getTapZoneDistance();
+            float circleDiameter = circleRadius * 2;
+
+            if (tapZoneDistance - circleDiameter < relativeDistance && relativeDistance < tapZoneDistance + circleDiameter) {
+                float tapAngle = zone.getTapAngle();
+
+                if (tapAngle - piDiv16 < relativeAngle && relativeAngle < tapAngle + piDiv16 && relativeY < circleRadius) {
                     matchedId = zone.getId();
                     zone.setState(TapZone.State.STATE_PRESSED, true);
                     pointerToZoneId.put(pointer, matchedId);
