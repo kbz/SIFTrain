@@ -10,6 +10,9 @@ public class TapZone {
         this.position.x = x;
         this.position.y = y;
 
+        this.tapZoneDistance = (float) Math.sqrt(x * x + y * y);
+        this.tapAngle = (float) Math.acos(x / this.tapZoneDistance);
+
         stateMap.put(State.STATE_PRESSED, false);
         stateMap.put(State.STATE_WARN, false);
     }
@@ -40,7 +43,18 @@ public class TapZone {
     Integer id;
     public float touchTime = -1f;
 
+    float tapZoneDistance;
+    float tapAngle;
+
     public Vector2 getPosition() {
         return position;
+    }
+
+    public float getTapZoneDistance() {
+        return tapZoneDistance;
+    }
+
+    public float getTapAngle() {
+        return tapAngle;
     }
 }

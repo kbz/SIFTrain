@@ -34,16 +34,17 @@ public class Results {
 
     public static Accuracy getAccuracyFor(float timing) {
         // Perfect
-        if (Math.abs(timing) < SongUtils.overallDiffPerfect[GlobalConfiguration.overallDifficulty] / 1000) {
+        float absTiming = Math.abs(timing);
+        if (absTiming < SongUtils.overallDiffPerfect[GlobalConfiguration.overallDifficulty]/ 1000) {
             return Accuracy.PERFECT;
         }
-        if (Math.abs(timing) < SongUtils.overallDiffGreat[GlobalConfiguration.overallDifficulty]/ 1000) {
+        if (absTiming < SongUtils.overallDiffGreat[GlobalConfiguration.overallDifficulty]/ 1000) {
             return Accuracy.GREAT;
         }
-        if (Math.abs(timing) < SongUtils.overallDiffNice[GlobalConfiguration.overallDifficulty]/ 1000) {
+        if (absTiming < SongUtils.overallDiffNice[GlobalConfiguration.overallDifficulty]/ 1000) {
             return Accuracy.GOOD;
         }
-        if (Math.abs(timing) < SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty]/ 1000) {
+        if (absTiming < SongUtils.overallDiffBad[GlobalConfiguration.overallDifficulty]/ 1000) {
             return Accuracy.BAD;
         }
         return Accuracy.MISS;

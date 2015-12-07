@@ -145,7 +145,8 @@ public class WorldRenderer {
         if (!world.paused) {
             drawAccuracy();
         }
-        if (world.paused) {
+//        if (world.paused) {
+        else {
             drawTapToContinue();
         }
         renderer.end();
