@@ -434,19 +434,17 @@ public class WorldController implements Music.OnCompletionListener {
         }
     }
 
-    //TODO calculate feedbackVolume somewhere else
     private void playSoundForAccuracy(CircleMark.Accuracy accuracy) {
         if (accuracy == CircleMark.Accuracy.PERFECT) {
-
             Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 100f);
         }
-        if (accuracy == CircleMark.Accuracy.GREAT) {
+        else if (accuracy == CircleMark.Accuracy.GREAT) {
             Assets.greatSound.play(GlobalConfiguration.feedbackVolume / 100f);
         }
-        if (accuracy == CircleMark.Accuracy.GOOD) {
+        else if (accuracy == CircleMark.Accuracy.GOOD) {
             Assets.goodSound.play(GlobalConfiguration.feedbackVolume / 100f);
         }
-        if (accuracy == CircleMark.Accuracy.BAD) {
+        else if (accuracy == CircleMark.Accuracy.BAD) {
             Assets.badSound.play(GlobalConfiguration.feedbackVolume / 100f);
         }
     }
@@ -508,14 +506,14 @@ public class WorldController implements Music.OnCompletionListener {
         float relativeY = (-screenY + centerY) / ppuY;
 
         float circleRadius = 400 * 0.1f;
+        float circleDiameter = circleRadius * 2;
+        float piDiv16 = (float) Math.PI / 16;
         float relativeDistance = (float) Math.sqrt(relativeX * relativeX + relativeY * relativeY);
         float relativeAngle = (float) Math.acos(relativeX / relativeDistance);
 
         int matchedId = -1;
-        float piDiv16 = (float) Math.PI / 16;
         for (TapZone zone : tapZones) {
             float tapZoneDistance = zone.getTapZoneDistance();
-            float circleDiameter = circleRadius * 2;
 
             if (tapZoneDistance - circleDiameter < relativeDistance && relativeDistance < tapZoneDistance + circleDiameter) {
                 float tapAngle = zone.getTapAngle();
@@ -524,6 +522,8 @@ public class WorldController implements Music.OnCompletionListener {
                     matchedId = zone.getId();
                     zone.setState(TapZone.State.STATE_PRESSED, true);
                     pointerToZoneId.put(pointer, matchedId);
+
+                    break;
                 }
             }
         }
@@ -546,7 +546,7 @@ public class WorldController implements Music.OnCompletionListener {
                     processAccuracy(accuracy, null, false);
                     leftMark = !leftMark;
                 }
-                if (mark.hold && accuracy.compareTo(CircleMark.Accuracy.GOOD) <= 0) {
+                else if (accuracy.compareTo(CircleMark.Accuracy.GOOD) <= 0) {
                     if (combo > largestCombo) {
                         largestCombo = combo;
                     }
@@ -624,13 +624,20 @@ public class WorldController implements Music.OnCompletionListener {
                 this.onCompletion(theSong);
             }
         }
-        if (done && !hasMusic) {
-            this.onCompletion(null);
-        }
-        if (time > world.getDuration() / (GlobalConfiguration.playbackRate == null ? 1.0f : GlobalConfiguration.playbackRate) + world.delay) {
-            if (!hasMusic)
+
+//        if (done && !hasMusic) {
+//            this.onCompletion(null);
+//        }
+//        if (time > world.getDuration() / (GlobalConfiguration.playbackRate == null ? 1.0f : GlobalConfiguration.playbackRate) + world.delay) {
+//            if (!hasMusic)
+//                this.onCompletion(null);
+//        }
+        if (!hasMusic) {
+            if (done || (time > world.getDuration() / (GlobalConfiguration.playbackRate == null ? 1.0f : GlobalConfiguration.playbackRate) + world.delay)) {
                 this.onCompletion(null);
+            }
         }
+
     }
 
     public void back() {
