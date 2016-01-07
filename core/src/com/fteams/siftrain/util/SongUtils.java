@@ -32,6 +32,8 @@ public class SongUtils {
     public final static String[] randomModes = {"Old mode", "New mode", "Keep Sides mode", "Mirrored Keep Sides mode", "Simple mode", "Extreme mode"};
     public final static String[] syncModes = {"Default", "Constant Sync", "Initial Sync", "Disabled"};
 
+    public final static String[] tapsound_modes = {"Default", "Threaded"};
+
     public final static Long[] noteSpeeds = {1800L, 1680L, 1560L, 1440L, 1320L, 1200L, 1050L, 900L, 750L, 600L, 450L};
     public final static Double[] overallDiffPerfect = {79.5, 73.5, 67.5, 61.5, 56.5, 49.5, 43.5, 37.5, 31.5, 25.5, 19.5}; // -6
     public final static Double[] overallDiffGreat = {139.5, 131.5, 123.5, 115.5, 107.5, 99.5, 91.5, 83.5, 75.5, 67.5, 59.5}; // -8

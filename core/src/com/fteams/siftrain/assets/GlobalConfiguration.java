@@ -26,6 +26,8 @@ public class GlobalConfiguration {
     public static int randomMode;
     // sync config
     public static int syncMode;
+    // tapsound config
+    public static int tapsoundMode;
 
     // other - per session configs
     public static boolean random;
@@ -55,7 +57,8 @@ public class GlobalConfiguration {
         randomMode = prefs.getInteger("random_mode", SongUtils.RANDOM_MODE_NEW);
         // sync mode
         syncMode = prefs.getInteger("sync_mode", SongUtils.SYNC_MODE_1);
-
+        // tapsound config
+        tapsoundMode = prefs.getInteger("tapsound_mode", 0);
     }
 
     public static void storeConfiguration() {
@@ -72,6 +75,7 @@ public class GlobalConfiguration {
         prefs.putInteger("random_mode", randomMode);
         prefs.putInteger("sorting_order", sortOrder);
         prefs.putInteger("sync_mode", syncMode);
+        prefs.putInteger("tapsound_mode", tapsoundMode);
         prefs.flush();
     }
 }

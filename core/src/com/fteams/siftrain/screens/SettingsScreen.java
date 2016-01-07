@@ -67,6 +67,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private CheckBox sortingModeChooser;
     private CheckBox randomModeChooser;
     private CheckBox sortingOrderChooser;
+    private CheckBox tapsoundModeChooser;
 
     private String[] sortingModes = {"File Name", "Song Name"};
     private String[] sortingOrders = {"Ascending", "Descending"};
@@ -89,6 +90,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
     private Integer newSyncMode;
     private Integer newNoteSpeed;
     private Integer newOverallDifficulty;
+    private Integer newTapsoundMode;
 
     @Override
     public void show() {
@@ -113,6 +115,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         newSortingOrder = GlobalConfiguration.sortOrder;
         newRandomMode = GlobalConfiguration.randomMode;
         newSyncMode = GlobalConfiguration.syncMode;
+        newTapsoundMode = GlobalConfiguration.tapsoundMode;
 
         ButtonGroup<TextButton> buttonGroup = new ButtonGroup<>();
         buttonGroup.add(volumeSettingsTabButton);
@@ -301,6 +304,12 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         randomModeChooser.getImageCell().width(0);
         randomModeChooser.addListener(this);
 
+        // extras - tapsound mode
+        tapsoundModeChooser = new CheckBox("Tap Sound Mode: " + SongUtils.tapsound_modes[GlobalConfiguration.tapsoundMode], Assets.menuSkin);
+        tapsoundModeChooser.getLabel().setFontScale(fontScale);
+        tapsoundModeChooser.getImageCell().width(0);
+        tapsoundModeChooser.addListener(this);
+
         final Table otherTable = new Table();
 
         otherTable.setHeight(stage.getHeight() * 0.7f);
@@ -311,6 +320,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         otherTable.add(sortingModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add(sortingOrderChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add(randomModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
+        otherTable.add(tapsoundModeChooser).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
         otherTable.add().expand().fill().row();
         otherTable.add(reloadBeatmaps).padTop(stage.getHeight() * 0.01f).padBottom(stage.getHeight() * 0.01f).left().row();
 
@@ -360,6 +370,7 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
                 GlobalConfiguration.sortMode = newSortingMode;
                 GlobalConfiguration.sortOrder = newSortingOrder;
                 GlobalConfiguration.randomMode = newRandomMode;
+                GlobalConfiguration.tapsoundMode = newTapsoundMode;
                 GlobalConfiguration.syncMode = newSyncMode;
                 GlobalConfiguration.storeConfiguration();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen());
@@ -452,6 +463,10 @@ public class SettingsScreen extends ChangeListener implements Screen, InputProce
         if (actor == syncModeCheckbox) {
             newSyncMode = (newSyncMode + 1) % 4;
             syncModeCheckbox.setText("Sync Mode: " + SongUtils.syncModes[newSyncMode]);
+        }
+        if (actor == tapsoundModeChooser) {
+            newTapsoundMode = (newTapsoundMode + 1) % SongUtils.tapsound_modes.length;
+            tapsoundModeChooser.setText("Tap Sound Mode: " + SongUtils.tapsound_modes[newTapsoundMode]);
         }
         if (actor == offsetValueLabel) {
             Input.TextInputListener listener = new Input.TextInputListener() {
