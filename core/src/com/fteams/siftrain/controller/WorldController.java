@@ -435,19 +435,41 @@ public class WorldController implements Music.OnCompletionListener {
     }
 
     private void playSoundForAccuracy(CircleMark.Accuracy accuracy) {
-        if (accuracy == CircleMark.Accuracy.PERFECT) {
-
-            Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 100f);
+//        long time = System.currentTimeMillis();
+        if (GlobalConfiguration.tapsoundMode == 0) {
+//            System.out.println("classic tapsound plays");
+            if (accuracy == CircleMark.Accuracy.PERFECT) {
+                Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 100f);
+            } else if (accuracy == CircleMark.Accuracy.GREAT) {
+                Assets.greatSound.play(GlobalConfiguration.feedbackVolume / 100f);
+            } else if (accuracy == CircleMark.Accuracy.GOOD) {
+                Assets.goodSound.play(GlobalConfiguration.feedbackVolume / 100f);
+            } else if (accuracy == CircleMark.Accuracy.BAD) {
+                Assets.badSound.play(GlobalConfiguration.feedbackVolume / 100f);
+            }
+//        } else if (GlobalConfiguration.tapsoundMode == 1){
+        } else {
+//            System.out.println("threadded tapsound plays");
+            final CircleMark.Accuracy ac = accuracy;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (ac == CircleMark.Accuracy.PERFECT) {
+                        Assets.perfectSound.play(GlobalConfiguration.feedbackVolume / 100f);
+                    }
+                    else if (ac == CircleMark.Accuracy.GREAT) {
+                        Assets.greatSound.play(GlobalConfiguration.feedbackVolume / 100f);
+                    }
+                    else if (ac == CircleMark.Accuracy.GOOD) {
+                        Assets.goodSound.play(GlobalConfiguration.feedbackVolume / 100f);
+                    }
+                    else if (ac == CircleMark.Accuracy.BAD) {
+                        Assets.badSound.play(GlobalConfiguration.feedbackVolume / 100f);
+                    }
+                }
+            }).start();
         }
-        if (accuracy == CircleMark.Accuracy.GREAT) {
-            Assets.greatSound.play(GlobalConfiguration.feedbackVolume / 100f);
-        }
-        if (accuracy == CircleMark.Accuracy.GOOD) {
-            Assets.goodSound.play(GlobalConfiguration.feedbackVolume / 100f);
-        }
-        if (accuracy == CircleMark.Accuracy.BAD) {
-            Assets.badSound.play(GlobalConfiguration.feedbackVolume / 100f);
-        }
+//        System.out.println("tapsound play time: " + (System.currentTimeMillis() - time));
     }
 
     public void pressed(int screenX, int screenY, int pointer, int button, float ppuX, float ppuY, int width, int height) {
