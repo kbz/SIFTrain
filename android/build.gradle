@@ -1,8 +1,8 @@
 apply plugin: "android"
 
 android {
-    buildToolsVersion "22.0.1"
-    compileSdkVersion 22
+    buildToolsVersion "23.0.2"
+    compileSdkVersion 23
     lintOptions {
         abortOnError false
     }

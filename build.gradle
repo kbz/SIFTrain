@@ -46,6 +46,8 @@ project(":android") {
     dependencies {
         compile project(":core")
         compile "com.google.code.gson:gson:2.3.1"
+        compile "com.android.support:support-v4:23.1.1"
+        compile "com.android.support:appcompat-v7:23.1.1"
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
